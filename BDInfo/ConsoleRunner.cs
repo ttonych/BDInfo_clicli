@@ -512,36 +512,30 @@ namespace BDInfo
             }
             else if (options.PlaylistNames.Count > 0)
             {
+                var seenPlaylists = new HashSet<TSPlaylistFile>();
                 foreach (string name in options.PlaylistNames)
                 {
-                    string normalized = NormalizePlaylistName(name);
-                    if (string.IsNullOrEmpty(normalized))
-                    {
-                        continue;
-                    }
-
-                    if (!playlistMap.TryGetValue(normalized, out TSPlaylistFile playlist))
-                    {
-                        playlist = playlistMap.Values.FirstOrDefault(p => string.Equals(p?.Name, normalized, StringComparison.OrdinalIgnoreCase));
-                    }
+                    IReadOnlyList<string> candidates = GetPlaylistNameCandidates(name);
+                    TSPlaylistFile playlist = ResolvePlaylistByCandidates(playlistMap, candidates);
+                    string displayName = GetPlaylistDisplayName(candidates, name);
 
                     if (playlist != null)
                     {
                         if (playlist.IsValid)
                         {
-                            if (!playlists.Contains(playlist))
+                            if (seenPlaylists.Add(playlist))
                             {
                                 playlists.Add(playlist);
                             }
                         }
                         else
                         {
-                            Console.Error.WriteLine(string.Format(CultureInfo.InvariantCulture, "Playlist {0} is filtered out by the current settings.", normalized));
+                            Console.Error.WriteLine(string.Format(CultureInfo.InvariantCulture, "Playlist {0} is filtered out by the current settings.", displayName));
                         }
                     }
-                    else
+                    else if (!string.IsNullOrEmpty(displayName))
                     {
-                        Console.Error.WriteLine(string.Format(CultureInfo.InvariantCulture, "Playlist {0} was not found on the disc.", normalized));
+                        Console.Error.WriteLine(string.Format(CultureInfo.InvariantCulture, "Playlist {0} was not found on the disc.", displayName));
                     }
                 }
             }
@@ -587,6 +581,136 @@ namespace BDInfo
             baseName = baseName.ToUpperInvariant();
 
             return string.Format(CultureInfo.InvariantCulture, "{0}.MPLS", baseName);
+        }
+
+        private static IReadOnlyList<string> GetPlaylistNameCandidates(string name)
+        {
+            var results = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return results;
+            }
+
+            string trimmed = name.Trim();
+
+            void AddCandidate(string candidate)
+            {
+                if (string.IsNullOrWhiteSpace(candidate))
+                {
+                    return;
+                }
+
+                string trimmedCandidate = candidate.Trim();
+                if (trimmedCandidate.Length == 0)
+                {
+                    return;
+                }
+
+                string normalizedCandidate = trimmedCandidate.ToUpperInvariant();
+                if (seen.Add(normalizedCandidate))
+                {
+                    results.Add(normalizedCandidate);
+                }
+            }
+
+            AddCandidate(trimmed);
+
+            string fileName = Path.GetFileName(trimmed);
+            AddCandidate(fileName);
+
+            string baseName = Path.GetFileNameWithoutExtension(fileName);
+            AddCandidate(baseName);
+
+            if (!string.IsNullOrEmpty(baseName))
+            {
+                AddCandidate(baseName + ".MPLS");
+
+                if (baseName.All(char.IsDigit))
+                {
+                    string padded = baseName.PadLeft(5, '0');
+                    AddCandidate(padded);
+                    AddCandidate(padded + ".MPLS");
+
+                    string unpadded = baseName.TrimStart('0');
+                    if (unpadded.Length == 0 && baseName.Length > 0)
+                    {
+                        unpadded = "0";
+                    }
+
+                    AddCandidate(unpadded);
+                    AddCandidate(unpadded + ".MPLS");
+                }
+            }
+
+            string normalized = NormalizePlaylistName(trimmed);
+            AddCandidate(normalized);
+
+            return results;
+        }
+
+        private static TSPlaylistFile ResolvePlaylistByCandidates(Dictionary<string, TSPlaylistFile> playlistMap, IReadOnlyList<string> candidates)
+        {
+            if (playlistMap == null || playlistMap.Count == 0 || candidates == null || candidates.Count == 0)
+            {
+                return null;
+            }
+
+            foreach (string candidate in candidates)
+            {
+                if (playlistMap.TryGetValue(candidate, out TSPlaylistFile playlist) && playlist != null)
+                {
+                    return playlist;
+                }
+            }
+
+            foreach (TSPlaylistFile playlist in playlistMap.Values)
+            {
+                if (playlist == null)
+                {
+                    continue;
+                }
+
+                string playlistName = playlist.Name ?? string.Empty;
+                string playlistBase = Path.GetFileNameWithoutExtension(playlistName) ?? string.Empty;
+
+                foreach (string candidate in candidates)
+                {
+                    if (string.Equals(playlistName, candidate, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return playlist;
+                    }
+
+                    if (!string.IsNullOrEmpty(playlistBase) && string.Equals(playlistBase, candidate, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return playlist;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static string GetPlaylistDisplayName(IReadOnlyList<string> candidates, string originalName)
+        {
+            if (candidates != null && candidates.Count > 0)
+            {
+                return candidates[0];
+            }
+
+            string normalized = NormalizePlaylistName(originalName);
+            if (!string.IsNullOrEmpty(normalized))
+            {
+                return normalized;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalName))
+            {
+                return originalName.Trim();
+            }
+
+            return string.Empty;
         }
 
         private static List<TSStreamFile> SelectStreamFiles(BDROM bdrom, IEnumerable<TSPlaylistFile> playlists, bool wholeDisc)
