@@ -225,7 +225,7 @@ namespace BDInfo
             // buttonOpenSavedReport
             //
             this.buttonOpenSavedReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOpenSavedReport.Location = new System.Drawing.Point(599, 548);
+            this.buttonOpenSavedReport.Location = new System.Drawing.Point(551, 548);
             this.buttonOpenSavedReport.Name = "buttonOpenSavedReport";
             this.buttonOpenSavedReport.Size = new System.Drawing.Size(108, 23);
             this.buttonOpenSavedReport.TabIndex = 13;

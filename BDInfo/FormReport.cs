@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace BDInfo
@@ -28,6 +29,9 @@ namespace BDInfo
     public partial class FormReport : Form
     {
         private List<TSPlaylistFile> Playlists;
+        private SavedReportData SavedReport;
+        private SavedPlaylistSelection SavedPlaylistSelection => comboBoxPlaylist.SelectedItem as SavedPlaylistSelection;
+        private SavedVideoStreamSelection SavedStreamSelection => comboBoxStream.SelectedItem as SavedVideoStreamSelection;
 
         public string ReportText
         {
@@ -45,6 +49,7 @@ namespace BDInfo
             ScanBDROMResult scanResult)
         {
             Playlists = playlists;
+            SavedReport = null;
 
             comboBoxPlaylist.Enabled = true;
             comboBoxAngle.Enabled = true;
@@ -53,6 +58,7 @@ namespace BDInfo
             buttonChart.Enabled = true;
 
             StreamWriter reportFile = null;
+            string autosavePath = null;
             if (BDInfoSettings.AutosaveReport)
             {
                 string reportName = string.Format(  CultureInfo.InvariantCulture,
@@ -60,8 +66,9 @@ namespace BDInfo
                                                     BDROM.VolumeLabel);
 
                 reportName = ToolBox.GetSafeFileName(reportName);
-                
-                reportFile = File.CreateText(Path.Combine(Environment.CurrentDirectory, reportName));
+
+                autosavePath = Path.Combine(Environment.CurrentDirectory, reportName);
+                reportFile = File.CreateText(autosavePath);
             }
             textBoxReport.Text = "";
 
@@ -1121,6 +1128,17 @@ namespace BDInfo
                 reportFile.Close();
             }
 
+            if (!string.IsNullOrEmpty(autosavePath))
+            {
+                try
+                {
+                    ReportPersistence.Save(autosavePath, BDROM, playlists);
+                }
+                catch
+                {
+                }
+            }
+
             textBoxReport.Select(0, 0);
             comboBoxPlaylist.SelectedIndex = 0;
             comboBoxChartType.SelectedIndex = 0;
@@ -1129,6 +1147,7 @@ namespace BDInfo
         public void LoadSavedReport(string filePath)
         {
             Playlists = null;
+            SavedReport = null;
 
             comboBoxPlaylist.Items.Clear();
             comboBoxAngle.Items.Clear();
@@ -1144,6 +1163,39 @@ namespace BDInfo
             {
                 textBoxReport.Text = File.ReadAllText(filePath);
                 Text = string.Format(CultureInfo.InvariantCulture, "BDInfo Report - {0}", Path.GetFileName(filePath));
+
+                SavedReport = ReportPersistence.Load(filePath);
+                if (SavedReport != null && SavedReport.Playlists.Count > 0)
+                {
+                    foreach (SavedPlaylistData playlist in SavedReport.Playlists)
+                    {
+                        comboBoxPlaylist.Items.Add(new SavedPlaylistSelection(playlist));
+                    }
+
+                    if (comboBoxPlaylist.Items.Count > 0)
+                    {
+                        comboBoxPlaylist.Enabled = true;
+                        comboBoxChartType.Enabled = true;
+                        comboBoxPlaylist.SelectedIndex = 0;
+
+                        bool hasStreams = SavedReport.Playlists.Any(p => p.VideoStreams.Count > 0);
+                        bool hasChartData = SavedReport.Playlists.Any(p =>
+                            p.VideoStreams.Any(stream =>
+                                p.Clips.Any(clip =>
+                                    clip.Diagnostics.ContainsKey(stream.PID) &&
+                                    clip.Diagnostics[stream.PID] != null &&
+                                    clip.Diagnostics[stream.PID].Count > 0)));
+
+                        comboBoxAngle.Enabled = hasStreams;
+                        comboBoxStream.Enabled = hasStreams;
+                        buttonChart.Enabled = hasChartData;
+
+                        if (comboBoxChartType.Items.Count > 0)
+                        {
+                            comboBoxChartType.SelectedIndex = 0;
+                        }
+                    }
+                }
             }
             catch
             {
@@ -1182,6 +1234,12 @@ namespace BDInfo
                 return;
             }
 
+            if (SavedPlaylistSelection != null)
+            {
+                PopulateSavedPlaylist(SavedPlaylistSelection.Data);
+                return;
+            }
+
             TSPlaylistFile playlist = (TSPlaylistFile)comboBoxPlaylist.SelectedItem;
 
             comboBoxAngle.Items.Clear();
@@ -1206,26 +1264,37 @@ namespace BDInfo
         }
 
         private void buttonChart_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
-            if (Playlists == null ||
-                comboBoxPlaylist.SelectedItem == null ||
-                comboBoxStream.SelectedItem == null ||
-                comboBoxAngle.SelectedItem == null ||
+            if (comboBoxAngle.SelectedItem == null ||
                 comboBoxChartType.SelectedItem == null)
             {
                 return;
             }
 
-            TSPlaylistFile playlist = 
+            int angleIndex = (int)comboBoxAngle.SelectedItem;
+            string chartType = comboBoxChartType.SelectedItem.ToString();
+
+            if (SavedReport != null && SavedPlaylistSelection != null && SavedStreamSelection != null)
+            {
+                FormChart savedChart = new FormChart();
+                savedChart.Generate(chartType, SavedReport, SavedPlaylistSelection.Data, SavedStreamSelection.Data, angleIndex);
+                savedChart.Show();
+                return;
+            }
+
+            if (Playlists == null ||
+                comboBoxPlaylist.SelectedItem == null ||
+                comboBoxStream.SelectedItem == null)
+            {
+                return;
+            }
+
+            TSPlaylistFile playlist =
                 (TSPlaylistFile)comboBoxPlaylist.SelectedItem;
             TSVideoStream videoStream =
                 (TSVideoStream)comboBoxStream.SelectedItem;
-            int angleIndex =
-                (int)comboBoxAngle.SelectedItem;
-            string chartType =
-                comboBoxChartType.SelectedItem.ToString();
 
             FormChart chart = new FormChart();
             chart.Generate(
@@ -1235,10 +1304,66 @@ namespace BDInfo
         }
 
         private void FormReport_FormClosed(
-            object sender, 
+            object sender,
             FormClosedEventArgs e)
         {
             GC.Collect();
+        }
+
+        private sealed class SavedPlaylistSelection
+        {
+            public SavedPlaylistSelection(SavedPlaylistData data)
+            {
+                Data = data ?? throw new ArgumentNullException(nameof(data));
+            }
+
+            public SavedPlaylistData Data { get; }
+
+            public override string ToString()
+            {
+                return Data.Name;
+            }
+        }
+
+        private void PopulateSavedPlaylist(SavedPlaylistData playlist)
+        {
+            comboBoxAngle.Items.Clear();
+            int maxAngle = Math.Max(0, playlist.AngleCount);
+            for (int i = 0; i <= maxAngle; i++)
+            {
+                comboBoxAngle.Items.Add(i);
+            }
+
+            if (comboBoxAngle.Items.Count > 0)
+            {
+                comboBoxAngle.SelectedIndex = 0;
+            }
+
+            comboBoxStream.Items.Clear();
+            foreach (SavedVideoStreamData stream in playlist.VideoStreams)
+            {
+                comboBoxStream.Items.Add(new SavedVideoStreamSelection(stream));
+            }
+
+            if (comboBoxStream.Items.Count > 0)
+            {
+                comboBoxStream.SelectedIndex = 0;
+            }
+        }
+
+        private sealed class SavedVideoStreamSelection
+        {
+            public SavedVideoStreamSelection(SavedVideoStreamData data)
+            {
+                Data = data ?? throw new ArgumentNullException(nameof(data));
+            }
+
+            public SavedVideoStreamData Data { get; }
+
+            public override string ToString()
+            {
+                return Data.DisplayName;
+            }
         }
     }
 }

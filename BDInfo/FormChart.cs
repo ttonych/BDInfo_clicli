@@ -91,33 +91,7 @@ namespace BDInfo
             ushort PID,
             int angleIndex)
         {
-            this.Text = string.Format("{0}: {1}", playlist.Name, chartType);
-            GraphControl.GraphPane.Title.Text = chartType;
-            GraphControl.IsEnableHEdit = false;
-            GraphControl.IsEnableVEdit = false;
-            GraphControl.IsEnableVPan = false;
-            GraphControl.IsEnableVZoom = false;
-            GraphControl.IsShowHScrollBar = true;
-            GraphControl.IsAutoScrollRange = true;
-            GraphControl.IsEnableHPan = true;
-            GraphControl.IsEnableHZoom = true;
-            GraphControl.IsEnableSelection = true;
-            GraphControl.IsEnableWheelZoom = true;
-            GraphControl.GraphPane.Legend.IsVisible = false;
-            GraphControl.GraphPane.XAxis.Scale.IsUseTenPower = false;
-            GraphControl.GraphPane.YAxis.Scale.IsUseTenPower = false;
-
-            if (BDInfoSettings.UseImagePrefix)
-            {
-                DefaultFileName = BDInfoSettings.UseImagePrefixValue;
-            }
-            else
-            {
-                DefaultFileName = string.Format(
-                    "{0}-{1}-",
-                    FixVolumeLabel(playlist.BDROM.VolumeLabel),
-                    Path.GetFileNameWithoutExtension(playlist.Name));
-            }
+            PrepareGraph(chartType, playlist.BDROM?.VolumeLabel, playlist.Name);
 
             switch (chartType)
             {
@@ -147,6 +121,96 @@ namespace BDInfo
                     break;
             }
             DefaultFileName += ".png";
+        }
+
+        private void PrepareGraph(string chartType, string volumeLabel, string playlistName)
+        {
+            this.Text = string.Format("{0}: {1}", playlistName, chartType);
+            GraphControl.GraphPane.Title.Text = chartType;
+            GraphControl.IsEnableHEdit = false;
+            GraphControl.IsEnableVEdit = false;
+            GraphControl.IsEnableVPan = false;
+            GraphControl.IsEnableVZoom = false;
+            GraphControl.IsShowHScrollBar = true;
+            GraphControl.IsAutoScrollRange = true;
+            GraphControl.IsEnableHPan = true;
+            GraphControl.IsEnableHZoom = true;
+            GraphControl.IsEnableSelection = true;
+            GraphControl.IsEnableWheelZoom = true;
+            GraphControl.GraphPane.Legend.IsVisible = false;
+            GraphControl.GraphPane.XAxis.Scale.IsUseTenPower = false;
+            GraphControl.GraphPane.YAxis.Scale.IsUseTenPower = false;
+
+            if (BDInfoSettings.UseImagePrefix)
+            {
+                DefaultFileName = BDInfoSettings.UseImagePrefixValue;
+            }
+            else
+            {
+                string safeLabel = string.IsNullOrWhiteSpace(volumeLabel) ? "REPORT" : volumeLabel;
+                DefaultFileName = string.Format(
+                    "{0}-{1}-",
+                    FixVolumeLabel(safeLabel),
+                    Path.GetFileNameWithoutExtension(playlistName));
+            }
+        }
+
+        public void Generate(
+            string chartType,
+            SavedReportData report,
+            SavedPlaylistData playlist,
+            SavedVideoStreamData stream,
+            int angleIndex)
+        {
+            string volumeLabel = report?.VolumeLabel ?? string.Empty;
+            PrepareGraph(chartType, volumeLabel, playlist.Name);
+
+            switch (chartType)
+            {
+                case "Video Bitrate: 1-Second Window":
+                    GenerateWindowChart(playlist, stream, angleIndex, 1);
+                    DefaultFileName += "bitrate-01s";
+                    break;
+                case "Video Bitrate: 5-Second Window":
+                    GenerateWindowChart(playlist, stream, angleIndex, 5);
+                    DefaultFileName += "bitrate-05s";
+                    break;
+                case "Video Bitrate: 10-Second Window":
+                    GenerateWindowChart(playlist, stream, angleIndex, 10);
+                    DefaultFileName += "bitrate-10s";
+                    break;
+                case "Video Frame Size (Min / Max)":
+                    GenerateFrameSizeChart(playlist, stream, angleIndex);
+                    DefaultFileName += "frame-size";
+                    break;
+                case "Video Frame Type Counts":
+                    GenerateFrameTypeChart(playlist, stream, angleIndex, false);
+                    DefaultFileName += "frame-type-count";
+                    break;
+                case "Video Frame Type Sizes":
+                    GenerateFrameTypeChart(playlist, stream, angleIndex, true);
+                    DefaultFileName += "frame-type-size";
+                    break;
+            }
+
+            DefaultFileName += ".png";
+        }
+
+        private static List<SavedStreamDiagnosticsData> GetDiagnostics(
+            SavedStreamClipData clip,
+            ushort pid)
+        {
+            if (clip.Diagnostics == null)
+            {
+                return null;
+            }
+
+            if (clip.Diagnostics.ContainsKey(pid))
+            {
+                return clip.Diagnostics[pid];
+            }
+
+            return null;
         }
 
         public string SaveChartImage(
@@ -240,6 +304,148 @@ namespace BDInfo
                         diag.Marker -
                         clip.TimeIn +
                         clip.RelativeTimeIn;
+
+                    double seconds = diag.Interval;
+                    double bits = diag.Bytes * 8.0;
+
+                    windowSecondsSum += seconds;
+                    windowSeconds.Enqueue(seconds);
+                    windowBitsSum += bits;
+                    windowBits.Enqueue(bits);
+
+                    if (windowSecondsSum > windowSize)
+                    {
+                        double bitrate = windowBitsSum / windowSecondsSum / 1000000;
+
+                        if (bitrate < pointMin) pointMin = bitrate;
+                        if (bitrate > pointMax) pointMax = bitrate;
+                        pointCount++; pointAvg += bitrate;
+
+                        for (double x = pointSeconds; x < (pointPosition - 1); x++)
+                        {
+                            double pointX = (x - 1) / 60;
+                            pointsMin.Add(pointX, 0);
+                            pointsAvg.Add(pointX, 0);
+                            pointsMax.Add(pointX, 0);
+                            pointSeconds += 1;
+                        }
+
+                        if (pointPosition >= pointSeconds)
+                        {
+                            double pointMinutes = (pointSeconds - 1) / 60;
+                            pointsMin.Add(pointMinutes, pointMin);
+                            pointsMax.Add(pointMinutes, pointMax);
+                            pointsAvg.Add(pointMinutes, pointAvg / pointCount);
+                            pointMin = double.MaxValue;
+                            pointMax = 0;
+                            pointAvg = 0;
+                            pointCount = 0;
+                            pointSeconds += 1;
+                        }
+
+                        windowBitsSum -= windowBits.Dequeue();
+                        windowSecondsSum -= windowSeconds.Dequeue();
+                    }
+
+                    if (pointPosition >= pointSeconds)
+                    {
+                        for (double x = pointSeconds; x < (pointPosition - 1); x++)
+                        {
+                            double pointX = (x - 1) / 60;
+                            pointsMin.Add(pointX, 0);
+                            pointsAvg.Add(pointX, 0);
+                            pointsMax.Add(pointX, 0);
+                            pointSeconds += 1;
+                        }
+                        double pointMinutes = (pointSeconds - 1) / 60;
+                        pointsMin.Add(pointMinutes, pointMin);
+                        pointsAvg.Add(pointMinutes, pointAvg / pointCount);
+                        pointsMax.Add(pointMinutes, pointMax);
+                        pointMin = double.MaxValue;
+                        pointMax = 0;
+                        pointAvg = 0;
+                        pointCount = 0;
+                        pointSeconds += 1;
+                    }
+                }
+            }
+
+            for (double x = pointSeconds; x < playlist.TotalLength; x++)
+            {
+                double pointX = (x - 1) / 60;
+                pointsMin.Add(pointX, 0);
+                pointsAvg.Add(pointX, 0);
+                pointsMax.Add(pointX, 0);
+            }
+
+            LineItem avgCurve = GraphControl.GraphPane.AddCurve(
+                "Avg", pointsAvg, Color.Gray, SymbolType.None);
+            avgCurve.Line.IsSmooth = true;
+
+            LineItem minCurve = GraphControl.GraphPane.AddCurve(
+                "Min", pointsMin, Color.LightGray, SymbolType.None);
+            minCurve.Line.IsSmooth = true;
+            minCurve.Line.Fill = new Fill(Color.White);
+
+            LineItem maxCurve = GraphControl.GraphPane.AddCurve(
+                "Max", pointsMax, Color.LightGray, SymbolType.None);
+            maxCurve.Line.IsSmooth = true;
+            maxCurve.Line.Fill = new Fill(Color.LightGray);
+
+            GraphControl.GraphPane.XAxis.Scale.Min = 0;
+            GraphControl.GraphPane.XAxis.Scale.Max = playlist.TotalLength / 60;
+            GraphControl.GraphPane.YAxis.Scale.Min = 0;
+            GraphControl.GraphPane.Y2Axis.Scale.Min = 0;
+            GraphControl.GraphPane.Y2Axis.IsVisible = true;
+
+            GraphControl.AxisChange();
+        }
+
+        private void GenerateWindowChart(
+            SavedPlaylistData playlist,
+            SavedVideoStreamData stream,
+            int angleIndex,
+            double windowSize)
+        {
+            UnitText = "Mbps";
+
+            GraphControl.GraphPane.XAxis.Title.Text = "Time (minutes)";
+            GraphControl.GraphPane.YAxis.Title.Text = "Bitrate (Mbps)";
+
+            PointPairList pointsMin = new PointPairList();
+            PointPairList pointsMax = new PointPairList();
+            PointPairList pointsAvg = new PointPairList();
+
+            Queue<double> windowBits = new Queue<double>();
+            Queue<double> windowSeconds = new Queue<double>();
+            double windowBitsSum = 0;
+            double windowSecondsSum = 0;
+
+            double pointPosition = 0;
+            double pointSeconds = 1.0;
+            double pointMin = double.MaxValue;
+            double pointMax = 0;
+            double pointAvg = 0;
+            int pointCount = 0;
+
+            foreach (SavedStreamClipData clip in playlist.Clips)
+            {
+                if (clip.AngleIndex != angleIndex)
+                {
+                    continue;
+                }
+
+                List<SavedStreamDiagnosticsData> diagList = GetDiagnostics(clip, stream.PID);
+                if (diagList == null)
+                {
+                    continue;
+                }
+
+                for (int i = 0; i < diagList.Count; i++)
+                {
+                    SavedStreamDiagnosticsData diag = diagList[i];
+
+                    pointPosition = diag.Marker - clip.TimeIn + clip.RelativeTimeIn;
 
                     double seconds = diag.Interval;
                     double bits = diag.Bytes * 8.0;
@@ -446,6 +652,111 @@ namespace BDInfo
             GraphControl.AxisChange();
         }
 
+        private void GenerateFrameSizeChart(
+            SavedPlaylistData playlist,
+            SavedVideoStreamData stream,
+            int angleIndex)
+        {
+            UnitText = "KB";
+
+            GraphControl.GraphPane.XAxis.Title.Text = "Time (minutes)";
+            GraphControl.GraphPane.YAxis.Title.Text = "Size (KB)";
+
+            PointPairList pointsMin = new PointPairList();
+            PointPairList pointsMax = new PointPairList();
+            PointPairList pointsAvg = new PointPairList();
+
+            double pointPosition = 0;
+            double pointSeconds = 1.0;
+            double pointMin = double.MaxValue;
+            double pointMax = 0;
+            double pointAvg = 0;
+            int pointCount = 0;
+            double overallMax = 0;
+
+            foreach (SavedStreamClipData clip in playlist.Clips)
+            {
+                if (clip.AngleIndex != angleIndex)
+                {
+                    continue;
+                }
+
+                List<SavedStreamDiagnosticsData> diagList = GetDiagnostics(clip, stream.PID);
+                if (diagList == null)
+                {
+                    continue;
+                }
+
+                for (int i = 0; i < diagList.Count; i++)
+                {
+                    SavedStreamDiagnosticsData diag = diagList[i];
+                    if (diag.Tag == null) continue;
+
+                    double frameSize = diag.Bytes / 1024.0;
+
+                    pointPosition = diag.Marker - clip.TimeIn + clip.RelativeTimeIn;
+
+                    if (frameSize > overallMax) overallMax = frameSize;
+                    if (frameSize < pointMin) pointMin = frameSize;
+                    if (frameSize > pointMax) pointMax = frameSize;
+
+                    pointCount++;
+                    pointAvg += frameSize;
+
+                    if (pointPosition >= pointSeconds)
+                    {
+                        for (double x = pointSeconds; x < (pointPosition - 1); x++)
+                        {
+                            double pointX = (x - 1) / 60;
+                            pointsMin.Add(pointX, 0);
+                            pointsAvg.Add(pointX, 0);
+                            pointsMax.Add(pointX, 0);
+                            pointSeconds += 1;
+                        }
+                        double pointMinutes = (pointSeconds - 1) / 60;
+                        pointsMin.Add(pointMinutes, pointMin);
+                        pointsAvg.Add(pointMinutes, pointAvg / pointCount);
+                        pointsMax.Add(pointMinutes, pointMax);
+                        pointMin = double.MaxValue;
+                        pointMax = 0;
+                        pointAvg = 0;
+                        pointCount = 0;
+                        pointSeconds += 1;
+                    }
+                }
+            }
+
+            for (double x = pointSeconds; x < playlist.TotalLength; x++)
+            {
+                double pointX = (x - 1) / 60;
+                pointsMin.Add(pointX, 0);
+                pointsAvg.Add(pointX, 0);
+                pointsMax.Add(pointX, 0);
+            }
+
+            LineItem avgCurve = GraphControl.GraphPane.AddCurve(
+                "Avg", pointsAvg, Color.Gray, SymbolType.None);
+            avgCurve.Line.IsSmooth = true;
+
+            LineItem minCurve = GraphControl.GraphPane.AddCurve(
+                "Min", pointsMin, Color.LightGray, SymbolType.None);
+            minCurve.Line.IsSmooth = true;
+            minCurve.Line.Fill = new Fill(Color.White);
+
+            LineItem maxCurve = GraphControl.GraphPane.AddCurve(
+                "Max", pointsMax, Color.LightGray, SymbolType.None);
+            maxCurve.Line.IsSmooth = true;
+            maxCurve.Line.Fill = new Fill(Color.LightGray);
+
+            GraphControl.GraphPane.XAxis.Scale.Min = 0;
+            GraphControl.GraphPane.XAxis.Scale.Max = playlist.TotalLength / 60;
+            GraphControl.GraphPane.YAxis.Scale.Min = 0;
+            GraphControl.GraphPane.Y2Axis.Scale.Min = 0;
+            GraphControl.GraphPane.Y2Axis.IsVisible = true;
+
+            GraphControl.AxisChange();
+        }
+
         public void GenerateFrameTypeChart(
             TSPlaylistFile playlist,
             ushort PID,
@@ -564,6 +875,165 @@ namespace BDInfo
                 GraphControl.GraphPane.Chart.Fill.Type = FillType.None;
                 GraphControl.GraphPane.XAxis.IsVisible = false;
                 GraphControl.GraphPane.YAxis.IsVisible = false;
+
+                int drgb = (int)Math.Truncate(255.0 / labels.Length);
+                int rgb = 0;
+
+                List<SortableFrameCount> sortedFrameCounts = new List<SortableFrameCount>();
+                foreach (string frameType in frameCount.Keys)
+                {
+                    sortedFrameCounts.Add(new SortableFrameCount(frameType, frameCount[frameType]));
+                }
+                sortedFrameCounts.Sort();
+
+                int j = sortedFrameCounts.Count;
+                for (int i = 0; i < j; i++)
+                {
+                    AddPieSlice(sortedFrameCounts[i].Name, sortedFrameCounts[i].Count, totalFrameCount, rgb);
+                    rgb += drgb;
+                    if (--j > i)
+                    {
+                        AddPieSlice(sortedFrameCounts[j].Name, sortedFrameCounts[j].Count, totalFrameCount, rgb);
+                        rgb += drgb;
+                    }
+                }
+                GraphControl.GraphPane.AxisChange();
+            }
+
+            GraphControl.IsShowHScrollBar = false;
+            GraphControl.IsAutoScrollRange = false;
+            GraphControl.IsEnableHPan = false;
+            GraphControl.IsEnableHZoom = false;
+            GraphControl.IsEnableSelection = false;
+            GraphControl.IsEnableWheelZoom = false;
+        }
+
+        private void GenerateFrameTypeChart(
+            SavedPlaylistData playlist,
+            SavedVideoStreamData stream,
+            int angleIndex,
+            bool isSizes)
+        {
+            IsHoverDisabled = true;
+
+            GraphControl.GraphPane.XAxis.Title.Text = "Frame Type";
+
+            if (isSizes)
+            {
+                UnitText = "KB";
+                GraphControl.GraphPane.YAxis.Title.Text = "Average / Peak Size (KB)";
+            }
+            else
+            {
+                UnitText = string.Empty;
+                GraphControl.GraphPane.YAxis.Title.Text = "Count";
+            }
+
+            Dictionary<string, double> frameCount = new Dictionary<string, double>();
+            Dictionary<string, double> frameSizes = new Dictionary<string, double>();
+            Dictionary<string, double> framePeaks = new Dictionary<string, double>();
+
+            foreach (SavedStreamClipData clip in playlist.Clips)
+            {
+                if (clip.AngleIndex != angleIndex)
+                {
+                    continue;
+                }
+
+                List<SavedStreamDiagnosticsData> diagList = GetDiagnostics(clip, stream.PID);
+                if (diagList == null)
+                {
+                    continue;
+                }
+
+                for (int i = 0; i < diagList.Count; i++)
+                {
+                    SavedStreamDiagnosticsData diag = diagList[i];
+                    if (diag.Tag == null)
+                    {
+                        continue;
+                    }
+
+                    string frameType = diag.Tag;
+                    double frameSize = diag.Bytes / 1024.0;
+
+                    if (!framePeaks.ContainsKey(frameType))
+                    {
+                        framePeaks[frameType] = frameSize;
+                    }
+                    else if (frameSize > framePeaks[frameType])
+                    {
+                        framePeaks[frameType] = frameSize;
+                    }
+                    if (!frameCount.ContainsKey(frameType))
+                    {
+                        frameCount[frameType] = 0;
+                    }
+                    frameCount[frameType]++;
+
+                    if (!frameSizes.ContainsKey(frameType))
+                    {
+                        frameSizes[frameType] = 0;
+                    }
+                    frameSizes[frameType] += frameSize;
+                }
+            }
+
+            string[] labels = new string[frameCount.Keys.Count];
+            double[] values = new double[frameCount.Keys.Count];
+            double[] peaks = new double[frameCount.Keys.Count];
+            Dictionary<string, int> frameTypes = new Dictionary<string, int>();
+
+            frameCount.Keys.CopyTo(labels, 0);
+
+            double totalFrameCount = 0;
+            for (int i = 0; i < labels.Length; i++)
+            {
+                string label = labels[i];
+                frameTypes[label] = i;
+                if (isSizes)
+                {
+                    values[i] = frameSizes[label] / frameCount[label];
+                    peaks[i] = framePeaks[label];
+                }
+                else
+                {
+                    values[i] = frameCount[label];
+                }
+                totalFrameCount += frameCount[label];
+            }
+
+            if (isSizes)
+            {
+                BarItem barItem = GraphControl.GraphPane.AddBar(
+                    "Average", null, values, Color.Black);
+                barItem.Bar.Fill.Type = FillType.Solid;
+
+                BarItem barItemMax = GraphControl.GraphPane.AddBar(
+                    "Peak", null, peaks, Color.Black);
+                barItemMax.Bar.Fill.Type = FillType.None;
+
+                GraphControl.GraphPane.XAxis.MajorTic.IsBetweenLabels = true;
+                GraphControl.GraphPane.XAxis.Scale.TextLabels = labels;
+                GraphControl.GraphPane.XAxis.Type = AxisType.Text;
+                GraphControl.AxisChange();
+
+                GraphControl.GraphPane.YAxis.Scale.Max +=
+                    GraphControl.GraphPane.YAxis.Scale.MajorStep;
+
+                BarItem.CreateBarLabels(GraphControl.GraphPane, false, "f0");
+                GraphControl.GraphPane.Legend.IsVisible = true;
+            }
+            else
+            {
+                GraphControl.GraphPane.Chart.Fill.Type = FillType.None;
+                GraphControl.GraphPane.XAxis.IsVisible = false;
+                GraphControl.GraphPane.YAxis.IsVisible = false;
+
+                if (labels.Length == 0)
+                {
+                    return;
+                }
 
                 int drgb = (int)Math.Truncate(255.0 / labels.Length);
                 int rgb = 0;
