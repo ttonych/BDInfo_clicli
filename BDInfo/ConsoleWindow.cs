@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace BDInfo
@@ -28,11 +29,13 @@ namespace BDInfo
 
             if (AttachConsole(ATTACH_PARENT_PROCESS))
             {
+                ReinitializeConsoleStreams();
                 return new ConsoleScope(detachOnDispose: false);
             }
 
             if (AllocConsole())
             {
+                ReinitializeConsoleStreams();
                 return new ConsoleScope(detachOnDispose: true);
             }
 
@@ -42,6 +45,45 @@ namespace BDInfo
         private static bool HasConsole()
         {
             return GetConsoleWindow() != IntPtr.Zero;
+        }
+
+        private static void ReinitializeConsoleStreams()
+        {
+            try
+            {
+                Stream outputStream = Console.OpenStandardOutput();
+                var outputWriter = new StreamWriter(outputStream, Console.OutputEncoding)
+                {
+                    AutoFlush = true
+                };
+                Console.SetOut(outputWriter);
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Stream errorStream = Console.OpenStandardError();
+                var errorWriter = new StreamWriter(errorStream, Console.OutputEncoding)
+                {
+                    AutoFlush = true
+                };
+                Console.SetError(errorWriter);
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Stream inputStream = Console.OpenStandardInput();
+                var inputReader = new StreamReader(inputStream, Console.InputEncoding);
+                Console.SetIn(inputReader);
+            }
+            catch
+            {
+            }
         }
 
         private sealed class ConsoleScope : IDisposable
