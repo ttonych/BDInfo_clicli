@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace BDInfo
@@ -609,29 +610,83 @@ namespace BDInfo
             foreach (TSStreamFile streamFile in streamFiles)
             {
                 string displayName = streamFile?.DisplayName ?? streamFile?.Name ?? string.Empty;
-                progressBar.Report(string.Format(CultureInfo.InvariantCulture, "Scanning {0}", displayName), finishedBytes);
+                string message = string.Format(CultureInfo.InvariantCulture, "Scanning {0}", displayName);
+                progressBar.Report(message, finishedBytes);
 
                 try
                 {
                     if (playlistMap.TryGetValue(streamFile.Name, out List<TSPlaylistFile> mappedPlaylists) && mappedPlaylists.Count > 0)
                     {
-                        streamFile.Scan(mappedPlaylists, true);
+                        Exception scanException = ScanStreamFileWithProgress(streamFile, mappedPlaylists, progressBar, message, finishedBytes);
+                        if (scanException != null)
+                        {
+                            scanResult.FileExceptions[streamFile.Name] = scanException;
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
                     scanResult.FileExceptions[streamFile.Name] = ex;
                 }
-                finally
-                {
-                    finishedBytes += GetStreamFileLength(streamFile);
-                    progressBar.Report(string.Format(CultureInfo.InvariantCulture, "Scanning {0}", displayName), finishedBytes);
-                }
+
+                finishedBytes += GetStreamFileLength(streamFile);
+                progressBar.Report(message, finishedBytes);
             }
 
             progressBar.Complete();
 
             return scanResult;
+        }
+
+        private static Exception ScanStreamFileWithProgress(
+            TSStreamFile streamFile,
+            List<TSPlaylistFile> playlists,
+            CliProgressBar progressBar,
+            string message,
+            long completedBytes)
+        {
+            if (streamFile == null)
+            {
+                return null;
+            }
+
+            Exception scanException = null;
+
+            using (var scanCompleted = new ManualResetEventSlim(false))
+            {
+                Thread scanThread = new Thread(() =>
+                {
+                    try
+                    {
+                        streamFile.Scan(playlists, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        scanException = ex;
+                    }
+                    finally
+                    {
+                        scanCompleted.Set();
+                    }
+                })
+                {
+                    IsBackground = true
+                };
+
+                scanThread.Start();
+
+                const int pollIntervalMilliseconds = 200;
+                while (!scanCompleted.Wait(pollIntervalMilliseconds))
+                {
+                    progressBar.Report(message, completedBytes + streamFile.Size);
+                }
+
+                scanThread.Join();
+            }
+
+            progressBar.Report(message, completedBytes + streamFile.Size);
+
+            return scanException;
         }
 
         private static long GetStreamFileLength(TSStreamFile streamFile)
