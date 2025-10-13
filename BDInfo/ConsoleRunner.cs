@@ -349,6 +349,18 @@ namespace BDInfo
                     throw new InvalidOperationException("No playlists matched the supplied criteria.");
                 }
 
+                if (selectedPlaylists.Count > 0)
+                {
+                    Console.WriteLine("Playlists selected for scan:");
+                    foreach (TSPlaylistFile playlist in selectedPlaylists)
+                    {
+                        if (playlist != null)
+                        {
+                            Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "  {0}", playlist.Name));
+                        }
+                    }
+                }
+
                 List<TSStreamFile> streamFiles = SelectStreamFiles(bdrom, selectedPlaylists, options.WholeDisc);
 
                 ScanBDROMResult scanResult = ScanStreamFiles(bdrom, selectedPlaylists, streamFiles);
@@ -779,12 +791,21 @@ namespace BDInfo
             foreach (TSStreamFile streamFile in streamFiles)
             {
                 string displayName = streamFile?.DisplayName ?? streamFile?.Name ?? string.Empty;
-                string message = string.Format(CultureInfo.InvariantCulture, "Scanning {0}", displayName);
+                List<TSPlaylistFile> mappedPlaylists = null;
+                if (!playlistMap.TryGetValue(streamFile.Name, out mappedPlaylists) || mappedPlaylists == null)
+                {
+                    mappedPlaylists = new List<TSPlaylistFile>();
+                }
+
+                string playlistSummary = BuildPlaylistSummary(mappedPlaylists);
+                string message = string.IsNullOrEmpty(playlistSummary)
+                    ? string.Format(CultureInfo.InvariantCulture, "Scanning {0}", displayName)
+                    : string.Format(CultureInfo.InvariantCulture, "Scanning {0} ({1})", displayName, playlistSummary);
                 progressBar.Report(message, finishedBytes);
 
                 try
                 {
-                    if (playlistMap.TryGetValue(streamFile.Name, out List<TSPlaylistFile> mappedPlaylists) && mappedPlaylists.Count > 0)
+                    if (mappedPlaylists.Count > 0)
                     {
                         Exception scanException = ScanStreamFileWithProgress(streamFile, mappedPlaylists, progressBar, message, finishedBytes);
                         if (scanException != null)
@@ -805,6 +826,29 @@ namespace BDInfo
             progressBar.Complete();
 
             return scanResult;
+        }
+
+        private static string BuildPlaylistSummary(IEnumerable<TSPlaylistFile> playlists)
+        {
+            if (playlists == null)
+            {
+                return string.Empty;
+            }
+
+            var names = playlists
+                .Where(p => p != null && !string.IsNullOrWhiteSpace(p.Name))
+                .Select(p => p.Name.Trim())
+                .Where(n => n.Length > 0)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (names.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            return string.Join(", ", names);
         }
 
         private static Exception ScanStreamFileWithProgress(
