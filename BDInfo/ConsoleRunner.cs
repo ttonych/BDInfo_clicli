@@ -297,7 +297,7 @@ namespace BDInfo
 
             bool requiresReportDestination = !options.ListPlaylists || NeedsFurtherProcessing(options);
             string reportDestination = null;
-            string chartFormat = null;
+            ImageFormat chartFormat = null;
             string chartExtension = null;
 
             Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "BDInfo v{0}", GetVersionString()));
@@ -377,7 +377,7 @@ namespace BDInfo
 
                 if (options.SaveCharts)
                 {
-                    if (string.IsNullOrEmpty(chartFormat) || string.IsNullOrEmpty(chartExtension))
+                    if (chartFormat == null || string.IsNullOrEmpty(chartExtension))
                     {
                         (chartFormat, chartExtension) = GetImageFormat(options.ChartFormat);
                     }
