@@ -33,6 +33,7 @@ namespace BDInfo
         {
             if (ConsoleRunner.TryHandle(args))
             {
+                Environment.Exit(Environment.ExitCode);
                 return;
             }
 
