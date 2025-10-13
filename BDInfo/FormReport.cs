@@ -30,7 +30,7 @@ namespace BDInfo
     {
         private List<TSPlaylistFile> Playlists;
         private SavedReportData SavedReport;
-        private SavedPlaylistSelection SavedPlaylistSelection => comboBoxPlaylist.SelectedItem as SavedPlaylistSelection;
+        private SavedPlaylistSelection SelectedSavedPlaylist => comboBoxPlaylist.SelectedItem as SavedPlaylistSelection;
         private SavedVideoStreamSelection SavedStreamSelection => comboBoxStream.SelectedItem as SavedVideoStreamSelection;
 
         public string ReportText
@@ -1234,9 +1234,9 @@ namespace BDInfo
                 return;
             }
 
-            if (SavedPlaylistSelection != null)
+            if (SelectedSavedPlaylist != null)
             {
-                PopulateSavedPlaylist(SavedPlaylistSelection.Data);
+                PopulateSavedPlaylist(SelectedSavedPlaylist.Data);
                 return;
             }
 
@@ -1276,10 +1276,10 @@ namespace BDInfo
             int angleIndex = (int)comboBoxAngle.SelectedItem;
             string chartType = comboBoxChartType.SelectedItem.ToString();
 
-            if (SavedReport != null && SavedPlaylistSelection != null && SavedStreamSelection != null)
+            if (SavedReport != null && SelectedSavedPlaylist != null && SavedStreamSelection != null)
             {
                 FormChart savedChart = new FormChart();
-                savedChart.Generate(chartType, SavedReport, SavedPlaylistSelection.Data, SavedStreamSelection.Data, angleIndex);
+                savedChart.Generate(chartType, SavedReport, SelectedSavedPlaylist.Data, SavedStreamSelection.Data, angleIndex);
                 savedChart.Show();
                 return;
             }

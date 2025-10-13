@@ -9,7 +9,7 @@ using System.Xml;
 namespace BDInfo
 {
     [DataContract]
-    internal class SavedReportData
+    public sealed class SavedReportData
     {
         [DataMember]
         public string VolumeLabel { get; set; }
@@ -19,7 +19,7 @@ namespace BDInfo
     }
 
     [DataContract]
-    internal class SavedPlaylistData
+    public sealed class SavedPlaylistData
     {
         [DataMember]
         public string Name { get; set; }
@@ -38,7 +38,7 @@ namespace BDInfo
     }
 
     [DataContract]
-    internal class SavedVideoStreamData
+    public sealed class SavedVideoStreamData
     {
         [DataMember]
         public ushort PID { get; set; }
@@ -53,7 +53,7 @@ namespace BDInfo
     }
 
     [DataContract]
-    internal class SavedStreamClipData
+    public sealed class SavedStreamClipData
     {
         [DataMember]
         public int AngleIndex { get; set; }
@@ -75,7 +75,7 @@ namespace BDInfo
     }
 
     [DataContract]
-    internal class SavedStreamDiagnosticsData
+    public sealed class SavedStreamDiagnosticsData
     {
         [DataMember]
         public double Marker { get; set; }
