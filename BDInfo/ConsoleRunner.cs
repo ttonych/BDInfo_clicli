@@ -295,26 +295,37 @@ namespace BDInfo
                 throw new ArgumentException("BD_PATH must be a directory containing a BDMV folder or an ISO file.");
             }
 
-            string reportDestination = options.ReportDestination;
-            if (string.IsNullOrWhiteSpace(reportDestination))
-            {
-                string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                if (string.IsNullOrWhiteSpace(baseDirectory))
-                {
-                    baseDirectory = Environment.CurrentDirectory;
-                }
-
-                reportDestination = baseDirectory;
-            }
-
-            reportDestination = Path.GetFullPath(reportDestination);
-            EnsureReportDestination(reportDestination);
-
-            var (chartFormat, chartExtension) = GetImageFormat(options.ChartFormat);
+            bool requiresReportDestination = !options.ListPlaylists || NeedsFurtherProcessing(options);
+            string reportDestination = null;
+            string chartFormat = null;
+            string chartExtension = null;
 
             Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "BDInfo v{0}", GetVersionString()));
             Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Source: {0}", bdPath));
-            Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Report destination: {0}", reportDestination));
+
+            if (requiresReportDestination)
+            {
+                reportDestination = options.ReportDestination;
+                if (string.IsNullOrWhiteSpace(reportDestination))
+                {
+                    string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                    if (string.IsNullOrWhiteSpace(baseDirectory))
+                    {
+                        baseDirectory = Environment.CurrentDirectory;
+                    }
+
+                    reportDestination = baseDirectory;
+                }
+
+                reportDestination = Path.GetFullPath(reportDestination);
+                EnsureReportDestination(reportDestination);
+                Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Report destination: {0}", reportDestination));
+
+                if (options.SaveCharts)
+                {
+                    (chartFormat, chartExtension) = GetImageFormat(options.ChartFormat);
+                }
+            }
 
             BDROM bdrom = null;
             try
@@ -356,11 +367,21 @@ namespace BDInfo
                     }
                 }
 
+                if (reportDestination == null)
+                {
+                    throw new InvalidOperationException("Report destination was not resolved.");
+                }
+
                 string reportPath = GenerateReport(bdrom, selectedPlaylists, scanResult, reportDestination);
                 Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Report written to: {0}", reportPath));
 
                 if (options.SaveCharts)
                 {
+                    if (string.IsNullOrEmpty(chartFormat) || string.IsNullOrEmpty(chartExtension))
+                    {
+                        (chartFormat, chartExtension) = GetImageFormat(options.ChartFormat);
+                    }
+
                     string chartsDirectory = Path.Combine(reportDestination, "charts");
                     int chartsSaved = SaveCharts(selectedPlaylists, chartsDirectory, chartFormat, chartExtension);
                     Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Charts saved to: {0} ({1} files)", chartsDirectory, chartsSaved));
@@ -494,7 +515,17 @@ namespace BDInfo
                 foreach (string name in options.PlaylistNames)
                 {
                     string normalized = NormalizePlaylistName(name);
-                    if (playlistMap.TryGetValue(normalized, out TSPlaylistFile playlist))
+                    if (string.IsNullOrEmpty(normalized))
+                    {
+                        continue;
+                    }
+
+                    if (!playlistMap.TryGetValue(normalized, out TSPlaylistFile playlist))
+                    {
+                        playlist = playlistMap.Values.FirstOrDefault(p => string.Equals(p?.Name, normalized, StringComparison.OrdinalIgnoreCase));
+                    }
+
+                    if (playlist != null)
                     {
                         if (playlist.IsValid)
                         {
@@ -536,12 +567,26 @@ namespace BDInfo
             }
 
             string trimmed = name.Trim();
-            if (!trimmed.EndsWith(".MPLS", StringComparison.OrdinalIgnoreCase))
+            string fileName = Path.GetFileName(trimmed);
+            if (string.IsNullOrEmpty(fileName))
             {
-                trimmed += ".MPLS";
+                fileName = trimmed;
             }
 
-            return trimmed.ToUpperInvariant();
+            string baseName = Path.GetFileNameWithoutExtension(fileName);
+            if (string.IsNullOrEmpty(baseName))
+            {
+                baseName = fileName;
+            }
+
+            if (baseName.All(char.IsDigit))
+            {
+                baseName = baseName.PadLeft(5, '0');
+            }
+
+            baseName = baseName.ToUpperInvariant();
+
+            return string.Format(CultureInfo.InvariantCulture, "{0}.MPLS", baseName);
         }
 
         private static List<TSStreamFile> SelectStreamFiles(BDROM bdrom, IEnumerable<TSPlaylistFile> playlists, bool wholeDisc)
