@@ -29,6 +29,11 @@ namespace BDInfo
     {
         private List<TSPlaylistFile> Playlists;
 
+        public string ReportText
+        {
+            get { return textBoxReport.Text; }
+        }
+
         public FormReport()
         {
             InitializeComponent();
