@@ -17,6 +17,9 @@ namespace BDInfo
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool FreeConsole();
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint GetConsoleProcessList(uint[] processList, uint count);
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();
 
@@ -45,6 +48,22 @@ namespace BDInfo
         private static bool HasConsole()
         {
             return GetConsoleWindow() != IntPtr.Zero;
+        }
+
+        public static void ReleaseConsoleIfOwned()
+        {
+            IntPtr consoleWindow = GetConsoleWindow();
+            if (consoleWindow == IntPtr.Zero)
+            {
+                return;
+            }
+
+            uint[] processIds = new uint[1];
+            uint attachedProcessCount = GetConsoleProcessList(processIds, (uint)processIds.Length);
+            if (attachedProcessCount == 1)
+            {
+                FreeConsole();
+            }
         }
 
         private static void ReinitializeConsoleStreams()
