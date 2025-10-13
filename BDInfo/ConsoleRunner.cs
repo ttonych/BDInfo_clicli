@@ -40,50 +40,53 @@ namespace BDInfo
                 return false;
             }
 
-            CliOptions options;
-            try
+            using (ConsoleWindow.EnsureAttached())
             {
-                options = ParseArguments(args);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-                PrintUsage();
-                Environment.ExitCode = 1;
+                CliOptions options;
+                try
+                {
+                    options = ParseArguments(args);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex.Message);
+                    PrintUsage();
+                    Environment.ExitCode = 1;
+                    return true;
+                }
+
+                if (options.ShowVersion)
+                {
+                    Console.WriteLine(GetVersionString());
+                    return true;
+                }
+
+                if (options.ShowHelp)
+                {
+                    PrintUsage();
+                    return true;
+                }
+
+                if (string.IsNullOrWhiteSpace(options.BdPath))
+                {
+                    Console.Error.WriteLine("BD_PATH is required.");
+                    PrintUsage();
+                    Environment.ExitCode = 1;
+                    return true;
+                }
+
+                try
+                {
+                    Run(options);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex.Message);
+                    Environment.ExitCode = 1;
+                }
+
                 return true;
             }
-
-            if (options.ShowVersion)
-            {
-                Console.WriteLine(GetVersionString());
-                return true;
-            }
-
-            if (options.ShowHelp)
-            {
-                PrintUsage();
-                return true;
-            }
-
-            if (string.IsNullOrWhiteSpace(options.BdPath))
-            {
-                Console.Error.WriteLine("BD_PATH is required.");
-                PrintUsage();
-                Environment.ExitCode = 1;
-                return true;
-            }
-
-            try
-            {
-                Run(options);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-                Environment.ExitCode = 1;
-            }
-
-            return true;
         }
 
         private static CliOptions ParseArguments(string[] args)
