@@ -26,12 +26,17 @@ namespace BDInfo
                 return NoOp.Instance;
             }
 
-            if (!AttachConsole(ATTACH_PARENT_PROCESS) && !AllocConsole())
+            if (AttachConsole(ATTACH_PARENT_PROCESS))
             {
-                return NoOp.Instance;
+                return new ConsoleScope(detachOnDispose: false);
             }
 
-            return new ConsoleScope();
+            if (AllocConsole())
+            {
+                return new ConsoleScope(detachOnDispose: true);
+            }
+
+            return NoOp.Instance;
         }
 
         private static bool HasConsole()
@@ -42,6 +47,12 @@ namespace BDInfo
         private sealed class ConsoleScope : IDisposable
         {
             private bool _disposed;
+            private readonly bool _detachOnDispose;
+
+            public ConsoleScope(bool detachOnDispose)
+            {
+                _detachOnDispose = detachOnDispose;
+            }
 
             public void Dispose()
             {
@@ -67,7 +78,10 @@ namespace BDInfo
                 {
                 }
 
-                FreeConsole();
+                if (_detachOnDispose)
+                {
+                    FreeConsole();
+                }
             }
         }
 
