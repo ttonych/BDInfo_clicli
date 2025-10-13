@@ -46,6 +46,12 @@ namespace BDInfo
         {
             Playlists = playlists;
 
+            comboBoxPlaylist.Enabled = true;
+            comboBoxAngle.Enabled = true;
+            comboBoxStream.Enabled = true;
+            comboBoxChartType.Enabled = true;
+            buttonChart.Enabled = true;
+
             StreamWriter reportFile = null;
             if (BDInfoSettings.AutosaveReport)
             {
@@ -1120,6 +1126,32 @@ namespace BDInfo
             comboBoxChartType.SelectedIndex = 0;
         }
 
+        public void LoadSavedReport(string filePath)
+        {
+            Playlists = null;
+
+            comboBoxPlaylist.Items.Clear();
+            comboBoxAngle.Items.Clear();
+            comboBoxStream.Items.Clear();
+
+            comboBoxPlaylist.Enabled = false;
+            comboBoxAngle.Enabled = false;
+            comboBoxStream.Enabled = false;
+            comboBoxChartType.Enabled = false;
+            buttonChart.Enabled = false;
+
+            try
+            {
+                textBoxReport.Text = File.ReadAllText(filePath);
+                Text = string.Format(CultureInfo.InvariantCulture, "BDInfo Report - {0}", Path.GetFileName(filePath));
+            }
+            catch
+            {
+                textBoxReport.Text = string.Empty;
+                throw;
+            }
+        }
+
         private void buttonCopy_Click(
             object sender, 
             EventArgs e)
@@ -1145,6 +1177,11 @@ namespace BDInfo
 
         private void comboBoxPlaylist_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (!comboBoxPlaylist.Enabled || comboBoxPlaylist.SelectedItem == null)
+            {
+                return;
+            }
+
             TSPlaylistFile playlist = (TSPlaylistFile)comboBoxPlaylist.SelectedItem;
 
             comboBoxAngle.Items.Clear();

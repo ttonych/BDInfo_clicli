@@ -59,6 +59,7 @@ namespace BDInfo
             this.labelPlaylistFiles = new System.Windows.Forms.Label();
             this.buttonViewReport = new System.Windows.Forms.Button();
             this.buttonScan = new System.Windows.Forms.Button();
+            this.buttonOpenSavedReport = new System.Windows.Forms.Button();
             this.textBoxDetails = new System.Windows.Forms.TextBox();
             this.labelProgress = new System.Windows.Forms.Label();
             this.buttonSelectAll = new System.Windows.Forms.Button();
@@ -208,9 +209,9 @@ namespace BDInfo
             this.buttonViewReport.Text = "View Report...";
             this.buttonViewReport.UseVisualStyleBackColor = true;
             this.buttonViewReport.Click += new System.EventHandler(this.buttonViewReport_Click);
-            // 
+            //
             // buttonScan
-            // 
+            //
             this.buttonScan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonScan.Enabled = false;
             this.buttonScan.Location = new System.Drawing.Point(368, 548);
@@ -220,6 +221,17 @@ namespace BDInfo
             this.buttonScan.Text = "Scan Bitrates";
             this.buttonScan.UseVisualStyleBackColor = true;
             this.buttonScan.Click += new System.EventHandler(this.buttonScan_Click);
+            //
+            // buttonOpenSavedReport
+            //
+            this.buttonOpenSavedReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonOpenSavedReport.Location = new System.Drawing.Point(599, 548);
+            this.buttonOpenSavedReport.Name = "buttonOpenSavedReport";
+            this.buttonOpenSavedReport.Size = new System.Drawing.Size(108, 23);
+            this.buttonOpenSavedReport.TabIndex = 13;
+            this.buttonOpenSavedReport.Text = "Open Saved...";
+            this.buttonOpenSavedReport.UseVisualStyleBackColor = true;
+            this.buttonOpenSavedReport.Click += new System.EventHandler(this.buttonOpenSavedReport_Click);
             // 
             // textBoxDetails
             // 
@@ -490,6 +502,7 @@ namespace BDInfo
             this.Controls.Add(this.buttonSelectAll);
             this.Controls.Add(this.labelProgress);
             this.Controls.Add(this.buttonSettings);
+            this.Controls.Add(this.buttonOpenSavedReport);
             this.Controls.Add(this.labelTimeRemainingElapsed);
             this.Controls.Add(this.labelTimeDivider);
             this.Controls.Add(this.labelTimeElapsed);
@@ -540,6 +553,7 @@ namespace BDInfo
         private System.Windows.Forms.Label labelPlaylistFiles;
         private System.Windows.Forms.Button buttonViewReport;
         private System.Windows.Forms.Button buttonScan;
+        private System.Windows.Forms.Button buttonOpenSavedReport;
         private System.Windows.Forms.TextBox textBoxDetails;
         private System.Windows.Forms.Label labelProgress;
         private System.Windows.Forms.Button buttonSelectAll;

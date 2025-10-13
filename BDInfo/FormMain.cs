@@ -276,14 +276,46 @@ namespace BDInfo
         }
 
         private void buttonViewReport_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             GenerateReport();
         }
 
+        private void buttonOpenSavedReport_Click(
+            object sender,
+            EventArgs e)
+        {
+            using (OpenFileDialog dialog = new OpenFileDialog())
+            {
+                dialog.Filter = "BDInfo Reports (*.txt)|*.txt|All Files (*.*)|*.*";
+                dialog.Title = "Open Saved Report";
+                dialog.InitialDirectory = Environment.CurrentDirectory;
+
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    try
+                    {
+                        FormReport report = new FormReport();
+                        report.LoadSavedReport(dialog.FileName);
+                        report.Show();
+                    }
+                    catch (Exception ex)
+                    {
+                        string msg = string.Format(CultureInfo.InvariantCulture,
+                            "Error opening report {0}: {1}",
+                            dialog.FileName,
+                            ex.Message);
+
+                        MessageBox.Show(msg, "BDInfo Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
         private void listViewPlaylistFiles_SelectedIndexChanged(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             LoadPlaylist();
