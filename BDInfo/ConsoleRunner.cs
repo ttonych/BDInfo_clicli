@@ -297,15 +297,17 @@ namespace BDInfo
             string reportDestination = options.ReportDestination;
             if (string.IsNullOrWhiteSpace(reportDestination))
             {
-                if (isFile)
+                string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                if (string.IsNullOrWhiteSpace(baseDirectory))
                 {
-                    throw new ArgumentException("REPORT_DEST is required when BD_PATH is an ISO file.");
+                    baseDirectory = Environment.CurrentDirectory;
                 }
-                reportDestination = bdPath;
+
+                reportDestination = baseDirectory;
             }
 
             reportDestination = Path.GetFullPath(reportDestination);
-            Directory.CreateDirectory(reportDestination);
+            EnsureReportDestination(reportDestination);
 
             var (chartFormat, chartExtension) = GetImageFormat(options.ChartFormat);
 
@@ -366,6 +368,62 @@ namespace BDInfo
             finally
             {
                 bdrom?.CloseDiscImage();
+            }
+        }
+
+        private static void EnsureReportDestination(string destination)
+        {
+            if (string.IsNullOrWhiteSpace(destination))
+            {
+                throw new ArgumentException("Report destination cannot be empty.");
+            }
+
+            if (File.Exists(destination))
+            {
+                throw new IOException(string.Format(CultureInfo.InvariantCulture, "Report destination '{0}' is a file.", destination));
+            }
+
+            try
+            {
+                Directory.CreateDirectory(destination);
+            }
+            catch (Exception ex)
+            {
+                throw new IOException(string.Format(CultureInfo.InvariantCulture, "Unable to create report destination '{0}': {1}", destination, ex.Message), ex);
+            }
+
+            string probeFile = Path.Combine(destination, Path.GetRandomFileName());
+            try
+            {
+                using (File.Create(probeFile, 1, FileOptions.DeleteOnClose))
+                {
+                }
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    using (File.Create(probeFile, 1))
+                    {
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new IOException(string.Format(CultureInfo.InvariantCulture, "Unable to write to report destination '{0}': {1}", destination, ex.Message), ex);
+                }
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(probeFile))
+                    {
+                        File.Delete(probeFile);
+                    }
+                }
+                catch
+                {
+                }
             }
         }
 
@@ -519,6 +577,8 @@ namespace BDInfo
             }
 
             var playlistMap = new Dictionary<string, List<TSPlaylistFile>>(StringComparer.OrdinalIgnoreCase);
+            long totalBytes = 0;
+
             foreach (TSStreamFile streamFile in streamFiles)
             {
                 var mappedPlaylists = new List<TSPlaylistFile>();
@@ -536,27 +596,165 @@ namespace BDInfo
                         }
                     }
                 }
+
                 playlistMap[streamFile.Name] = mappedPlaylists;
+                totalBytes += GetStreamFileLength(streamFile);
             }
+
+            var progressBar = new CliProgressBar(totalBytes, streamFiles.Count);
+            long finishedBytes = 0;
+
+            progressBar.Report("Preparing scan", finishedBytes);
 
             foreach (TSStreamFile streamFile in streamFiles)
             {
+                string displayName = streamFile?.DisplayName ?? streamFile?.Name ?? string.Empty;
+                progressBar.Report(string.Format(CultureInfo.InvariantCulture, "Scanning {0}", displayName), finishedBytes);
+
                 try
                 {
-                    if (!playlistMap.TryGetValue(streamFile.Name, out List<TSPlaylistFile> mappedPlaylists) || mappedPlaylists.Count == 0)
+                    if (playlistMap.TryGetValue(streamFile.Name, out List<TSPlaylistFile> mappedPlaylists) && mappedPlaylists.Count > 0)
                     {
-                        continue;
+                        streamFile.Scan(mappedPlaylists, true);
                     }
-
-                    streamFile.Scan(mappedPlaylists, true);
                 }
                 catch (Exception ex)
                 {
                     scanResult.FileExceptions[streamFile.Name] = ex;
                 }
+                finally
+                {
+                    finishedBytes += GetStreamFileLength(streamFile);
+                    progressBar.Report(string.Format(CultureInfo.InvariantCulture, "Scanning {0}", displayName), finishedBytes);
+                }
             }
 
+            progressBar.Complete();
+
             return scanResult;
+        }
+
+        private static long GetStreamFileLength(TSStreamFile streamFile)
+        {
+            if (streamFile == null)
+            {
+                return 0;
+            }
+
+            if (BDInfoSettings.EnableSSIF && streamFile.InterleavedFile != null)
+            {
+                if (streamFile.InterleavedFile.FileInfo != null)
+                {
+                    return streamFile.InterleavedFile.FileInfo.Length;
+                }
+
+                if (streamFile.InterleavedFile.DFileInfo != null)
+                {
+                    return streamFile.InterleavedFile.DFileInfo.Length;
+                }
+            }
+
+            if (streamFile.FileInfo != null)
+            {
+                return streamFile.FileInfo.Length;
+            }
+
+            if (streamFile.DFileInfo != null)
+            {
+                return streamFile.DFileInfo.Length;
+            }
+
+            if (streamFile.Size > 0)
+            {
+                return streamFile.Size;
+            }
+
+            return 0;
+        }
+
+        private sealed class CliProgressBar
+        {
+            private readonly long _totalBytes;
+            private readonly int _barWidth;
+            private readonly bool _enabled;
+            private int _lastLength;
+
+            public CliProgressBar(long totalBytes, int itemCount, int barWidth = 40)
+            {
+                _enabled = itemCount > 0;
+                _barWidth = barWidth;
+                _totalBytes = totalBytes > 0 ? totalBytes : 1;
+
+                if (_enabled)
+                {
+                    Console.WriteLine();
+                }
+            }
+
+            public void Report(string message, long completedBytes)
+            {
+                if (!_enabled)
+                {
+                    return;
+                }
+
+                if (message == null)
+                {
+                    message = string.Empty;
+                }
+
+                long boundedBytes = completedBytes;
+                if (boundedBytes < 0)
+                {
+                    boundedBytes = 0;
+                }
+                if (boundedBytes > _totalBytes)
+                {
+                    boundedBytes = _totalBytes;
+                }
+
+                double progress = (double)boundedBytes / _totalBytes;
+                if (progress < 0)
+                {
+                    progress = 0;
+                }
+                if (progress > 1)
+                {
+                    progress = 1;
+                }
+
+                int filled = (int)Math.Round(progress * _barWidth);
+                if (filled < 0)
+                {
+                    filled = 0;
+                }
+                if (filled > _barWidth)
+                {
+                    filled = _barWidth;
+                }
+
+                if (message.Length > 60)
+                {
+                    message = message.Substring(0, 57) + "...";
+                }
+
+                string bar = new string('#', filled).PadRight(_barWidth);
+                string line = string.Format(CultureInfo.InvariantCulture, "[{0}] {1,3}% {2}", bar, (int)Math.Round(progress * 100), message);
+                int padding = Math.Max(0, _lastLength - line.Length);
+                Console.Write("\r{0}{1}", line, new string(' ', padding));
+                _lastLength = line.Length;
+            }
+
+            public void Complete()
+            {
+                if (!_enabled)
+                {
+                    return;
+                }
+
+                Report("Scan complete", _totalBytes);
+                Console.WriteLine();
+            }
         }
 
         private static string GenerateReport(BDROM bdrom, List<TSPlaylistFile> playlists, ScanBDROMResult scanResult, string destination)
@@ -647,7 +845,7 @@ namespace BDInfo
         {
             Console.WriteLine("Usage: BDInfo.exe <BD_PATH> [REPORT_DEST]");
             Console.WriteLine("BD_PATH may be a directory containing a BDMV folder or a BluRay ISO file.");
-            Console.WriteLine("REPORT_DEST is the folder the BDInfo report is to be written to. If not given, the report will be written to BD_PATH. REPORT_DEST is required if BD_PATH is an ISO file.");
+            Console.WriteLine("REPORT_DEST is the folder the BDInfo report is to be written to. If not given, the report will be written next to BDInfo.exe.");
             Console.WriteLine();
             Console.WriteLine("Options:");
             Console.WriteLine("  -?, --help, -h             Print out the options.");
