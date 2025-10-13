@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -146,6 +147,41 @@ namespace BDInfo
                     break;
             }
             DefaultFileName += ".png";
+        }
+
+        public string SaveChartImage(
+            string directory,
+            ImageFormat format,
+            string extension)
+        {
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                throw new ArgumentException("directory");
+            }
+
+            if (format == null)
+            {
+                throw new ArgumentNullException(nameof(format));
+            }
+
+            if (string.IsNullOrWhiteSpace(extension))
+            {
+                extension = ".png";
+            }
+
+            Directory.CreateDirectory(directory);
+
+            string baseName = Path.GetFileNameWithoutExtension(DefaultFileName);
+            string safeName = ToolBox.GetSafeFileName(baseName);
+            string fileName = safeName + extension;
+            string fullPath = Path.Combine(directory, fileName);
+
+            using (Image image = GraphControl.GetImage())
+            {
+                image.Save(fullPath, format);
+            }
+
+            return fullPath;
         }
 
         private string FixVolumeLabel(string label)

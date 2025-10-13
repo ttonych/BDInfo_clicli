@@ -31,6 +31,14 @@ namespace BDInfo
         [STAThread]
         static void Main(string[] args)
         {
+            if (ConsoleRunner.TryHandle(args))
+            {
+                Environment.Exit(Environment.ExitCode);
+                return;
+            }
+
+            ConsoleWindow.ReleaseConsoleIfOwned();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormMain(args));
