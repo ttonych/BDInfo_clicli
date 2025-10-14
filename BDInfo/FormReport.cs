@@ -73,6 +73,7 @@ namespace BDInfo
             textBoxReport.Text = "";
 
             string report = "";
+            SavedReportData autosaveMetadata = null;
             string protection = (BDROM.IsBDPlus ? "BD+" : BDROM.IsUHD ? "AACS2" : "AACS");
 
             if (!string.IsNullOrEmpty(BDROM.DiscTitle))
@@ -1115,11 +1116,28 @@ namespace BDInfo
                 GC.Collect();
             }
 
+            if (BDInfoSettings.AutosaveReport)
+            {
+                try
+                {
+                    autosaveMetadata = ReportPersistence.Capture(BDROM, playlists);
+                }
+                catch
+                {
+                    autosaveMetadata = null;
+                }
+            }
+
             if (BDInfoSettings.AutosaveReport && reportFile != null)
             {
                 try { reportFile.Write(report); }
                 catch { }
 
+                if (autosaveMetadata != null)
+                {
+                    try { reportFile.Write(ReportPersistence.CreateEmbeddedMetadataBlock(autosaveMetadata)); }
+                    catch { }
+                }
             }
             textBoxReport.Text += report;
 
@@ -1132,7 +1150,14 @@ namespace BDInfo
             {
                 try
                 {
-                    ReportPersistence.Save(autosavePath, BDROM, playlists);
+                    if (autosaveMetadata != null)
+                    {
+                        ReportPersistence.Save(autosavePath, autosaveMetadata);
+                    }
+                    else
+                    {
+                        ReportPersistence.Save(autosavePath, BDROM, playlists);
+                    }
                 }
                 catch
                 {
@@ -1161,10 +1186,21 @@ namespace BDInfo
 
             try
             {
-                textBoxReport.Text = File.ReadAllText(filePath);
+                string rawReport = File.ReadAllText(filePath);
+                string displayReport = rawReport;
                 Text = string.Format(CultureInfo.InvariantCulture, "BDInfo Report - {0}", Path.GetFileName(filePath));
 
-                SavedReport = ReportPersistence.Load(filePath);
+                SavedReportData embeddedReport;
+                if (ReportPersistence.TryExtractEmbeddedMetadata(rawReport, out displayReport, out embeddedReport) && embeddedReport != null)
+                {
+                    SavedReport = embeddedReport;
+                }
+                else
+                {
+                    SavedReport = ReportPersistence.Load(filePath);
+                }
+
+                textBoxReport.Text = displayReport;
                 if (SavedReport != null && SavedReport.Playlists.Count > 0)
                 {
                     foreach (SavedPlaylistData playlist in SavedReport.Playlists)
