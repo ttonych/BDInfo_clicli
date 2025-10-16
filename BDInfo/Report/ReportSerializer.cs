@@ -6,7 +6,6 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Xml;
-using System.Xml.Json;
 using BDInfo;
 
 namespace BDInfo.Reporting
