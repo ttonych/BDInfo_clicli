@@ -1086,13 +1086,14 @@ namespace BDInfo
                 ? "UNKNOWN"
                 : bdrom.VolumeLabel;
 
-            string sanitizedTextName = ToolBox.GetSafeFileName(string.Format(CultureInfo.InvariantCulture, "BDINFO.{0}.txt", volumeLabel));
-            string sanitizedBaseName = Path.GetFileNameWithoutExtension(sanitizedTextName);
-
-            if (string.IsNullOrWhiteSpace(sanitizedBaseName))
+            string sanitizedVolumeLabel = ToolBox.GetSafeFileName(volumeLabel);
+            if (string.IsNullOrWhiteSpace(sanitizedVolumeLabel))
             {
-                sanitizedBaseName = "BDINFO";
+                sanitizedVolumeLabel = "BDINFO";
             }
+
+            string sanitizedTextName = ToolBox.GetSafeFileName(string.Format(CultureInfo.InvariantCulture, "BDINFO.{0}.txt", sanitizedVolumeLabel));
+            string sanitizedBaseName = sanitizedVolumeLabel;
 
             var writtenPaths = new List<string>();
 
