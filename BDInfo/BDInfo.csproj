@@ -107,6 +107,8 @@
     <Compile Include="FormPlaylist.Designer.cs">
       <DependentUpon>FormPlaylist.cs</DependentUpon>
     </Compile>
+    <Compile Include="Report\ReportModels.cs" />
+    <Compile Include="Report\ReportSerializer.cs" />
     <Compile Include="ToolBox.cs" />
     <Compile Include="FormChart.cs">
       <SubType>Form</SubType>

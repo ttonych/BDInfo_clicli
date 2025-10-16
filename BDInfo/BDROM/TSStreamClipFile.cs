@@ -57,6 +57,12 @@ namespace BDInfo
             Name = fileInfo.Name.ToUpper();
         }
 
+        internal TSStreamClipFile(string name)
+        {
+            Name = name.ToUpperInvariant();
+            IsValid = true;
+        }
+
         public void Scan()
         {
             FileStream fileStream = null;

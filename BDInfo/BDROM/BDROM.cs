@@ -62,6 +62,8 @@ namespace BDInfo
         public bool Is3D = false;
         public bool Is50Hz = false;
         public bool IsUHD = false;
+        public bool IsReport { get; internal set; } = false;
+        public string ReportPath { get; internal set; } = null;
 
         public bool IsImage = false;
         public FileStream IoStream = null;
@@ -93,9 +95,15 @@ namespace BDInfo
 
         public event OnPlaylistFileScanError PlaylistFileScanError;
 
+        internal BDROM()
+        {
+            IsReport = true;
+        }
+
         public BDROM(
             string path)
         {
+            IsReport = false;
             //
             // Locate BDMV directories.
             //

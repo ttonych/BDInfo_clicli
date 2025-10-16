@@ -22,12 +22,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
+using BDInfo.Reporting;
 
 namespace BDInfo
 {
     public partial class FormReport : Form
     {
         private List<TSPlaylistFile> Playlists;
+        private BDROM ReportBDROM;
+        private List<TSPlaylistFile> ReportPlaylists = new List<TSPlaylistFile>();
+        private ScanBDROMResult ReportScanResult;
 
         public string ReportText
         {
@@ -45,6 +49,10 @@ namespace BDInfo
             ScanBDROMResult scanResult)
         {
             Playlists = playlists;
+            ReportBDROM = BDROM;
+            ReportPlaylists = playlists != null ? new List<TSPlaylistFile>(playlists) : new List<TSPlaylistFile>();
+            ReportScanResult = scanResult;
+            buttonExport.Enabled = ReportBDROM != null && ReportPlaylists.Count > 0;
 
             StreamWriter reportFile = null;
             if (BDInfoSettings.AutosaveReport)
@@ -1121,14 +1129,64 @@ namespace BDInfo
         }
 
         private void buttonCopy_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             Clipboard.SetText(textBoxReport.Text);
         }
 
+        private void buttonExport_Click(
+            object sender,
+            EventArgs e)
+        {
+            if (ReportBDROM == null || ReportPlaylists == null || ReportPlaylists.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "There is no report data available to export.",
+                    "BDInfo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            string defaultName = ReportBDROM.VolumeLabel;
+            if (string.IsNullOrWhiteSpace(defaultName))
+            {
+                defaultName = "BDINFO";
+            }
+            defaultName = ToolBox.GetSafeFileName(defaultName) + ".bdinfo";
+
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.Filter = "BDInfo Report (*.bdinfo)|*.bdinfo|All files (*.*)|*.*";
+                dialog.DefaultExt = "bdinfo";
+                dialog.FileName = defaultName;
+
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    try
+                    {
+                        BDInfoReportSerializer.Save(dialog.FileName, ReportBDROM, ReportPlaylists, ReportScanResult);
+                        MessageBox.Show(this,
+                            "Report exported successfully.",
+                            "BDInfo",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(this,
+                            string.Format(CultureInfo.InvariantCulture, "Error exporting report: {0}", ex.Message),
+                            "BDInfo Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
         private void textBoxReport_KeyDown(
-            object sender, 
+            object sender,
             KeyEventArgs e)
         {
             if (e.Control && (e.KeyCode == System.Windows.Forms.Keys.A))

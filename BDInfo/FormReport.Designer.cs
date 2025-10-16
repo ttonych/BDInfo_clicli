@@ -48,6 +48,7 @@ namespace BDInfo
         private void InitializeComponent()
         {
             this.buttonCopy = new System.Windows.Forms.Button();
+            this.buttonExport = new System.Windows.Forms.Button();
             this.textBoxReport = new System.Windows.Forms.TextBox();
             this.buttonChart = new System.Windows.Forms.Button();
             this.labelChartType = new System.Windows.Forms.Label();
@@ -61,7 +62,7 @@ namespace BDInfo
             this.SuspendLayout();
             // 
             // buttonCopy
-            // 
+            //
             this.buttonCopy.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.buttonCopy.Location = new System.Drawing.Point(285, 457);
             this.buttonCopy.Name = "buttonCopy";
@@ -70,6 +71,17 @@ namespace BDInfo
             this.buttonCopy.Text = "Copy to Clipboard";
             this.buttonCopy.UseVisualStyleBackColor = true;
             this.buttonCopy.Click += new System.EventHandler(this.buttonCopy_Click);
+            //
+            // buttonExport
+            //
+            this.buttonExport.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.buttonExport.Location = new System.Drawing.Point(157, 457);
+            this.buttonExport.Name = "buttonExport";
+            this.buttonExport.Size = new System.Drawing.Size(122, 23);
+            this.buttonExport.TabIndex = 7;
+            this.buttonExport.Text = "Export Report...";
+            this.buttonExport.UseVisualStyleBackColor = true;
+            this.buttonExport.Click += new System.EventHandler(this.buttonExport_Click);
             // 
             // textBoxReport
             // 
@@ -191,6 +203,7 @@ namespace BDInfo
             this.Controls.Add(this.comboBoxAngle);
             this.Controls.Add(this.labelPlaylist);
             this.Controls.Add(this.comboBoxPlaylist);
+            this.Controls.Add(this.buttonExport);
             this.Controls.Add(this.buttonCopy);
             this.Controls.Add(this.textBoxReport);
             this.Name = "FormReport";
@@ -214,6 +227,7 @@ namespace BDInfo
         private System.Windows.Forms.ComboBox comboBoxAngle;
         private System.Windows.Forms.Label labelPlaylist;
         private System.Windows.Forms.ComboBox comboBoxPlaylist;
+        private System.Windows.Forms.Button buttonExport;
 
     }
 }

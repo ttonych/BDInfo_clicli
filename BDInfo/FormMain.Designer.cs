@@ -85,6 +85,7 @@ namespace BDInfo
             this.columnHeaderDescription = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.buttonRescan = new System.Windows.Forms.Button();
             this.buttonIsoBrowse = new System.Windows.Forms.Button();
+            this.buttonLoadReport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerOuter)).BeginInit();
             this.splitContainerOuter.Panel1.SuspendLayout();
             this.splitContainerOuter.Panel2.SuspendLayout();
@@ -96,9 +97,9 @@ namespace BDInfo
             this.SuspendLayout();
             // 
             // buttonBrowse
-            // 
+            //
             this.buttonBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBrowse.Location = new System.Drawing.Point(598, 22);
+            this.buttonBrowse.Location = new System.Drawing.Point(531, 22);
             this.buttonBrowse.Name = "buttonBrowse";
             this.buttonBrowse.Size = new System.Drawing.Size(62, 23);
             this.buttonBrowse.TabIndex = 1;
@@ -112,7 +113,7 @@ namespace BDInfo
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxSource.Location = new System.Drawing.Point(17, 24);
             this.textBoxSource.Name = "textBoxSource";
-            this.textBoxSource.Size = new System.Drawing.Size(575, 20);
+            this.textBoxSource.Size = new System.Drawing.Size(508, 20);
             this.textBoxSource.TabIndex = 0;
             this.textBoxSource.TextChanged += new System.EventHandler(this.textBoxSource_TextChanged);
             // 
@@ -457,10 +458,10 @@ namespace BDInfo
             // 
             this.buttonRescan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonRescan.Enabled = false;
-            this.buttonRescan.Location = new System.Drawing.Point(706, 22);
+            this.buttonRescan.Location = new System.Drawing.Point(710, 22);
             this.buttonRescan.Name = "buttonRescan";
             this.buttonRescan.Size = new System.Drawing.Size(66, 23);
-            this.buttonRescan.TabIndex = 3;
+            this.buttonRescan.TabIndex = 4;
             this.buttonRescan.Text = "Rescan";
             this.buttonRescan.UseVisualStyleBackColor = true;
             this.buttonRescan.Click += new System.EventHandler(this.buttonRescan_Click);
@@ -468,13 +469,24 @@ namespace BDInfo
             // buttonIsoBrowse
             // 
             this.buttonIsoBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonIsoBrowse.Location = new System.Drawing.Point(666, 22);
+            this.buttonIsoBrowse.Location = new System.Drawing.Point(599, 22);
             this.buttonIsoBrowse.Name = "buttonIsoBrowse";
             this.buttonIsoBrowse.Size = new System.Drawing.Size(34, 23);
             this.buttonIsoBrowse.TabIndex = 2;
             this.buttonIsoBrowse.Text = "ISO";
             this.buttonIsoBrowse.UseVisualStyleBackColor = true;
             this.buttonIsoBrowse.Click += new System.EventHandler(this.buttonBrowse_Click);
+            //
+            // buttonLoadReport
+            //
+            this.buttonLoadReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonLoadReport.Location = new System.Drawing.Point(639, 22);
+            this.buttonLoadReport.Name = "buttonLoadReport";
+            this.buttonLoadReport.Size = new System.Drawing.Size(65, 23);
+            this.buttonLoadReport.TabIndex = 3;
+            this.buttonLoadReport.Text = "Report...";
+            this.buttonLoadReport.UseVisualStyleBackColor = true;
+            this.buttonLoadReport.Click += new System.EventHandler(this.buttonBrowse_Click);
             // 
             // FormMain
             // 
@@ -482,6 +494,7 @@ namespace BDInfo
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(784, 575);
+            this.Controls.Add(this.buttonLoadReport);
             this.Controls.Add(this.buttonIsoBrowse);
             this.Controls.Add(this.buttonRescan);
             this.Controls.Add(this.splitContainerOuter);
@@ -566,5 +579,6 @@ namespace BDInfo
         private System.Windows.Forms.ColumnHeader columnHeaderPlaylistGroup;
         private System.Windows.Forms.ColumnHeader columnHeaderIndex;
         private System.Windows.Forms.Button buttonIsoBrowse;
+        private System.Windows.Forms.Button buttonLoadReport;
     }
 }
