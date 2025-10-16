@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using BDInfo.Reporting;
 
 namespace BDInfo
 {
@@ -21,6 +22,12 @@ namespace BDInfo
             "Video Frame Type Sizes"
         };
 
+        private enum ReportFormat
+        {
+            Text,
+            Bdinfo
+        }
+
         private sealed class CliOptions
         {
             public string BdPath;
@@ -31,7 +38,9 @@ namespace BDInfo
             public bool WholeDisc;
             public bool SaveCharts;
             public string ChartFormat = "png";
+            public bool ReportFormatsSpecified;
             public List<string> PlaylistNames { get; } = new List<string>();
+            public HashSet<ReportFormat> ReportFormats { get; } = new HashSet<ReportFormat> { ReportFormat.Text };
         }
 
         public static bool TryHandle(string[] args)
@@ -145,6 +154,35 @@ namespace BDInfo
                     {
                         options.ChartFormat = value;
                     }
+                    continue;
+                }
+
+                if (IsOption(arg, "-r", "--report"))
+                {
+                    string value = ExtractOptionValue(args, ref i, "-r", "--report");
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        throw new ArgumentException("The --report option requires a comma separated list of formats.");
+                    }
+
+                    if (!options.ReportFormatsSpecified)
+                    {
+                        options.ReportFormats.Clear();
+                    }
+
+                    bool anyFormat = false;
+                    foreach (string token in SplitValues(value))
+                    {
+                        options.ReportFormats.Add(ParseReportFormat(token));
+                        anyFormat = true;
+                    }
+
+                    if (!anyFormat)
+                    {
+                        throw new ArgumentException("The --report option did not include any formats.");
+                    }
+
+                    options.ReportFormatsSpecified = true;
                     continue;
                 }
 
@@ -384,8 +422,16 @@ namespace BDInfo
                     throw new InvalidOperationException("Report destination was not resolved.");
                 }
 
-                string reportPath = GenerateReport(bdrom, selectedPlaylists, scanResult, reportDestination);
-                Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Report written to: {0}", reportPath));
+                if (options.ReportFormats.Count == 0)
+                {
+                    options.ReportFormats.Add(ReportFormat.Text);
+                }
+
+                List<string> reportPaths = GenerateReports(bdrom, selectedPlaylists, scanResult, reportDestination, options.ReportFormats);
+                foreach (string path in reportPaths)
+                {
+                    Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Report written to: {0}", path));
+                }
 
                 if (options.SaveCharts)
                 {
@@ -463,7 +509,10 @@ namespace BDInfo
 
         private static bool NeedsFurtherProcessing(CliOptions options)
         {
-            return options.PlaylistNames.Count > 0 || options.WholeDisc || options.SaveCharts;
+            return options.PlaylistNames.Count > 0
+                   || options.WholeDisc
+                   || options.SaveCharts
+                   || options.ReportFormatsSpecified;
         }
 
         private static void AttachErrorHandlers(BDROM bdrom)
@@ -1025,21 +1074,65 @@ namespace BDInfo
             }
         }
 
-        private static string GenerateReport(BDROM bdrom, List<TSPlaylistFile> playlists, ScanBDROMResult scanResult, string destination)
+        private static List<string> GenerateReports(BDROM bdrom, List<TSPlaylistFile> playlists, ScanBDROMResult scanResult, string destination, IReadOnlyCollection<ReportFormat> formats)
         {
-            using (var report = new FormReport())
+            if (formats == null || formats.Count == 0)
             {
-                report.Generate(bdrom, playlists, scanResult);
-                string reportText = report.ReportText;
+                formats = new[] { ReportFormat.Text };
+            }
 
-                string volumeLabel = string.IsNullOrWhiteSpace(bdrom.VolumeLabel)
-                    ? "UNKNOWN"
-                    : bdrom.VolumeLabel;
+            string volumeLabel = string.IsNullOrWhiteSpace(bdrom.VolumeLabel)
+                ? "UNKNOWN"
+                : bdrom.VolumeLabel;
 
-                string fileName = ToolBox.GetSafeFileName(string.Format(CultureInfo.InvariantCulture, "BDINFO.{0}.txt", volumeLabel));
-                string reportPath = Path.Combine(destination, fileName);
-                File.WriteAllText(reportPath, reportText);
-                return reportPath;
+            string sanitizedTextName = ToolBox.GetSafeFileName(string.Format(CultureInfo.InvariantCulture, "BDINFO.{0}.txt", volumeLabel));
+            string sanitizedBaseName = Path.GetFileNameWithoutExtension(sanitizedTextName);
+
+            if (string.IsNullOrWhiteSpace(sanitizedBaseName))
+            {
+                sanitizedBaseName = "BDINFO";
+            }
+
+            var writtenPaths = new List<string>();
+
+            if (formats.Contains(ReportFormat.Text))
+            {
+                using (var report = new FormReport())
+                {
+                    report.Generate(bdrom, playlists, scanResult);
+                    string reportText = report.ReportText;
+                    string reportPath = Path.Combine(destination, sanitizedTextName);
+                    File.WriteAllText(reportPath, reportText);
+                    writtenPaths.Add(reportPath);
+                }
+            }
+
+            if (formats.Contains(ReportFormat.Bdinfo))
+            {
+                string reportPath = Path.Combine(destination, sanitizedBaseName + ".bdinfo");
+                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult);
+                writtenPaths.Add(reportPath);
+            }
+
+            return writtenPaths;
+        }
+
+        private static ReportFormat ParseReportFormat(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("Report format value cannot be empty.");
+            }
+
+            switch (value.Trim().ToLowerInvariant())
+            {
+                case "txt":
+                case "text":
+                    return ReportFormat.Text;
+                case "bdinfo":
+                    return ReportFormat.Bdinfo;
+                default:
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Unsupported report format: {0}", value));
             }
         }
 
@@ -1122,6 +1215,7 @@ namespace BDInfo
             Console.WriteLine("  -w, --whole                Scan whole disc - every playlist.");
             Console.WriteLine("  -v, --version              Print the version.");
             Console.WriteLine("  -c, --charts               Save all charts as image (select image format, default png)");
+            Console.WriteLine("  -r, --report              Choose report formats (txt, bdinfo). Use commas for multiple.");
         }
     }
 }

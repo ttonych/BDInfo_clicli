@@ -49,5 +49,10 @@ namespace BDInfo
             CdReader = reader;
             Name = fileInfo.Name.ToUpper();
         }
+
+        internal TSInterleavedFile(string name)
+        {
+            Name = name.ToUpperInvariant();
+        }
     }
 }

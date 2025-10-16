@@ -199,6 +199,13 @@ namespace BDInfo
             Name = fileInfo.Name.ToUpper();
         }
 
+        internal TSStreamFile(string name, long size, double length)
+        {
+            Name = name.ToUpperInvariant();
+            Size = size;
+            Length = length;
+        }
+
         public string DisplayName
         {
             get

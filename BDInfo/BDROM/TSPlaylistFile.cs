@@ -128,6 +128,12 @@ namespace BDInfo
             IsInitialized = true;
         }
 
+        internal TSPlaylistFile(BDROM bdrom, string name)
+        {
+            BDROM = bdrom;
+            Name = name.ToUpperInvariant();
+        }
+
         public override string ToString()
         {
             return Name;

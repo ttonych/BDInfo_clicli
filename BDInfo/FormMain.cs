@@ -24,9 +24,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using BDInfo.Reporting;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace BDInfo
@@ -129,14 +131,9 @@ namespace BDInfo
 
         private void textBoxSource_TextChanged(object sender, EventArgs e)
         {
-            if (textBoxSource.Text.Length > 0)
-            {
-                buttonRescan.Enabled = true;
-            }
-            else
-            {
-                buttonRescan.Enabled = false;
-            }
+            bool hasText = textBoxSource.Text.Length > 0;
+            bool isReport = BDROM != null && BDROM.IsReport;
+            buttonRescan.Enabled = hasText && !isReport;
         }
 
         private void FormMain_DragEnter(object sender, DragEventArgs e)
@@ -174,6 +171,12 @@ namespace BDInfo
                 {
                     openDialog.IsFolderPicker = true;
                     openDialog.Title = "Select a BluRay BDMV Folder:";
+                }
+                else if (((Button) sender).Name == "buttonLoadReport")
+                {
+                    openDialog.IsFolderPicker = false;
+                    openDialog.Title = "Select a BDInfo report file:";
+                    openDialog.Filters.Add(new CommonFileDialogFilter("BDInfo Report", "bdinfo"));
                 }
                 else
                 {
@@ -390,6 +393,18 @@ namespace BDInfo
 
         private BackgroundWorker InitBDROMWorker = null;
 
+        private class InitBDROMParameters
+        {
+            public string Path;
+            public bool IsReport;
+        }
+
+        private class InitBDROMResult
+        {
+            public Exception Exception;
+            public BDInfoReportData ReportData;
+        }
+
         private void InitBDROM(
             string path)
         {
@@ -398,6 +413,7 @@ namespace BDInfo
             CustomPlaylistCount = 0;
             buttonBrowse.Enabled = false;
             buttonIsoBrowse.Enabled = false;
+            buttonLoadReport.Enabled = false;
             buttonRescan.Enabled = false;
             buttonSelectAll.Enabled = false;
             buttonUnselectAll.Enabled = false;
@@ -422,25 +438,55 @@ namespace BDInfo
             InitBDROMWorker.DoWork += InitBDROMWork;
             InitBDROMWorker.ProgressChanged += InitBDROMProgress;
             InitBDROMWorker.RunWorkerCompleted += InitBDROMCompleted;
-            InitBDROMWorker.RunWorkerAsync(path);
+            bool isReport = false;
+            try
+            {
+                if (!string.IsNullOrEmpty(path))
+                {
+                    isReport = string.Equals(Path.GetExtension(path), ".bdinfo", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch
+            {
+                isReport = false;
+            }
+
+            var parameters = new InitBDROMParameters { Path = path, IsReport = isReport };
+
+            InitBDROMWorker.RunWorkerAsync(parameters);
         }
 
         private void InitBDROMWork(
-            object sender, 
+            object sender,
             DoWorkEventArgs e)
         {
             try
             {
-                BDROM = new BDROM((string)e.Argument);
-                BDROM.StreamClipFileScanError += new BDROM.OnStreamClipFileScanError(BDROM_StreamClipFileScanError);
-                BDROM.StreamFileScanError += new BDROM.OnStreamFileScanError(BDROM_StreamFileScanError);
-                BDROM.PlaylistFileScanError += new BDROM.OnPlaylistFileScanError(BDROM_PlaylistFileScanError);
-                BDROM.Scan();
-                e.Result = null;
+                InitBDROMParameters parameters = e.Argument as InitBDROMParameters;
+                string path = parameters?.Path ?? e.Argument as string;
+                bool isReport = parameters?.IsReport ?? false;
+
+                if (isReport)
+                {
+                    BDInfoReportData reportData = BDInfoReportSerializer.Load(path);
+                    BDROM = BDInfoReportSerializer.CreateBDROM(reportData);
+                    ScanResult = BDInfoReportSerializer.CreateScanResult(reportData.ScanResult);
+                    e.Result = new InitBDROMResult { ReportData = reportData };
+                }
+                else
+                {
+                    BDROM = new BDROM(path);
+                    BDROM.StreamClipFileScanError += new BDROM.OnStreamClipFileScanError(BDROM_StreamClipFileScanError);
+                    BDROM.StreamFileScanError += new BDROM.OnStreamFileScanError(BDROM_StreamFileScanError);
+                    BDROM.PlaylistFileScanError += new BDROM.OnPlaylistFileScanError(BDROM_PlaylistFileScanError);
+                    BDROM.Scan();
+                    ScanResult = new ScanBDROMResult();
+                    e.Result = new InitBDROMResult();
+                }
             }
             catch (Exception ex)
             {
-                e.Result = ex;
+                e.Result = new InitBDROMResult { Exception = ex };
             }
         }
 
@@ -481,28 +527,32 @@ namespace BDInfo
         }
 
         private void InitBDROMCompleted(
-            object sender, 
+            object sender,
             RunWorkerCompletedEventArgs e)
         {
             HideNotification();
 
-            if (e.Result != null)
+            InitBDROMResult result = e.Result as InitBDROMResult;
+            Exception exception = result?.Exception ?? (e.Result as Exception);
+
+            if (exception != null)
             {
-                string msg = string.Format(CultureInfo.InvariantCulture,
-                                            "{0}", ((Exception)e.Result).Message);
+                string msg = string.Format(CultureInfo.InvariantCulture, "{0}", exception.Message);
 
                 MessageBox.Show(msg, "BDInfo Error",
                                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                 buttonBrowse.Enabled = true;
                 buttonIsoBrowse.Enabled = true;
+                buttonLoadReport.Enabled = true;
                 buttonRescan.Enabled = true;
                 return;
             }
 
             buttonBrowse.Enabled = true;
             buttonIsoBrowse.Enabled = true;
-            buttonRescan.Enabled = true;
-            buttonScan.Enabled = true;
+            buttonLoadReport.Enabled = true;
+            buttonRescan.Enabled = !(BDROM?.IsReport ?? false);
+            buttonScan.Enabled = !(BDROM?.IsReport ?? false);
             buttonSelectAll.Enabled = true;
             buttonUnselectAll.Enabled = true;
             buttonCustomPlaylist.Enabled = true;
@@ -524,7 +574,14 @@ namespace BDInfo
                                                     Environment.NewLine);
             }
 
-            if (!BDROM.IsImage)
+            if (BDROM.IsReport)
+            {
+                textBoxDetails.Text += string.Format(CultureInfo.InvariantCulture,
+                                                    "Loaded BDInfo report: {0}{1}",
+                                                    string.IsNullOrEmpty(BDROM.ReportPath) ? textBoxSource.Text : BDROM.ReportPath,
+                                                    Environment.NewLine);
+            }
+            else if (!BDROM.IsImage)
             {
                 textBoxSource.Text = BDROM.DirectoryRoot.FullName;
                 textBoxDetails.Text += string.Format(CultureInfo.InvariantCulture,
@@ -1068,6 +1125,16 @@ namespace BDInfo
                 ScanBDROMWorker.IsBusy)
             {
                 ScanBDROMWorker.CancelAsync();
+                return;
+            }
+
+            if (BDROM != null && BDROM.IsReport)
+            {
+                MessageBox.Show(this,
+                    "Scanning is not available for exported reports.",
+                    "BDInfo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
                 return;
             }
 
