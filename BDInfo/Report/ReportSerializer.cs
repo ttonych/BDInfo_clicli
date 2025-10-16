@@ -318,10 +318,10 @@ namespace BDInfo.Reporting
                     }
 
                     playlist.SortedStreams = CreateStreamList(playlistData.SortedStreams);
-                    playlist.VideoStreams = CreateStreamList(playlistData.VideoStreams);
-                    playlist.AudioStreams = CreateStreamList(playlistData.AudioStreams);
-                    playlist.TextStreams = CreateStreamList(playlistData.TextStreams);
-                    playlist.GraphicsStreams = CreateStreamList(playlistData.GraphicsStreams);
+                    playlist.VideoStreams = CreateStreamList<TSVideoStream>(playlistData.VideoStreams);
+                    playlist.AudioStreams = CreateStreamList<TSAudioStream>(playlistData.AudioStreams);
+                    playlist.TextStreams = CreateStreamList<TSTextStream>(playlistData.TextStreams);
+                    playlist.GraphicsStreams = CreateStreamList<TSGraphicsStream>(playlistData.GraphicsStreams);
 
                     bdrom.PlaylistFiles[playlist.Name] = playlist;
                 }
@@ -872,6 +872,27 @@ namespace BDInfo.Reporting
                     }
                 }
             }
+        }
+
+        private static List<TStream> CreateStreamList<TStream>(List<StreamData> data) where TStream : TSStream
+        {
+            var list = new List<TStream>();
+            if (data == null)
+            {
+                return list;
+            }
+
+            foreach (var streamData in data)
+            {
+                var stream = CreateStream(streamData);
+                if (stream is TStream typed)
+                {
+                    list.Add(typed);
+                }
+            }
+
+            LinkAudioCoreStreams(list.Cast<TSStream>(), data);
+            return list;
         }
 
         private static List<TSStream> CreateStreamList(List<StreamData> data)
