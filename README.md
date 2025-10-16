@@ -110,8 +110,9 @@ LGPL‑2.1 (same as the original BDInfo).
 - This fork: CLI mode, GUI export/reload, JSON/XML report support, HDR10+ bug fix.
 
 
-======
+
 Original README.md UniqProject/BDInfo
+======
 
 BDInfo
 ======
