@@ -469,6 +469,8 @@ namespace BDInfo
 
             ExtendedData = (ExtendedDataSet)stream.ExtendedData;
 
+            IsHdr10Plus = ExtendedData.IsHdr10Plus;
+
             VideoParamSets = ExtendedData.VideoParamSets;
             VUIParameterSets = ExtendedData.VUIParameterSets;
             SeqParameterSets = ExtendedData.SeqParameterSets;
