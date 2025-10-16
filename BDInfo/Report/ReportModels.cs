@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.Serialization;
 using BDInfo;
 
@@ -41,7 +42,35 @@ namespace BDInfo.Reporting
         [DataMember] public bool IsInterlaced;
         [DataMember] public int FrameRateEnumerator;
         [DataMember] public int FrameRateDenominator;
-        [DataMember] public TSAspectRatio AspectRatio;
+        [IgnoreDataMember]
+        public TSAspectRatio AspectRatio { get; set; }
+
+        [DataMember(Name = "AspectRatio")]
+        public string AspectRatioValue
+        {
+            get => ((int)AspectRatio).ToString(CultureInfo.InvariantCulture);
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    AspectRatio = TSAspectRatio.Unknown;
+                    return;
+                }
+
+                if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numericValue))
+                {
+                    AspectRatio = (TSAspectRatio)numericValue;
+                }
+                else if (Enum.TryParse(value, true, out TSAspectRatio parsedValue))
+                {
+                    AspectRatio = parsedValue;
+                }
+                else
+                {
+                    AspectRatio = TSAspectRatio.Unknown;
+                }
+            }
+        }
         [DataMember] public TSVideoFormat VideoFormat;
         [DataMember] public TSFrameRate FrameRate;
         [DataMember] public string EncodingProfile;
