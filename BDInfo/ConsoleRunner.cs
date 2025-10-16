@@ -25,7 +25,8 @@ namespace BDInfo
         private enum ReportFormat
         {
             Text,
-            Bdinfo
+            Bdinfo,
+            BdinfoJson
         }
 
         private sealed class CliOptions
@@ -1107,10 +1108,16 @@ namespace BDInfo
                 }
             }
 
-            if (formats.Contains(ReportFormat.Bdinfo))
+            if (formats.Contains(ReportFormat.BdinfoJson))
             {
                 string reportPath = Path.Combine(destination, sanitizedBaseName + ".bdinfo");
-                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult);
+                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Json);
+                writtenPaths.Add(reportPath);
+            }
+            else if (formats.Contains(ReportFormat.Bdinfo))
+            {
+                string reportPath = Path.Combine(destination, sanitizedBaseName + ".bdinfo");
+                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Xml);
                 writtenPaths.Add(reportPath);
             }
 
@@ -1130,7 +1137,11 @@ namespace BDInfo
                 case "text":
                     return ReportFormat.Text;
                 case "bdinfo":
+                case "bdinfo-xml":
                     return ReportFormat.Bdinfo;
+                case "bdinfo-json":
+                case "json":
+                    return ReportFormat.BdinfoJson;
                 default:
                     throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Unsupported report format: {0}", value));
             }
@@ -1215,7 +1226,7 @@ namespace BDInfo
             Console.WriteLine("  -w, --whole                Scan whole disc - every playlist.");
             Console.WriteLine("  -v, --version              Print the version.");
             Console.WriteLine("  -c, --charts               Save all charts as image (select image format, default png)");
-            Console.WriteLine("  -r, --report              Choose report formats (txt, bdinfo). Use commas for multiple.");
+            Console.WriteLine("  -r, --report              Choose report formats (txt, bdinfo, bdinfo-json). Use commas for multiple.");
         }
     }
 }

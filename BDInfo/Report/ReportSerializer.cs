@@ -3,16 +3,36 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Xml;
+using System.Xml.Json;
 using BDInfo;
 
 namespace BDInfo.Reporting
 {
+    public enum BDInfoReportFormat
+    {
+        Xml,
+        Json
+    }
+
     public static class BDInfoReportSerializer
     {
-        private static readonly DataContractSerializer Serializer = new DataContractSerializer(typeof(BDInfoReportData));
+        private static readonly DataContractSerializer XmlSerializer = new DataContractSerializer(typeof(BDInfoReportData));
+        private static readonly DataContractJsonSerializer JsonSerializer = new DataContractJsonSerializer(
+            typeof(BDInfoReportData),
+            new DataContractJsonSerializerSettings
+            {
+                UseSimpleDictionaryFormat = true
+            });
 
-        public static void Save(string path, BDROM bdrom, IEnumerable<TSPlaylistFile> playlists, ScanBDROMResult scanResult)
+        public static void Save(
+            string path,
+            BDROM bdrom,
+            IEnumerable<TSPlaylistFile> playlists,
+            ScanBDROMResult scanResult,
+            BDInfoReportFormat format = BDInfoReportFormat.Xml)
         {
             if (bdrom == null)
             {
@@ -37,9 +57,32 @@ namespace BDInfo.Reporting
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? ".");
 
             using (var stream = File.Create(path))
-            using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { Indent = true }))
             {
-                Serializer.WriteObject(writer, report);
+                switch (format)
+                {
+                    case BDInfoReportFormat.Json:
+                        using (var writer = JsonReaderWriterFactory.CreateJsonWriter(
+                                   stream,
+                                   Encoding.UTF8,
+                                   ownsStream: false,
+                                   indent: true,
+                                   indentChars: "  "))
+                        {
+                            JsonSerializer.WriteObject(writer, report);
+                            writer.Flush();
+                        }
+
+                        stream.SetLength(stream.Position);
+                        break;
+
+                    default:
+                        using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { Indent = true }))
+                        {
+                            XmlSerializer.WriteObject(writer, report);
+                        }
+
+                        break;
+                }
             }
         }
 
@@ -49,16 +92,77 @@ namespace BDInfo.Reporting
             {
                 throw new ArgumentException("Path cannot be empty.", nameof(path));
             }
-
             using (var stream = File.OpenRead(path))
-            using (var reader = XmlReader.Create(stream))
             {
-                var report = (BDInfoReportData)Serializer.ReadObject(reader);
+                var format = DetectFormat(stream);
+
+                BDInfoReportData report;
+                switch (format)
+                {
+                    case BDInfoReportFormat.Json:
+                        stream.Seek(0, SeekOrigin.Begin);
+                        using (var reader = JsonReaderWriterFactory.CreateJsonReader(stream, Encoding.UTF8, XmlDictionaryReaderQuotas.Max, null))
+                        {
+                            report = (BDInfoReportData)JsonSerializer.ReadObject(reader);
+                        }
+
+                        break;
+
+                    default:
+                        stream.Seek(0, SeekOrigin.Begin);
+                        using (var reader = XmlReader.Create(stream))
+                        {
+                            report = (BDInfoReportData)XmlSerializer.ReadObject(reader);
+                        }
+
+                        break;
+                }
+
                 if (report != null)
                 {
                     report.SourcePath = path;
                 }
+
                 return report;
+            }
+        }
+
+        private static BDInfoReportFormat DetectFormat(Stream stream)
+        {
+            if (!stream.CanSeek)
+            {
+                throw new NotSupportedException("Report streams must be seekable.");
+            }
+
+            long originalPosition = stream.Position;
+            try
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+
+                int nextByte;
+                do
+                {
+                    nextByte = stream.ReadByte();
+                }
+                while (nextByte != -1 && char.IsWhiteSpace((char)nextByte));
+
+                if (nextByte == -1)
+                {
+                    throw new SerializationException("Report file is empty.");
+                }
+
+                if (nextByte == '{' || nextByte == '[')
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return BDInfoReportFormat.Json;
+                }
+
+                stream.Seek(0, SeekOrigin.Begin);
+                return BDInfoReportFormat.Xml;
+            }
+            finally
+            {
+                stream.Seek(originalPosition, SeekOrigin.Begin);
             }
         }
 

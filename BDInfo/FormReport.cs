@@ -1158,7 +1158,7 @@ namespace BDInfo
 
             using (SaveFileDialog dialog = new SaveFileDialog())
             {
-                dialog.Filter = "BDInfo Report (*.bdinfo)|*.bdinfo|All files (*.*)|*.*";
+                dialog.Filter = "BDInfo Report (XML) (*.bdinfo)|*.bdinfo|BDInfo Report (JSON) (*.bdinfo)|*.bdinfo|All files (*.*)|*.*";
                 dialog.DefaultExt = "bdinfo";
                 dialog.FileName = defaultName;
 
@@ -1166,7 +1166,10 @@ namespace BDInfo
                 {
                     try
                     {
-                        BDInfoReportSerializer.Save(dialog.FileName, ReportBDROM, ReportPlaylists, ReportScanResult);
+                        BDInfoReportFormat format = dialog.FilterIndex == 2
+                            ? BDInfoReportFormat.Json
+                            : BDInfoReportFormat.Xml;
+                        BDInfoReportSerializer.Save(dialog.FileName, ReportBDROM, ReportPlaylists, ReportScanResult, format);
                         MessageBox.Show(this,
                             "Report exported successfully.",
                             "BDInfo",
