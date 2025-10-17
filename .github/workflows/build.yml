@@ -1,0 +1,29 @@
+name: Build (BDInfo_clicli)
+
+on:
+  push:
+    branches: [ "**" ]
+    tags: [ "v*.*.*" ]    # pushing a tag like v1.2.3 will create/update a GitHub Release
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Puts MSBuild from Visual Studio into PATH (for .NET Framework builds).
+      # Docs: microsoft/setup-msbuild
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      # Installs nuget.exe into PATH so we can run "nuget restore".
+      # Docs: NuGet/setup-nuget
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      # Restore packages for classic .NET Framework solutions (packages.config).
+      - name: Restore NuGet packages
+        ru
