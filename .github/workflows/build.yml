@@ -14,56 +14,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Puts MSBuild from Visual Studio into PATH (for .NET Framework builds).
-      # Docs: microsoft/setup-msbuild
+      # Put MSBuild into PATH (for .NET Framework builds).
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      # Installs nuget.exe into PATH so we can run "nuget restore".
-      # Docs: NuGet/setup-nuget
+      # nuget.exe for classic packages.config restore.
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v2
 
-      # Restore packages for classic .NET Framework solutions (packages.config).
       - name: Restore NuGet packages
         run: nuget restore BDInfo.sln
 
-      # Build Release configuration (adjust Platform if your solution requires).
-      - name: Build Release
-        run: msbuild BDInfo.sln /p:Configuration=Release /p:Platform="Any CPU" /m
-
-      # Stage all project Release outputs into a clean dist/ folder
-      # (so final paths don't include /bin/Release in the artifact).
-      - name: Stage build outputs to dist/
+      # Build directly to dist/ using MSBuild OutDir to avoid /bin/ in outputs.
+      - name: Build to dist/
         shell: pwsh
         run: |
-          $dist = "dist"
+          $dist = Join-Path $PWD "dist"
           if (Test-Path $dist) { Remove-Item $dist -Recurse -Force }
           New-Item -ItemType Directory -Force -Path $dist | Out-Null
 
-          # Find every .../bin/Release folder and copy its content to dist/<ProjectName>
-          $releaseDirs = Get-ChildItem -Path . -Recurse -Directory |
-            Where-Object { $_.FullName -match '[\\/]bin[\\/]Release$' }
+          # OutDir must be an absolute path and should end with a backslash
+          $out = (Resolve-Path $dist).Path + "\"
+          & msbuild BDInfo.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutDir="$out" /m
+          Write-Host "Built to ${out}"
 
-          foreach ($dir in $releaseDirs) {
-            $projectDir = Split-Path (Split-Path $dir.FullName -Parent) -Leaf
-            $target = Join-Path $dist $projectDir
-            New-Item -ItemType Directory -Force -Path $target | Out-Null
-            Copy-Item -Path (Join-Path $dir.FullName '*') -Destination $target -Recurse -Force
-          }
-
-          # Use ${dist} because a colon immediately after a variable confuses the parser.
-          Write-Host "Staged to ${dist}:"
-          Get-ChildItem $dist -Recurse | ForEach-Object { $_.FullName }
-
-      # Package everything from dist/ into a single ZIP at repository root (for Release asset).
+      # Package everything from dist/ into a single ZIP at repository root.
       - name: Package ZIP for Release
         shell: pwsh
         run: |
-          $dist = "dist"
           $zipPath = "BDInfo_clicli.zip"
           if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-          Compress-Archive -Path "$dist/*" -DestinationPath $zipPath -CompressionLevel Optimal
+          Compress-Archive -Path "dist/*" -DestinationPath $zipPath -CompressionLevel Optimal
           Write-Host "Created $zipPath"
 
       # Upload only one artifact with simplified paths (no /bin/ in structure).
