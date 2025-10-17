@@ -26,4 +26,66 @@ jobs:
 
       # Restore packages for classic .NET Framework solutions (packages.config).
       - name: Restore NuGet packages
-        ru
+        run: nuget restore BDInfo.sln
+
+      # Build Release configuration (adjust Platform if your solution requires).
+      - name: Build Release
+        run: msbuild BDInfo.sln /p:Configuration=Release /p:Platform="Any CPU" /m
+
+      # Stage all project Release outputs into a clean dist/ folder
+      # (so final paths don't include /bin/Release).
+      - name: Stage build outputs to dist/
+        shell: pwsh
+        run: |
+          $dist = "dist"
+          if (Test-Path $dist) { Remove-Item $dist -Recurse -Force }
+          New-Item -ItemType Directory -Force -Path $dist | Out-Null
+
+          # Find every .../bin/Release folder and copy its content to dist/<ProjectName>
+          $releaseDirs = Get-ChildItem -Path . -Recurse -Directory |
+            Where-Object { $_.FullName -match '[\\/]bin[\\/]Release$' }
+
+          foreach ($dir in $releaseDirs) {
+            $projectDir = Split-Path (Split-Path $dir.FullName -Parent) -Leaf
+            $target = Join-Path $dist $projectDir
+            New-Item -ItemType Directory -Force -Path $target | Out-Null
+            Copy-Item -Path (Join-Path $dir.FullName '*') -Destination $target -Recurse -Force
+          }
+
+          # Use ${dist} because a colon immediately after a variable confuses the parser.
+          Write-Host "Staged to ${dist}:"
+          Get-ChildItem $dist -Recurse | ForEach-Object { $_.FullName }
+
+      # Package everything from dist/ into a single ZIP at repository root.
+      - name: Package ZIP
+        shell: pwsh
+        run: |
+          $dist = "dist"
+          $zipPath = "BDInfo-Release.zip"
+          if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+          Compress-Archive -Path "$dist/*" -DestinationPath $zipPath -CompressionLevel Optimal
+          Write-Host "Created $zipPath"
+
+      # Upload the ZIP as a workflow artifact (Actions Artifacts v4).
+      - name: Upload artifact (ZIP)
+        uses: actions/upload-artifact@v4
+        with:
+          name: BDInfo-Release-zip
+          path: BDInfo-Release.zip
+          if-no-files-found: error
+
+      # Optionally upload unzipped files as a separate artifact.
+      - name: Upload artifact (files)
+        uses: actions/upload-artifact@v4
+        with:
+          name: BDInfo-Release-files
+          path: dist/**
+          if-no-files-found: error
+
+      # On tag pushes (v*.*.*), create/update a GitHub Release and attach the ZIP.
+      - name: Create GitHub Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            BDInfo-Release.zip
