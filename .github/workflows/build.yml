@@ -33,7 +33,7 @@ jobs:
         run: msbuild BDInfo.sln /p:Configuration=Release /p:Platform="Any CPU" /m
 
       # Stage all project Release outputs into a clean dist/ folder
-      # (so final paths don't include /bin/Release).
+      # (so final paths don't include /bin/Release in the artifact).
       - name: Stage build outputs to dist/
         shell: pwsh
         run: |
@@ -56,29 +56,21 @@ jobs:
           Write-Host "Staged to ${dist}:"
           Get-ChildItem $dist -Recurse | ForEach-Object { $_.FullName }
 
-      # Package everything from dist/ into a single ZIP at repository root.
-      - name: Package ZIP
+      # Package everything from dist/ into a single ZIP at repository root (for Release asset).
+      - name: Package ZIP for Release
         shell: pwsh
         run: |
           $dist = "dist"
-          $zipPath = "BDInfo-Release.zip"
+          $zipPath = "BDInfo_clicli.zip"
           if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
           Compress-Archive -Path "$dist/*" -DestinationPath $zipPath -CompressionLevel Optimal
           Write-Host "Created $zipPath"
 
-      # Upload the ZIP as a workflow artifact (Actions Artifacts v4).
-      - name: Upload artifact (ZIP)
+      # Upload only one artifact with simplified paths (no /bin/ in structure).
+      - name: Upload artifact (files only)
         uses: actions/upload-artifact@v4
         with:
-          name: BDInfo-Release-zip
-          path: BDInfo-Release.zip
-          if-no-files-found: error
-
-      # Optionally upload unzipped files as a separate artifact.
-      - name: Upload artifact (files)
-        uses: actions/upload-artifact@v4
-        with:
-          name: BDInfo-Release-files
+          name: BDInfo_clicli
           path: dist/**
           if-no-files-found: error
 
@@ -88,4 +80,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            BDInfo-Release.zip
+            BDInfo_clicli.zip
