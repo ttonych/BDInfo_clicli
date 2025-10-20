@@ -6,7 +6,7 @@
 BDInfo_clicli forks **https://github.com/UniqProject/BDInfo** (tag v0.7.6.2_1b https://github.com/UniqProject/BDInfo/releases/tag/v0.7.6.2_1b). UniqProject/BDInfo itself is not the original BDInfo—the original project is from CinemaSquid: http://www.cinemasquid.com/blu-ray/tools/bdinfo
 
 - **Export & reload .bdinfo reports** (export via **CLI** and **GUI**; open/reload in **GUI**)
-- **Report formats: JSON and XML** (the `.bdinfo` file can be either; format is auto‑detected)
+- **Report formats: JSON and XML** (the `.bdinfo` file can be either; format is auto‑detected; optional ZIP compression)
 - **HDR10+ carryover bug fix** in video stream metadata
 - A simple **command‑line (CLI) mode** for headless use
 
@@ -37,13 +37,14 @@ Options:
   -v, --version              Print the version.
   -c, --charts               Save all charts as image (select image format, default png)
   -r, --report               Choose report formats (txt, bdinfo, bdinfo-json). Use commas for multiple.
+  -z, --compress             Compress generated .bdinfo reports using ZIP.
 ```
 
 ---
 
 ### 2) Export & reload reports (.bdinfo)
 You can now **export a BDInfo report to a single `.bdinfo` file** and later **open it in the GUI** to browse playlists, streams, and **see charts as if you just scanned the disc**.
-You can choose the **report format** when exporting: **JSON** or **XML**. The exported file uses the `.bdinfo` extension in both cases.
+You can choose the **report format** when exporting: **JSON** or **XML**. The exported file uses the `.bdinfo` extension in both cases, and ZIP compression is optional.
 
 - **Export locations**: available in **GUI** (button **“Export Report…”**) and in the **CLI** (use `-r` / `--report`).
 - **Open/reload**: supported **only in the GUI**. Click **Report…** and select a previously saved `.bdinfo` file. BDInfo **automatically detects** whether it is JSON or XML.
@@ -90,6 +91,8 @@ Common options:
 - `-w, --whole` – scan **all** playlists
 - `-r, --report` – choose report formats: `txt`, `bdinfo`, `bdinfo-json` (comma‑separate for multiple)
 - `-c, --charts` – save bitrate charts as images (default **png**)
+- `-z, --compress` – Compress generated .bdinfo reports using ZIP
+
 
 ---
 
