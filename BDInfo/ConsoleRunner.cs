@@ -1246,8 +1246,8 @@ namespace BDInfo
             Console.WriteLine("  -w, --whole                Scan whole disc - every playlist.");
             Console.WriteLine("  -v, --version              Print the version.");
             Console.WriteLine("  -c, --charts               Save all charts as image (select image format, default png)");
-            Console.WriteLine("  -r, --report              Choose report formats (txt, bdinfo, bdinfo-json). Use commas for multiple.");
-            Console.WriteLine("  -z, --compress            Compress generated .bdinfo reports using ZIP.");
+            Console.WriteLine("  -r, --report               Choose report formats (txt, bdinfo, bdinfo-json). Use commas for multiple.");
+            Console.WriteLine("  -z, --compress             Compress generated .bdinfo reports using ZIP.");
         }
     }
 }
