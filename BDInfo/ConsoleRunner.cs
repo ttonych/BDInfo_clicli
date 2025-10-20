@@ -42,6 +42,7 @@ namespace BDInfo
             public bool ReportFormatsSpecified;
             public List<string> PlaylistNames { get; } = new List<string>();
             public HashSet<ReportFormat> ReportFormats { get; } = new HashSet<ReportFormat> { ReportFormat.Text };
+            public bool CompressReports;
         }
 
         public static bool TryHandle(string[] args)
@@ -155,6 +156,12 @@ namespace BDInfo
                     {
                         options.ChartFormat = value;
                     }
+                    continue;
+                }
+
+                if (IsOption(arg, "-z", "--compress"))
+                {
+                    options.CompressReports = true;
                     continue;
                 }
 
@@ -428,7 +435,13 @@ namespace BDInfo
                     options.ReportFormats.Add(ReportFormat.Text);
                 }
 
-                List<string> reportPaths = GenerateReports(bdrom, selectedPlaylists, scanResult, reportDestination, options.ReportFormats);
+                List<string> reportPaths = GenerateReports(
+                    bdrom,
+                    selectedPlaylists,
+                    scanResult,
+                    reportDestination,
+                    options.ReportFormats,
+                    options.CompressReports);
                 foreach (string path in reportPaths)
                 {
                     Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Report written to: {0}", path));
@@ -1075,7 +1088,13 @@ namespace BDInfo
             }
         }
 
-        private static List<string> GenerateReports(BDROM bdrom, List<TSPlaylistFile> playlists, ScanBDROMResult scanResult, string destination, IReadOnlyCollection<ReportFormat> formats)
+        private static List<string> GenerateReports(
+            BDROM bdrom,
+            List<TSPlaylistFile> playlists,
+            ScanBDROMResult scanResult,
+            string destination,
+            IReadOnlyCollection<ReportFormat> formats,
+            bool compress)
         {
             if (formats == null || formats.Count == 0)
             {
@@ -1112,13 +1131,13 @@ namespace BDInfo
             if (formats.Contains(ReportFormat.BdinfoJson))
             {
                 string reportPath = Path.Combine(destination, sanitizedBaseName + ".bdinfo");
-                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Json);
+                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Json, compress);
                 writtenPaths.Add(reportPath);
             }
             else if (formats.Contains(ReportFormat.Bdinfo))
             {
                 string reportPath = Path.Combine(destination, sanitizedBaseName + ".bdinfo");
-                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Xml);
+                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Xml, compress);
                 writtenPaths.Add(reportPath);
             }
 
@@ -1228,6 +1247,7 @@ namespace BDInfo
             Console.WriteLine("  -v, --version              Print the version.");
             Console.WriteLine("  -c, --charts               Save all charts as image (select image format, default png)");
             Console.WriteLine("  -r, --report              Choose report formats (txt, bdinfo, bdinfo-json). Use commas for multiple.");
+            Console.WriteLine("  -z, --compress            Compress generated .bdinfo reports using ZIP.");
         }
     }
 }

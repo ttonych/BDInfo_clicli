@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
@@ -31,7 +32,8 @@ namespace BDInfo.Reporting
             BDROM bdrom,
             IEnumerable<TSPlaylistFile> playlists,
             ScanBDROMResult scanResult,
-            BDInfoReportFormat format = BDInfoReportFormat.Xml)
+            BDInfoReportFormat format = BDInfoReportFormat.Xml,
+            bool compress = false)
         {
             if (bdrom == null)
             {
@@ -55,32 +57,24 @@ namespace BDInfo.Reporting
 
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? ".");
 
-            using (var stream = File.Create(path))
+            if (compress)
             {
-                switch (format)
+                using (var fileStream = File.Create(path))
+                using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Create))
                 {
-                    case BDInfoReportFormat.Json:
-                        using (var writer = JsonReaderWriterFactory.CreateJsonWriter(
-                                   stream,
-                                   Encoding.UTF8,
-                                   ownsStream: false,
-                                   indent: true,
-                                   indentChars: "  "))
-                        {
-                            JsonSerializer.WriteObject(writer, report);
-                            writer.Flush();
-                        }
-
-                        stream.SetLength(stream.Position);
-                        break;
-
-                    default:
-                        using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { Indent = true }))
-                        {
-                            XmlSerializer.WriteObject(writer, report);
-                        }
-
-                        break;
+                    string entryName = format == BDInfoReportFormat.Json ? "report.json" : "report.xml";
+                    var entry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
+                    using (var entryStream = entry.Open())
+                    {
+                        WriteReport(entryStream, report, format);
+                    }
+                }
+            }
+            else
+            {
+                using (var stream = File.Create(path))
+                {
+                    WriteReport(stream, report, format);
                 }
             }
         }
@@ -93,36 +87,46 @@ namespace BDInfo.Reporting
             }
             using (var stream = File.OpenRead(path))
             {
-                var format = DetectFormat(stream);
-
-                BDInfoReportData report;
-                switch (format)
+                if (IsZipArchive(stream))
                 {
-                    case BDInfoReportFormat.Json:
-                        stream.Seek(0, SeekOrigin.Begin);
-                        using (var reader = JsonReaderWriterFactory.CreateJsonReader(stream, Encoding.UTF8, XmlDictionaryReaderQuotas.Max, null))
+                    using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true))
+                    {
+                        var entry = SelectReportEntry(archive);
+                        if (entry == null)
                         {
-                            report = (BDInfoReportData)JsonSerializer.ReadObject(reader);
+                            throw new SerializationException("Report archive does not contain a report entry.");
                         }
 
-                        break;
-
-                    default:
-                        stream.Seek(0, SeekOrigin.Begin);
-                        using (var reader = XmlReader.Create(stream))
+                        using (var entryStream = entry.Open())
+                        using (var buffer = new MemoryStream())
                         {
-                            report = (BDInfoReportData)XmlSerializer.ReadObject(reader);
+                            entryStream.CopyTo(buffer);
+                            buffer.Seek(0, SeekOrigin.Begin);
+
+                            var format = DetectFormat(buffer);
+                            buffer.Seek(0, SeekOrigin.Begin);
+                            var report = ReadReport(buffer, format);
+                            if (report != null)
+                            {
+                                report.SourcePath = path;
+                            }
+
+                            return report;
                         }
-
-                        break;
+                    }
                 }
-
-                if (report != null)
+                else
                 {
-                    report.SourcePath = path;
-                }
+                    var format = DetectFormat(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    var report = ReadReport(stream, format);
+                    if (report != null)
+                    {
+                        report.SourcePath = path;
+                    }
 
-                return report;
+                    return report;
+                }
             }
         }
 
@@ -162,6 +166,98 @@ namespace BDInfo.Reporting
             finally
             {
                 stream.Seek(originalPosition, SeekOrigin.Begin);
+            }
+        }
+
+        private static bool IsZipArchive(Stream stream)
+        {
+            if (!stream.CanSeek)
+            {
+                return false;
+            }
+
+            long originalPosition = stream.Position;
+            try
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                int first = stream.ReadByte();
+                int second = stream.ReadByte();
+                return first == 'P' && second == 'K';
+            }
+            finally
+            {
+                stream.Seek(originalPosition, SeekOrigin.Begin);
+            }
+        }
+
+        private static ZipArchiveEntry SelectReportEntry(ZipArchive archive)
+        {
+            if (archive == null)
+            {
+                return null;
+            }
+
+            var entry = archive.Entries
+                .FirstOrDefault(e => string.Equals(e.Name, "report.json", StringComparison.OrdinalIgnoreCase))
+                       ?? archive.Entries
+                .FirstOrDefault(e => string.Equals(e.Name, "report.xml", StringComparison.OrdinalIgnoreCase));
+
+            if (entry != null)
+            {
+                return entry;
+            }
+
+            return archive.Entries.FirstOrDefault(e => e.Length > 0);
+        }
+
+        private static void WriteReport(Stream stream, BDInfoReportData report, BDInfoReportFormat format)
+        {
+            switch (format)
+            {
+                case BDInfoReportFormat.Json:
+                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(
+                               stream,
+                               Encoding.UTF8,
+                               ownsStream: false,
+                               indent: true,
+                               indentChars: "  "))
+                    {
+                        JsonSerializer.WriteObject(writer, report);
+                        writer.Flush();
+                    }
+
+                    if (stream.CanSeek)
+                    {
+                        stream.SetLength(stream.Position);
+                    }
+
+                    break;
+
+                default:
+                    using (var writer = XmlWriter.Create(stream, new XmlWriterSettings { Indent = true }))
+                    {
+                        XmlSerializer.WriteObject(writer, report);
+                    }
+
+                    break;
+            }
+        }
+
+        private static BDInfoReportData ReadReport(Stream stream, BDInfoReportFormat format)
+        {
+            switch (format)
+            {
+                case BDInfoReportFormat.Json:
+                    using (var reader = JsonReaderWriterFactory.CreateJsonReader(stream, Encoding.UTF8, XmlDictionaryReaderQuotas.Max, null))
+                    {
+                        return (BDInfoReportData)JsonSerializer.ReadObject(reader);
+                    }
+
+                default:
+                    using (var reader = XmlReader.Create(stream))
+                    {
+                        return (BDInfoReportData)XmlSerializer.ReadObject(reader);
+                    }
             }
         }
 
