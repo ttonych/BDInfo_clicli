@@ -484,7 +484,7 @@ namespace BDInfo
             this.buttonLoadReport.Name = "buttonLoadReport";
             this.buttonLoadReport.Size = new System.Drawing.Size(65, 23);
             this.buttonLoadReport.TabIndex = 3;
-            this.buttonLoadReport.Text = "Report...";
+            this.buttonLoadReport.Text = "Load Report...";
             this.buttonLoadReport.UseVisualStyleBackColor = true;
             this.buttonLoadReport.Click += new System.EventHandler(this.buttonBrowse_Click);
             // 
@@ -575,6 +575,7 @@ namespace BDInfo
         private System.Windows.Forms.ColumnHeader columnHeaderStreamLanguage;
         private System.Windows.Forms.ColumnHeader columnHeaderBitrate;
         private System.Windows.Forms.ColumnHeader columnHeaderDescription;
+
         private System.Windows.Forms.Button buttonRescan;
         private System.Windows.Forms.ColumnHeader columnHeaderPlaylistGroup;
         private System.Windows.Forms.ColumnHeader columnHeaderIndex;
