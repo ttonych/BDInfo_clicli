@@ -411,6 +411,8 @@ namespace BDInfo
 
                 ScanBDROMResult scanResult = ScanStreamFiles(bdrom, selectedPlaylists, streamFiles);
 
+                UpdatePlaylistStreams(selectedPlaylists);
+
                 if (scanResult.ScanException != null)
                 {
                     throw scanResult.ScanException;
@@ -963,6 +965,79 @@ namespace BDInfo
             progressBar.Report(message, completedBytes + streamFile.Size);
 
             return scanException;
+        }
+
+        private static void UpdatePlaylistStreams(IEnumerable<TSPlaylistFile> playlists)
+        {
+            if (playlists == null)
+            {
+                return;
+            }
+
+            foreach (TSPlaylistFile playlist in playlists)
+            {
+                if (playlist == null)
+                {
+                    continue;
+                }
+
+                foreach (TSStream stream in playlist.Streams.Values)
+                {
+                    if (stream.IsGraphicsStream)
+                    {
+                        var graphicsStream = (TSGraphicsStream)stream;
+                        graphicsStream.Captions = 0;
+                        graphicsStream.ForcedCaptions = 0;
+                    }
+                }
+
+                foreach (TSStreamClip clip in playlist.StreamClips)
+                {
+                    TSStreamFile streamFile = clip?.StreamFile;
+                    if (streamFile == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (TSStream clipStream in streamFile.Streams.Values)
+                    {
+                        if (!playlist.Streams.TryGetValue(clipStream.PID, out TSStream playlistStream))
+                        {
+                            continue;
+                        }
+
+                        if (clipStream.IsGraphicsStream && playlistStream.IsGraphicsStream)
+                        {
+                            var playlistGraphicsStream = (TSGraphicsStream)playlistStream;
+                            var clipGraphicsStream = (TSGraphicsStream)clipStream;
+
+                            playlistGraphicsStream.Captions += clipGraphicsStream.Captions;
+                            playlistGraphicsStream.ForcedCaptions += clipGraphicsStream.ForcedCaptions;
+
+                            if (playlistGraphicsStream.Width == 0 && clipGraphicsStream.Width > 0)
+                            {
+                                playlistGraphicsStream.Width = clipGraphicsStream.Width;
+                            }
+
+                            if (playlistGraphicsStream.Height == 0 && clipGraphicsStream.Height > 0)
+                            {
+                                playlistGraphicsStream.Height = clipGraphicsStream.Height;
+                            }
+                        }
+                        else if (clipStream.IsAudioStream && playlistStream.IsAudioStream)
+                        {
+                            var playlistAudioStream = (TSAudioStream)playlistStream;
+                            var clipAudioStream = (TSAudioStream)clipStream;
+
+                            if (clipAudioStream.CoreStream != null &&
+                                (playlistAudioStream.CoreStream == null || !playlistAudioStream.CoreStream.IsInitialized))
+                            {
+                                playlistAudioStream.CoreStream = (TSAudioStream)clipAudioStream.CoreStream.Clone();
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private static long GetStreamFileLength(TSStreamFile streamFile)
