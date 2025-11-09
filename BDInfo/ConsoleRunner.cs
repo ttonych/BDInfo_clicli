@@ -1029,8 +1029,7 @@ namespace BDInfo
                             var playlistAudioStream = (TSAudioStream)playlistStream;
                             var clipAudioStream = (TSAudioStream)clipStream;
 
-                            if (clipAudioStream.CoreStream != null &&
-                                (playlistAudioStream.CoreStream == null || !playlistAudioStream.CoreStream.IsInitialized))
+                            if (clipAudioStream.CoreStream != null)
                             {
                                 playlistAudioStream.CoreStream = (TSAudioStream)clipAudioStream.CoreStream.Clone();
                             }
