@@ -480,9 +480,9 @@ namespace BDInfo
             // buttonLoadReport
             //
             this.buttonLoadReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonLoadReport.Location = new System.Drawing.Point(639, 22);
+            this.buttonLoadReport.Location = new System.Drawing.Point(16, 548);
             this.buttonLoadReport.Name = "buttonLoadReport";
-            this.buttonLoadReport.Size = new System.Drawing.Size(65, 23);
+            this.buttonLoadReport.Size = new System.Drawing.Size(116, 23);
             this.buttonLoadReport.TabIndex = 3;
             this.buttonLoadReport.Text = "Load Report...";
             this.buttonLoadReport.UseVisualStyleBackColor = true;
@@ -583,3 +583,4 @@ namespace BDInfo
         private System.Windows.Forms.Button buttonLoadReport;
     }
 }
+
