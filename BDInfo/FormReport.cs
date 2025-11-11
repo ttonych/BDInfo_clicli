@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using BDInfo.Reporting;
 
@@ -1163,6 +1164,7 @@ namespace BDInfo
                     "BDInfo Report (JSON) (*.bdinfo)", "*.bdinfo",
                     "BDInfo Report (XML, compressed) (*.bdinfo)", "*.bdinfo",
                     "BDInfo Report (JSON, compressed) (*.bdinfo)", "*.bdinfo",
+                    "BDInfo Report (Text) (*.txt)", "*.txt",
                     "All files (*.*)", "*.*");
                 dialog.DefaultExt = "bdinfo";
                 dialog.FileName = defaultName;
@@ -1171,10 +1173,41 @@ namespace BDInfo
                 {
                     try
                     {
-                        bool compress = dialog.FilterIndex == 3 || dialog.FilterIndex == 4;
-                        BDInfoReportFormat format = dialog.FilterIndex == 2 || dialog.FilterIndex == 4
-                            ? BDInfoReportFormat.Json
-                            : BDInfoReportFormat.Xml;
+                        bool compress = false;
+                        BDInfoReportFormat format = BDInfoReportFormat.Xml;
+
+                        switch (dialog.FilterIndex)
+                        {
+                            case 1:
+                                format = BDInfoReportFormat.Xml;
+                                break;
+                            case 2:
+                                format = BDInfoReportFormat.Json;
+                                break;
+                            case 3:
+                                format = BDInfoReportFormat.Xml;
+                                compress = true;
+                                break;
+                            case 4:
+                                format = BDInfoReportFormat.Json;
+                                compress = true;
+                                break;
+                            case 5:
+                                using (var writer = new StreamWriter(dialog.FileName, false, Encoding.UTF8))
+                                {
+                                    writer.Write(textBoxReport.Text);
+                                }
+                                MessageBox.Show(this,
+                                    "Report exported successfully.",
+                                    "BDInfo",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+                                return;
+                            default:
+                                format = BDInfoReportFormat.Xml;
+                                break;
+                        }
+
                         BDInfoReportSerializer.Save(
                             dialog.FileName,
                             ReportBDROM,
