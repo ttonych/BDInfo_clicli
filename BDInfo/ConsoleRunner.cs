@@ -1029,11 +1029,128 @@ namespace BDInfo
                             var playlistAudioStream = (TSAudioStream)playlistStream;
                             var clipAudioStream = (TSAudioStream)clipStream;
 
-                            if (clipAudioStream.CoreStream != null)
-                            {
-                                playlistAudioStream.CoreStream = (TSAudioStream)clipAudioStream.CoreStream.Clone();
-                            }
+                            MergeAudioStream(playlistAudioStream, clipAudioStream);
+                            UpdatePlaylistAudioReferences(playlist, clipAudioStream);
                         }
+                    }
+                }
+            }
+        }
+
+        private static void MergeAudioStream(TSAudioStream target, TSAudioStream source)
+        {
+            if (target == null || source == null)
+            {
+                return;
+            }
+
+            if (source.ChannelCount > target.ChannelCount)
+            {
+                target.ChannelCount = source.ChannelCount;
+                target.ChannelLayout = source.ChannelLayout;
+            }
+
+            if (source.LFE > target.LFE)
+            {
+                target.LFE = source.LFE;
+            }
+
+            if (source.SampleRate > target.SampleRate)
+            {
+                target.SampleRate = source.SampleRate;
+            }
+
+            if (source.BitDepth > target.BitDepth)
+            {
+                target.BitDepth = source.BitDepth;
+            }
+
+            if (source.BitRate > target.BitRate)
+            {
+                target.BitRate = source.BitRate;
+            }
+
+            if (source.DialNorm != 0 && (target.DialNorm == 0 || source.DialNorm < target.DialNorm))
+            {
+                target.DialNorm = source.DialNorm;
+            }
+
+            if (source.AudioMode != TSAudioMode.Unknown)
+            {
+                target.AudioMode = source.AudioMode;
+            }
+
+            if (source.HasExtensions != target.HasExtensions)
+            {
+                target.HasExtensions = source.HasExtensions;
+            }
+
+            if (source.ExtendedData != target.ExtendedData)
+            {
+                target.ExtendedData = source.ExtendedData;
+            }
+
+            if (!string.IsNullOrEmpty(source.LanguageCode))
+            {
+                target.LanguageCode = source.LanguageCode;
+            }
+
+            if (!string.IsNullOrEmpty(source.LanguageName))
+            {
+                target.LanguageName = source.LanguageName;
+            }
+
+            if (source.IsInitialized)
+            {
+                target.IsInitialized = true;
+            }
+
+            target.IsVBR = source.IsVBR;
+
+            MergeAudioCoreStream(target, source.CoreStream as TSAudioStream);
+        }
+
+        private static void MergeAudioCoreStream(TSAudioStream target, TSAudioStream sourceCore)
+        {
+            if (target == null || sourceCore == null)
+            {
+                return;
+            }
+
+            if (target.CoreStream == null)
+            {
+                target.CoreStream = (TSAudioStream)sourceCore.Clone();
+            }
+            else
+            {
+                MergeAudioStream(target.CoreStream, sourceCore);
+            }
+        }
+
+        private static void UpdatePlaylistAudioReferences(TSPlaylistFile playlist, TSAudioStream clipAudioStream)
+        {
+            if (playlist == null || clipAudioStream == null)
+            {
+                return;
+            }
+
+            if (playlist.PlaylistStreams != null && playlist.PlaylistStreams.TryGetValue(clipAudioStream.PID, out TSStream playlistStream))
+            {
+                MergeAudioStream(playlistStream as TSAudioStream, clipAudioStream);
+            }
+
+            if (playlist.AngleStreams != null)
+            {
+                foreach (Dictionary<ushort, TSStream> angleStreamMap in playlist.AngleStreams)
+                {
+                    if (angleStreamMap == null)
+                    {
+                        continue;
+                    }
+
+                    if (angleStreamMap.TryGetValue(clipAudioStream.PID, out TSStream angleStream))
+                    {
+                        MergeAudioStream(angleStream as TSAudioStream, clipAudioStream);
                     }
                 }
             }
