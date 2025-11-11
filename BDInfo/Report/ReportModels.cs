@@ -86,6 +86,7 @@ namespace BDInfo.Reporting
     [DataContract]
     public class AudioStreamData : StreamData
     {
+        [DataMember(EmitDefaultValue = false)] public AudioStreamData CoreStream;
     }
 
     [DataContract]

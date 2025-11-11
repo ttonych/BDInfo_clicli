@@ -860,7 +860,7 @@ namespace BDInfo.Reporting
             return list;
         }
 
-        private static StreamData CreateStreamData(TSStream stream)
+        private static StreamData CreateStreamData(TSStream stream, bool includeAudioCore = true)
         {
             StreamData data;
             if (stream is TSVideoStream video)
@@ -880,19 +880,7 @@ namespace BDInfo.Reporting
             }
             else if (stream is TSAudioStream audio)
             {
-                data = new AudioStreamData
-                {
-                    SampleRate = audio.SampleRate,
-                    ChannelCount = audio.ChannelCount,
-                    BitDepth = audio.BitDepth,
-                    LFE = audio.LFE,
-                    DialNorm = audio.DialNorm,
-                    HasExtensions = audio.HasExtensions,
-                    AudioMode = audio.AudioMode,
-                    ChannelLayout = audio.ChannelLayout,
-                    ExtendedData = audio.ExtendedData as string,
-                    CoreStreamPID = audio.CoreStream?.PID
-                };
+                data = CreateAudioStreamData(audio, includeAudioCore);
             }
             else if (stream is TSGraphicsStream graphics)
             {
@@ -913,6 +901,41 @@ namespace BDInfo.Reporting
                 data = new StreamData();
             }
 
+            PopulateCommonStreamData(data, stream);
+
+            return data;
+        }
+
+        private static AudioStreamData CreateAudioStreamData(TSAudioStream audio, bool includeAudioCore)
+        {
+            var data = new AudioStreamData
+            {
+                SampleRate = audio.SampleRate,
+                ChannelCount = audio.ChannelCount,
+                BitDepth = audio.BitDepth,
+                LFE = audio.LFE,
+                DialNorm = audio.DialNorm,
+                HasExtensions = audio.HasExtensions,
+                AudioMode = audio.AudioMode,
+                ChannelLayout = audio.ChannelLayout,
+                ExtendedData = audio.ExtendedData as string
+            };
+
+            if (includeAudioCore && audio.CoreStream is TSAudioStream core)
+            {
+                if (core.PID != 0 && !ReferenceEquals(core, audio))
+                {
+                    data.CoreStreamPID = core.PID;
+                }
+
+                data.CoreStream = CreateStreamData(core, false) as AudioStreamData;
+            }
+
+            return data;
+        }
+
+        private static void PopulateCommonStreamData(StreamData data, TSStream stream)
+        {
             data.PID = stream.PID;
             data.StreamType = stream.StreamType;
             data.IsVBR = stream.IsVBR;
@@ -927,13 +950,7 @@ namespace BDInfo.Reporting
             data.PacketSeconds = stream.PacketSeconds;
             data.AngleIndex = stream.AngleIndex;
             data.BaseView = stream.BaseView;
-
-            if (!(stream is TSAudioStream) && stream is TSVideoStream videoStream)
-            {
-                data.ExtendedData = videoStream.ExtendedData as string;
-            }
-
-            return data;
+            data.ExtendedData = stream.ExtendedData as string;
         }
 
         private static TSStream CreateStream(StreamData data)
@@ -1062,12 +1079,30 @@ namespace BDInfo.Reporting
 
             foreach (var streamData in data)
             {
-                if (streamData is AudioStreamData audioData && audioData.CoreStreamPID.HasValue)
+                if (streamData is AudioStreamData audioData &&
+                    audioMap.TryGetValue(streamData.PID, out var audio))
                 {
-                    if (audioMap.TryGetValue(streamData.PID, out var audio) &&
-                        audioMap.TryGetValue(audioData.CoreStreamPID.Value, out var core))
+                    TSAudioStream resolvedCore = null;
+
+                    if (audioData.CoreStreamPID.HasValue &&
+                        audioData.CoreStreamPID.Value != 0 &&
+                        audioData.CoreStreamPID.Value != audio.PID &&
+                        audioMap.TryGetValue(audioData.CoreStreamPID.Value, out var mappedCore))
                     {
-                        audio.CoreStream = core;
+                        resolvedCore = mappedCore;
+                    }
+
+                    if (resolvedCore == null && audioData.CoreStream != null)
+                    {
+                        if (CreateStream(audioData.CoreStream) is TSAudioStream createdCore)
+                        {
+                            resolvedCore = createdCore;
+                        }
+                    }
+
+                    if (resolvedCore != null && audio.CoreStream == null)
+                    {
+                        audio.CoreStream = resolvedCore;
                     }
                 }
             }
