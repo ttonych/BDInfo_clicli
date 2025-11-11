@@ -81,11 +81,20 @@ namespace BDInfo.Reporting
     [DataContract]
     public class VideoStreamData : StreamData
     {
+        [DataMember(EmitDefaultValue = false)] public List<string> ExtendedFormatInfo;
+        [DataMember(EmitDefaultValue = false)] public string MasteringDisplayColorPrimaries;
+        [DataMember(EmitDefaultValue = false)] public string MasteringDisplayLuminance;
+        [DataMember(EmitDefaultValue = false)] public uint MaximumContentLightLevel;
+        [DataMember(EmitDefaultValue = false)] public uint MaximumFrameAverageLightLevel;
+        [DataMember(EmitDefaultValue = false)] public bool LightLevelAvailable;
+        [DataMember(EmitDefaultValue = false)] public byte PreferredTransferCharacteristics;
+        [DataMember(EmitDefaultValue = false)] public bool IsHdr10Plus;
     }
 
     [DataContract]
     public class AudioStreamData : StreamData
     {
+        [DataMember(EmitDefaultValue = false)] public AudioStreamData CoreStream;
     }
 
     [DataContract]

@@ -411,6 +411,8 @@ namespace BDInfo
 
                 ScanBDROMResult scanResult = ScanStreamFiles(bdrom, selectedPlaylists, streamFiles);
 
+                UpdatePlaylistStreams(selectedPlaylists);
+
                 if (scanResult.ScanException != null)
                 {
                     throw scanResult.ScanException;
@@ -963,6 +965,437 @@ namespace BDInfo
             progressBar.Report(message, completedBytes + streamFile.Size);
 
             return scanException;
+        }
+
+        private static void UpdatePlaylistStreams(IEnumerable<TSPlaylistFile> playlists)
+        {
+            if (playlists == null)
+            {
+                return;
+            }
+
+            foreach (TSPlaylistFile playlist in playlists)
+            {
+                if (playlist == null)
+                {
+                    continue;
+                }
+
+                foreach (TSStream stream in playlist.Streams.Values)
+                {
+                    if (stream.IsGraphicsStream)
+                    {
+                        var graphicsStream = (TSGraphicsStream)stream;
+                        graphicsStream.Captions = 0;
+                        graphicsStream.ForcedCaptions = 0;
+                    }
+                }
+
+                foreach (TSStreamClip clip in playlist.StreamClips)
+                {
+                    TSStreamFile streamFile = clip?.StreamFile;
+                    if (streamFile == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (TSStream clipStream in streamFile.Streams.Values)
+                    {
+                        if (!playlist.Streams.TryGetValue(clipStream.PID, out TSStream playlistStream))
+                        {
+                            continue;
+                        }
+
+                        if (clipStream.IsGraphicsStream && playlistStream.IsGraphicsStream)
+                        {
+                            var playlistGraphicsStream = (TSGraphicsStream)playlistStream;
+                            var clipGraphicsStream = (TSGraphicsStream)clipStream;
+
+                            playlistGraphicsStream.Captions += clipGraphicsStream.Captions;
+                            playlistGraphicsStream.ForcedCaptions += clipGraphicsStream.ForcedCaptions;
+
+                            if (playlistGraphicsStream.Width == 0 && clipGraphicsStream.Width > 0)
+                            {
+                                playlistGraphicsStream.Width = clipGraphicsStream.Width;
+                            }
+
+                            if (playlistGraphicsStream.Height == 0 && clipGraphicsStream.Height > 0)
+                            {
+                                playlistGraphicsStream.Height = clipGraphicsStream.Height;
+                            }
+                        }
+                        else if (clipStream.IsAudioStream && playlistStream.IsAudioStream)
+                        {
+                            var playlistAudioStream = (TSAudioStream)playlistStream;
+                            var clipAudioStream = (TSAudioStream)clipStream;
+
+                            if (clipAudioStream.CoreStream != null)
+                            {
+                                if (playlistAudioStream.CoreStream == null)
+                                {
+                                    playlistAudioStream.CoreStream = (TSAudioStream)clipAudioStream.CoreStream.Clone();
+                                }
+                                else if (!playlistAudioStream.CoreStream.IsInitialized && clipAudioStream.CoreStream.IsInitialized)
+                                {
+                                    playlistAudioStream.CoreStream = (TSAudioStream)clipAudioStream.CoreStream.Clone();
+                                }
+                            }
+
+                            MergeAudioStream(playlistAudioStream, clipAudioStream);
+                            UpdatePlaylistAudioReferences(playlist, clipAudioStream);
+                        }
+                        else if (clipStream.IsVideoStream && playlistStream.IsVideoStream)
+                        {
+                            var playlistVideoStream = (TSVideoStream)playlistStream;
+                            var clipVideoStream = (TSVideoStream)clipStream;
+
+                            MergeVideoStream(playlistVideoStream, clipVideoStream);
+                            UpdatePlaylistVideoReferences(playlist, clipVideoStream);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void MergeAudioStream(TSAudioStream target, TSAudioStream source)
+        {
+            if (target == null || source == null)
+            {
+                return;
+            }
+
+            if (source.ChannelCount > target.ChannelCount)
+            {
+                target.ChannelCount = source.ChannelCount;
+                target.ChannelLayout = source.ChannelLayout;
+            }
+
+            if (source.LFE > target.LFE)
+            {
+                target.LFE = source.LFE;
+            }
+
+            if (source.SampleRate > target.SampleRate)
+            {
+                target.SampleRate = source.SampleRate;
+            }
+
+            if (source.BitDepth > target.BitDepth)
+            {
+                target.BitDepth = source.BitDepth;
+            }
+
+            if (source.BitRate > target.BitRate)
+            {
+                target.BitRate = source.BitRate;
+            }
+
+            if (source.DialNorm != 0 && (target.DialNorm == 0 || source.DialNorm < target.DialNorm))
+            {
+                target.DialNorm = source.DialNorm;
+            }
+
+            if (source.AudioMode != TSAudioMode.Unknown)
+            {
+                target.AudioMode = source.AudioMode;
+            }
+
+            if (source.HasExtensions != target.HasExtensions)
+            {
+                target.HasExtensions = source.HasExtensions;
+            }
+
+            if (source.ExtendedData != target.ExtendedData)
+            {
+                target.ExtendedData = source.ExtendedData;
+            }
+
+            if (!string.IsNullOrEmpty(source.LanguageCode))
+            {
+                target.LanguageCode = source.LanguageCode;
+            }
+
+            if (!string.IsNullOrEmpty(source.LanguageName))
+            {
+                target.LanguageName = source.LanguageName;
+            }
+
+            if (source.IsInitialized)
+            {
+                target.IsInitialized = true;
+            }
+
+            target.IsVBR = source.IsVBR;
+
+            MergeAudioCoreStream(target, source.CoreStream as TSAudioStream);
+        }
+
+        private static void MergeAudioCoreStream(TSAudioStream target, TSAudioStream sourceCore)
+        {
+            if (target == null || sourceCore == null)
+            {
+                return;
+            }
+
+            if (target.CoreStream == null)
+            {
+                target.CoreStream = (TSAudioStream)sourceCore.Clone();
+            }
+            else
+            {
+                MergeAudioStream(target.CoreStream, sourceCore);
+            }
+        }
+
+        private static void MergeVideoStream(TSVideoStream target, TSVideoStream source)
+        {
+            if (target == null || source == null)
+            {
+                return;
+            }
+
+            if (source.Width > target.Width)
+            {
+                target.Width = source.Width;
+            }
+
+            if (source.Height > target.Height)
+            {
+                target.Height = source.Height;
+            }
+
+            if (source.FrameRate != TSFrameRate.Unknown)
+            {
+                target.FrameRate = source.FrameRate;
+            }
+
+            if (source.FrameRateEnumerator > 0)
+            {
+                target.FrameRateEnumerator = source.FrameRateEnumerator;
+            }
+
+            if (source.FrameRateDenominator > 0)
+            {
+                target.FrameRateDenominator = source.FrameRateDenominator;
+            }
+
+            if (source.AspectRatio != TSAspectRatio.Unknown)
+            {
+                target.AspectRatio = source.AspectRatio;
+            }
+
+            if (!string.IsNullOrEmpty(source.EncodingProfile))
+            {
+                target.EncodingProfile = source.EncodingProfile;
+            }
+
+            if (source.BitRate > target.BitRate)
+            {
+                target.BitRate = source.BitRate;
+            }
+
+            if (source.ActiveBitRate > target.ActiveBitRate)
+            {
+                target.ActiveBitRate = source.ActiveBitRate;
+            }
+
+            if (source.BaseView != null && target.BaseView == null)
+            {
+                target.BaseView = source.BaseView;
+            }
+
+            if (source.IsInitialized)
+            {
+                target.IsInitialized = true;
+            }
+
+            target.IsVBR = source.IsVBR;
+
+            MergeVideoExtendedData(target, source);
+        }
+
+        private static void MergeVideoExtendedData(TSVideoStream target, TSVideoStream source)
+        {
+            if (target == null || source == null)
+            {
+                return;
+            }
+
+            if (source.ExtendedData is TSCodecHEVC.ExtendedDataSet sourceExtended)
+            {
+                if (target.ExtendedData is TSCodecHEVC.ExtendedDataSet targetExtended)
+                {
+                    MergeHevcExtendedData(targetExtended, sourceExtended);
+                }
+                else
+                {
+                    target.ExtendedData = CloneHevcExtendedData(sourceExtended);
+                }
+            }
+            else if (source.ExtendedData != null && target.ExtendedData == null)
+            {
+                target.ExtendedData = source.ExtendedData;
+            }
+        }
+
+        private static TSCodecHEVC.ExtendedDataSet CloneHevcExtendedData(TSCodecHEVC.ExtendedDataSet source)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var clone = new TSCodecHEVC.ExtendedDataSet
+            {
+                MasteringDisplayColorPrimaries = source.MasteringDisplayColorPrimaries,
+                MasteringDisplayLuminance = source.MasteringDisplayLuminance,
+                MaximumContentLightLevel = source.MaximumContentLightLevel,
+                MaximumFrameAverageLightLevel = source.MaximumFrameAverageLightLevel,
+                LightLevelAvailable = source.LightLevelAvailable,
+                PreferredTransferCharacteristics = source.PreferredTransferCharacteristics,
+                IsHdr10Plus = source.IsHdr10Plus
+            };
+
+            if (source.ExtendedFormatInfo != null && source.ExtendedFormatInfo.Count > 0)
+            {
+                clone.ExtendedFormatInfo.AddRange(source.ExtendedFormatInfo);
+            }
+
+            if (source.VideoParamSets != null && source.VideoParamSets.Count > 0)
+            {
+                clone.VideoParamSets.AddRange(source.VideoParamSets);
+            }
+
+            if (source.VUIParameterSets != null && source.VUIParameterSets.Count > 0)
+            {
+                clone.VUIParameterSets.AddRange(source.VUIParameterSets);
+            }
+
+            if (source.SeqParameterSets != null && source.SeqParameterSets.Count > 0)
+            {
+                clone.SeqParameterSets.AddRange(source.SeqParameterSets);
+            }
+
+            if (source.PicParameterSets != null && source.PicParameterSets.Count > 0)
+            {
+                clone.PicParameterSets.AddRange(source.PicParameterSets);
+            }
+
+            return clone;
+        }
+
+        private static void MergeHevcExtendedData(TSCodecHEVC.ExtendedDataSet target, TSCodecHEVC.ExtendedDataSet source)
+        {
+            if (target == null || source == null)
+            {
+                return;
+            }
+
+            if (source.ExtendedFormatInfo != null)
+            {
+                foreach (string value in source.ExtendedFormatInfo)
+                {
+                    if (!string.IsNullOrEmpty(value) && !target.ExtendedFormatInfo.Contains(value))
+                    {
+                        target.ExtendedFormatInfo.Add(value);
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(target.MasteringDisplayColorPrimaries) && !string.IsNullOrEmpty(source.MasteringDisplayColorPrimaries))
+            {
+                target.MasteringDisplayColorPrimaries = source.MasteringDisplayColorPrimaries;
+            }
+
+            if (string.IsNullOrEmpty(target.MasteringDisplayLuminance) && !string.IsNullOrEmpty(source.MasteringDisplayLuminance))
+            {
+                target.MasteringDisplayLuminance = source.MasteringDisplayLuminance;
+            }
+
+            if (source.MaximumContentLightLevel > target.MaximumContentLightLevel)
+            {
+                target.MaximumContentLightLevel = source.MaximumContentLightLevel;
+            }
+
+            if (source.MaximumFrameAverageLightLevel > target.MaximumFrameAverageLightLevel)
+            {
+                target.MaximumFrameAverageLightLevel = source.MaximumFrameAverageLightLevel;
+            }
+
+            if (source.LightLevelAvailable)
+            {
+                target.LightLevelAvailable = true;
+            }
+
+            if (source.PreferredTransferCharacteristics != 0)
+            {
+                target.PreferredTransferCharacteristics = source.PreferredTransferCharacteristics;
+            }
+
+            if (source.IsHdr10Plus)
+            {
+                target.IsHdr10Plus = true;
+            }
+        }
+
+        private static void UpdatePlaylistVideoReferences(TSPlaylistFile playlist, TSVideoStream clipVideoStream)
+        {
+            if (playlist == null || clipVideoStream == null)
+            {
+                return;
+            }
+
+            if (playlist.PlaylistStreams != null && playlist.PlaylistStreams.TryGetValue(clipVideoStream.PID, out TSStream playlistStream))
+            {
+                MergeVideoStream(playlistStream as TSVideoStream, clipVideoStream);
+            }
+
+            if (playlist.AngleStreams == null)
+            {
+                return;
+            }
+
+            foreach (Dictionary<ushort, TSStream> angleStreamMap in playlist.AngleStreams)
+            {
+                if (angleStreamMap == null)
+                {
+                    continue;
+                }
+
+                if (angleStreamMap.TryGetValue(clipVideoStream.PID, out TSStream angleStream))
+                {
+                    MergeVideoStream(angleStream as TSVideoStream, clipVideoStream);
+                }
+            }
+        }
+
+        private static void UpdatePlaylistAudioReferences(TSPlaylistFile playlist, TSAudioStream clipAudioStream)
+        {
+            if (playlist == null || clipAudioStream == null)
+            {
+                return;
+            }
+
+            if (playlist.PlaylistStreams != null && playlist.PlaylistStreams.TryGetValue(clipAudioStream.PID, out TSStream playlistStream))
+            {
+                MergeAudioStream(playlistStream as TSAudioStream, clipAudioStream);
+            }
+
+            if (playlist.AngleStreams != null)
+            {
+                foreach (Dictionary<ushort, TSStream> angleStreamMap in playlist.AngleStreams)
+                {
+                    if (angleStreamMap == null)
+                    {
+                        continue;
+                    }
+
+                    if (angleStreamMap.TryGetValue(clipAudioStream.PID, out TSStream angleStream))
+                    {
+                        MergeAudioStream(angleStream as TSAudioStream, clipAudioStream);
+                    }
+                }
+            }
         }
 
         private static long GetStreamFileLength(TSStreamFile streamFile)

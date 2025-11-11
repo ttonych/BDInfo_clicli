@@ -860,12 +860,12 @@ namespace BDInfo.Reporting
             return list;
         }
 
-        private static StreamData CreateStreamData(TSStream stream)
+        private static StreamData CreateStreamData(TSStream stream, bool includeAudioCore = true)
         {
             StreamData data;
             if (stream is TSVideoStream video)
             {
-                data = new VideoStreamData
+                var videoData = new VideoStreamData
                 {
                     VideoFormat = video.VideoFormat,
                     FrameRate = video.FrameRate,
@@ -877,22 +877,13 @@ namespace BDInfo.Reporting
                     FrameRateDenominator = video.FrameRateDenominator,
                     EncodingProfile = video.EncodingProfile
                 };
+
+                PopulateVideoStreamData(videoData, video);
+                data = videoData;
             }
             else if (stream is TSAudioStream audio)
             {
-                data = new AudioStreamData
-                {
-                    SampleRate = audio.SampleRate,
-                    ChannelCount = audio.ChannelCount,
-                    BitDepth = audio.BitDepth,
-                    LFE = audio.LFE,
-                    DialNorm = audio.DialNorm,
-                    HasExtensions = audio.HasExtensions,
-                    AudioMode = audio.AudioMode,
-                    ChannelLayout = audio.ChannelLayout,
-                    ExtendedData = audio.ExtendedData as string,
-                    CoreStreamPID = audio.CoreStream?.PID
-                };
+                data = CreateAudioStreamData(audio, includeAudioCore);
             }
             else if (stream is TSGraphicsStream graphics)
             {
@@ -913,6 +904,135 @@ namespace BDInfo.Reporting
                 data = new StreamData();
             }
 
+            PopulateCommonStreamData(data, stream);
+
+            return data;
+        }
+
+        private static AudioStreamData CreateAudioStreamData(TSAudioStream audio, bool includeAudioCore)
+        {
+            var data = new AudioStreamData
+            {
+                SampleRate = audio.SampleRate,
+                ChannelCount = audio.ChannelCount,
+                BitDepth = audio.BitDepth,
+                LFE = audio.LFE,
+                DialNorm = audio.DialNorm,
+                HasExtensions = audio.HasExtensions,
+                AudioMode = audio.AudioMode,
+                ChannelLayout = audio.ChannelLayout,
+                ExtendedData = audio.ExtendedData as string
+            };
+
+            if (includeAudioCore && audio.CoreStream is TSAudioStream core)
+            {
+                if (core.PID != 0 && !ReferenceEquals(core, audio))
+                {
+                    data.CoreStreamPID = core.PID;
+                }
+
+                data.CoreStream = CreateStreamData(core, false) as AudioStreamData;
+            }
+
+            return data;
+        }
+
+        private static void PopulateVideoStreamData(VideoStreamData data, TSVideoStream video)
+        {
+            if (data == null || video == null)
+            {
+                return;
+            }
+
+            if (video.ExtendedData is TSCodecHEVC.ExtendedDataSet hevcData)
+            {
+                if (hevcData.ExtendedFormatInfo != null && hevcData.ExtendedFormatInfo.Count > 0)
+                {
+                    data.ExtendedFormatInfo = new List<string>(hevcData.ExtendedFormatInfo);
+                }
+
+                if (!string.IsNullOrEmpty(hevcData.MasteringDisplayColorPrimaries))
+                {
+                    data.MasteringDisplayColorPrimaries = hevcData.MasteringDisplayColorPrimaries;
+                }
+
+                if (!string.IsNullOrEmpty(hevcData.MasteringDisplayLuminance))
+                {
+                    data.MasteringDisplayLuminance = hevcData.MasteringDisplayLuminance;
+                }
+
+                if (hevcData.MaximumContentLightLevel != 0)
+                {
+                    data.MaximumContentLightLevel = hevcData.MaximumContentLightLevel;
+                }
+
+                if (hevcData.MaximumFrameAverageLightLevel != 0)
+                {
+                    data.MaximumFrameAverageLightLevel = hevcData.MaximumFrameAverageLightLevel;
+                }
+
+                if (hevcData.LightLevelAvailable)
+                {
+                    data.LightLevelAvailable = true;
+                }
+
+                if (hevcData.PreferredTransferCharacteristics != 0)
+                {
+                    data.PreferredTransferCharacteristics = hevcData.PreferredTransferCharacteristics;
+                }
+
+                if (hevcData.IsHdr10Plus)
+                {
+                    data.IsHdr10Plus = true;
+                }
+            }
+        }
+
+        private static void PopulateVideoExtendedData(TSVideoStream video, VideoStreamData data)
+        {
+            if (video == null || data == null)
+            {
+                return;
+            }
+
+            bool hasHevcInfo =
+                (data.ExtendedFormatInfo != null && data.ExtendedFormatInfo.Count > 0)
+                || !string.IsNullOrEmpty(data.MasteringDisplayColorPrimaries)
+                || !string.IsNullOrEmpty(data.MasteringDisplayLuminance)
+                || data.MaximumContentLightLevel != 0
+                || data.MaximumFrameAverageLightLevel != 0
+                || data.LightLevelAvailable
+                || data.PreferredTransferCharacteristics != 0
+                || data.IsHdr10Plus;
+
+            if (hasHevcInfo)
+            {
+                var extendedData = new TSCodecHEVC.ExtendedDataSet
+                {
+                    MasteringDisplayColorPrimaries = data.MasteringDisplayColorPrimaries ?? string.Empty,
+                    MasteringDisplayLuminance = data.MasteringDisplayLuminance ?? string.Empty,
+                    MaximumContentLightLevel = data.MaximumContentLightLevel,
+                    MaximumFrameAverageLightLevel = data.MaximumFrameAverageLightLevel,
+                    LightLevelAvailable = data.LightLevelAvailable,
+                    PreferredTransferCharacteristics = data.PreferredTransferCharacteristics,
+                    IsHdr10Plus = data.IsHdr10Plus
+                };
+
+                if (data.ExtendedFormatInfo != null && data.ExtendedFormatInfo.Count > 0)
+                {
+                    extendedData.ExtendedFormatInfo.AddRange(data.ExtendedFormatInfo);
+                }
+
+                video.ExtendedData = extendedData;
+            }
+            else if (!string.IsNullOrEmpty(data.ExtendedData))
+            {
+                video.ExtendedData = data.ExtendedData;
+            }
+        }
+
+        private static void PopulateCommonStreamData(StreamData data, TSStream stream)
+        {
             data.PID = stream.PID;
             data.StreamType = stream.StreamType;
             data.IsVBR = stream.IsVBR;
@@ -928,12 +1048,15 @@ namespace BDInfo.Reporting
             data.AngleIndex = stream.AngleIndex;
             data.BaseView = stream.BaseView;
 
-            if (!(stream is TSAudioStream) && stream is TSVideoStream videoStream)
+            switch (stream)
             {
-                data.ExtendedData = videoStream.ExtendedData as string;
+                case TSAudioStream audio when audio.ExtendedData is string audioExtended:
+                    data.ExtendedData = audioExtended;
+                    break;
+                case TSVideoStream video when video.ExtendedData is string videoExtended:
+                    data.ExtendedData = videoExtended;
+                    break;
             }
-
-            return data;
         }
 
         private static TSStream CreateStream(StreamData data)
@@ -965,6 +1088,7 @@ namespace BDInfo.Reporting
                     video.IsInterlaced = data.IsInterlaced;
                     video.FrameRateEnumerator = data.FrameRateEnumerator;
                     video.FrameRateDenominator = data.FrameRateDenominator;
+                    PopulateVideoExtendedData(video, data as VideoStreamData);
                     stream = video;
                     break;
                 }
@@ -1062,12 +1186,30 @@ namespace BDInfo.Reporting
 
             foreach (var streamData in data)
             {
-                if (streamData is AudioStreamData audioData && audioData.CoreStreamPID.HasValue)
+                if (streamData is AudioStreamData audioData &&
+                    audioMap.TryGetValue(streamData.PID, out var audio))
                 {
-                    if (audioMap.TryGetValue(streamData.PID, out var audio) &&
-                        audioMap.TryGetValue(audioData.CoreStreamPID.Value, out var core))
+                    TSAudioStream resolvedCore = null;
+
+                    if (audioData.CoreStreamPID.HasValue &&
+                        audioData.CoreStreamPID.Value != 0 &&
+                        audioData.CoreStreamPID.Value != audio.PID &&
+                        audioMap.TryGetValue(audioData.CoreStreamPID.Value, out var mappedCore))
                     {
-                        audio.CoreStream = core;
+                        resolvedCore = mappedCore;
+                    }
+
+                    if (resolvedCore == null && audioData.CoreStream != null)
+                    {
+                        if (CreateStream(audioData.CoreStream) is TSAudioStream createdCore)
+                        {
+                            resolvedCore = createdCore;
+                        }
+                    }
+
+                    if (resolvedCore != null && audio.CoreStream == null)
+                    {
+                        audio.CoreStream = resolvedCore;
                     }
                 }
             }

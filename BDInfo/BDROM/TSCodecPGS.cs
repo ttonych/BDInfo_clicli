@@ -58,9 +58,8 @@ namespace BDInfo
         private static string ReadODS(TSGraphicsStream stream, TSStreamBuffer buffer)
         {
             string tag = string.Empty;
-            int temp = 0;
-            int segmentSize = buffer.ReadBits2(16, false);
-            int objectID = buffer.ReadBits2(16, false); // object ID
+            _ = buffer.ReadBits2(16, false);
+            _ = buffer.ReadBits2(16, false); // object ID
 
             if (!stream.LastFrame.Finished)
             {
@@ -81,8 +80,7 @@ namespace BDInfo
 
         private static void ReadPCS(TSGraphicsStream stream, TSStreamBuffer buffer)
         {
-            int temp = 0;
-            int segmentSize = buffer.ReadBits2(16, false);
+            _ = buffer.ReadBits2(16, false);
             if (!stream.IsInitialized)
             {
                 stream.Width = buffer.ReadBits2(16, false);
@@ -91,27 +89,27 @@ namespace BDInfo
             }
             else
             {
-                temp = buffer.ReadBits2(16, false);
-                temp = buffer.ReadBits2(16, false);
+                _ = buffer.ReadBits2(16, false);
+                _ = buffer.ReadBits2(16, false);
             }
-            
-            temp = buffer.ReadByte();
+
+            _ = buffer.ReadByte();
             int compositionNumber = buffer.ReadBits2(16, false);
             int compositionState = buffer.ReadByte(false);
-            temp = buffer.ReadBits2(16, false);
+            _ = buffer.ReadBits2(16, false);
             int numCompositionObjects = buffer.ReadByte(false);
 
-            for (int i = 0; i < numCompositionObjects; i++) 
+            for (int i = 0; i < numCompositionObjects; i++)
             {
                 int objectID = buffer.ReadBits2(16, false); // object ID
-                temp = buffer.ReadByte(false); // Window ID
+                _ = buffer.ReadByte(false); // Window ID
                 var forced = buffer.ReadByte(false); // Object Cropped Flag
-                temp = buffer.ReadBits2(16, false); // Object Horizontal Position
-                temp = buffer.ReadBits2(16, false); // Object Vertical Position
-                temp = buffer.ReadBits2(16, false); // Object Cropping Horizontal Position
-                temp = buffer.ReadBits2(16, false); // Object Cropping Vertical Position
-                temp = buffer.ReadBits2(16, false); // Object Cropping Width
-                temp = buffer.ReadBits2(16, false); // Object Cropping Height Position
+                _ = buffer.ReadBits2(16, false); // Object Horizontal Position
+                _ = buffer.ReadBits2(16, false); // Object Vertical Position
+                _ = buffer.ReadBits2(16, false); // Object Cropping Horizontal Position
+                _ = buffer.ReadBits2(16, false); // Object Cropping Vertical Position
+                _ = buffer.ReadBits2(16, false); // Object Cropping Width
+                _ = buffer.ReadBits2(16, false); // Object Cropping Height Position
 
                 stream.LastFrame = new Frame { Started = true, Forced = (forced & 0x40) == 0x40, Finished = false };
 
