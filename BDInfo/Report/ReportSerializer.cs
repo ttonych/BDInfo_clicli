@@ -1048,9 +1048,14 @@ namespace BDInfo.Reporting
             data.AngleIndex = stream.AngleIndex;
             data.BaseView = stream.BaseView;
 
-            if (stream.ExtendedData is string extendedString)
+            switch (stream)
             {
-                data.ExtendedData = extendedString;
+                case TSAudioStream audio when audio.ExtendedData is string audioExtended:
+                    data.ExtendedData = audioExtended;
+                    break;
+                case TSVideoStream video when video.ExtendedData is string videoExtended:
+                    data.ExtendedData = videoExtended;
+                    break;
             }
         }
 
