@@ -865,7 +865,7 @@ namespace BDInfo.Reporting
             StreamData data;
             if (stream is TSVideoStream video)
             {
-                data = new VideoStreamData
+                var videoData = new VideoStreamData
                 {
                     VideoFormat = video.VideoFormat,
                     FrameRate = video.FrameRate,
@@ -877,6 +877,9 @@ namespace BDInfo.Reporting
                     FrameRateDenominator = video.FrameRateDenominator,
                     EncodingProfile = video.EncodingProfile
                 };
+
+                PopulateVideoStreamData(videoData, video);
+                data = videoData;
             }
             else if (stream is TSAudioStream audio)
             {
@@ -934,6 +937,100 @@ namespace BDInfo.Reporting
             return data;
         }
 
+        private static void PopulateVideoStreamData(VideoStreamData data, TSVideoStream video)
+        {
+            if (data == null || video == null)
+            {
+                return;
+            }
+
+            if (video.ExtendedData is TSCodecHEVC.ExtendedDataSet hevcData)
+            {
+                if (hevcData.ExtendedFormatInfo != null && hevcData.ExtendedFormatInfo.Count > 0)
+                {
+                    data.ExtendedFormatInfo = new List<string>(hevcData.ExtendedFormatInfo);
+                }
+
+                if (!string.IsNullOrEmpty(hevcData.MasteringDisplayColorPrimaries))
+                {
+                    data.MasteringDisplayColorPrimaries = hevcData.MasteringDisplayColorPrimaries;
+                }
+
+                if (!string.IsNullOrEmpty(hevcData.MasteringDisplayLuminance))
+                {
+                    data.MasteringDisplayLuminance = hevcData.MasteringDisplayLuminance;
+                }
+
+                if (hevcData.MaximumContentLightLevel != 0)
+                {
+                    data.MaximumContentLightLevel = hevcData.MaximumContentLightLevel;
+                }
+
+                if (hevcData.MaximumFrameAverageLightLevel != 0)
+                {
+                    data.MaximumFrameAverageLightLevel = hevcData.MaximumFrameAverageLightLevel;
+                }
+
+                if (hevcData.LightLevelAvailable)
+                {
+                    data.LightLevelAvailable = true;
+                }
+
+                if (hevcData.PreferredTransferCharacteristics != 0)
+                {
+                    data.PreferredTransferCharacteristics = hevcData.PreferredTransferCharacteristics;
+                }
+
+                if (hevcData.IsHdr10Plus)
+                {
+                    data.IsHdr10Plus = true;
+                }
+            }
+        }
+
+        private static void PopulateVideoExtendedData(TSVideoStream video, VideoStreamData data)
+        {
+            if (video == null || data == null)
+            {
+                return;
+            }
+
+            bool hasHevcInfo =
+                (data.ExtendedFormatInfo != null && data.ExtendedFormatInfo.Count > 0)
+                || !string.IsNullOrEmpty(data.MasteringDisplayColorPrimaries)
+                || !string.IsNullOrEmpty(data.MasteringDisplayLuminance)
+                || data.MaximumContentLightLevel != 0
+                || data.MaximumFrameAverageLightLevel != 0
+                || data.LightLevelAvailable
+                || data.PreferredTransferCharacteristics != 0
+                || data.IsHdr10Plus;
+
+            if (hasHevcInfo)
+            {
+                var extendedData = new TSCodecHEVC.ExtendedDataSet
+                {
+                    MasteringDisplayColorPrimaries = data.MasteringDisplayColorPrimaries ?? string.Empty,
+                    MasteringDisplayLuminance = data.MasteringDisplayLuminance ?? string.Empty,
+                    MaximumContentLightLevel = data.MaximumContentLightLevel,
+                    MaximumFrameAverageLightLevel = data.MaximumFrameAverageLightLevel,
+                    LightLevelAvailable = data.LightLevelAvailable,
+                    PreferredTransferCharacteristics = data.PreferredTransferCharacteristics,
+                    IsHdr10Plus = data.IsHdr10Plus
+                };
+
+                if (data.ExtendedFormatInfo != null && data.ExtendedFormatInfo.Count > 0)
+                {
+                    extendedData.ExtendedFormatInfo.AddRange(data.ExtendedFormatInfo);
+                }
+
+                video.ExtendedData = extendedData;
+            }
+            else if (!string.IsNullOrEmpty(data.ExtendedData))
+            {
+                video.ExtendedData = data.ExtendedData;
+            }
+        }
+
         private static void PopulateCommonStreamData(StreamData data, TSStream stream)
         {
             data.PID = stream.PID;
@@ -950,6 +1047,11 @@ namespace BDInfo.Reporting
             data.PacketSeconds = stream.PacketSeconds;
             data.AngleIndex = stream.AngleIndex;
             data.BaseView = stream.BaseView;
+
+            if (stream.ExtendedData is string extendedString)
+            {
+                data.ExtendedData = extendedString;
+            }
         }
 
         private static TSStream CreateStream(StreamData data)
@@ -981,6 +1083,7 @@ namespace BDInfo.Reporting
                     video.IsInterlaced = data.IsInterlaced;
                     video.FrameRateEnumerator = data.FrameRateEnumerator;
                     video.FrameRateDenominator = data.FrameRateDenominator;
+                    PopulateVideoExtendedData(video, data as VideoStreamData);
                     stream = video;
                     break;
                 }
