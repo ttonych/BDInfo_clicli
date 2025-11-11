@@ -950,7 +950,6 @@ namespace BDInfo.Reporting
             data.PacketSeconds = stream.PacketSeconds;
             data.AngleIndex = stream.AngleIndex;
             data.BaseView = stream.BaseView;
-            data.ExtendedData = stream.ExtendedData as string;
         }
 
         private static TSStream CreateStream(StreamData data)
