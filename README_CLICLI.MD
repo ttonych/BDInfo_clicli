@@ -35,8 +35,9 @@ Options:
   -m, --mpls=VALUE           Comma separated list of playlists to scan.
   -w, --whole                Scan whole disc - every playlist.
   -v, --version              Print the version.
-  -c, --charts               Save all charts as image (select image format, default png)
+  -c, --charts[=FORMAT]      Save all charts as image (png by default; also jpg, bmp, gif, tiff).
   -r, --report               Choose report formats (txt, bdinfo, bdinfo-json). Use commas for multiple.
+  -z, --compress             Compress generated .bdinfo reports using ZIP.
 ```
 
 ---
@@ -68,9 +69,32 @@ Fixed an issue where loading an HDR10+ title first could cause a subsequent non�
 ---
 
 ## Build from source
-1. Open `BDInfo.sln` in Visual Studio.
-2. Target **.NET Framework 4.7.2+**.
+1. Open `BDInfo.sln` in Visual Studio, or build with Visual Studio MSBuild.
+2. Target **.NET Framework 4.8**.
 3. Build the **BDInfo** solution.
+
+Authoritative local build commands:
+
+```powershell
+& 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe' BDInfo.sln /t:Restore /p:Configuration=Release /p:Platform='Any CPU'
+& 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe' BDInfo.sln /p:Configuration=Release /p:Platform='Any CPU' /m
+```
+
+`dotnet build` is not the supported build path for this classic .NET Framework WinForms project.
+
+---
+
+## Development workflow
+Normal changes should be made on a short-lived branch and reviewed through a pull request into `UHD_Support`.
+
+Required checks before publishing a branch:
+- `git diff --check`
+- Visual Studio MSBuild Release build
+- `BDInfo.exe --help`
+- Real-disc CLI smoke for CLI/report/chart changes
+- `.bdinfo` round-trip check for report serialization changes
+
+Codex/agent operating rules live in `AGENTS.md`. Pull requests should use the repository PR template.
 
 ---
 
@@ -89,7 +113,8 @@ Common options:
 - `-m, --mpls=VALUE` – comma‑separated playlist IDs to scan (e.g., `-m 800,801`)
 - `-w, --whole` – scan **all** playlists
 - `-r, --report` – choose report formats: `txt`, `bdinfo`, `bdinfo-json` (comma‑separate for multiple)
-- `-c, --charts` – save bitrate charts as images (default **png**)
+- `-c, --charts[=FORMAT]` – save bitrate charts as images (default **png**; also `jpg`, `bmp`, `gif`, `tiff`)
+- `-z, --compress` – compress generated `.bdinfo` reports using ZIP
 
 ---
 
@@ -108,4 +133,3 @@ LGPL‑2.1 (same as the original BDInfo).
 - Original **BDInfo** by Cinema Squid.
 - Upstream fork: **UniqProject/BDInfo** (`v0.7.6.2_1b`).
 - This fork: CLI mode, GUI export/reload, JSON/XML report support, HDR10+ bug fix.
-

@@ -55,7 +55,12 @@ namespace BDInfo.Reporting
                 ScanResult = ConvertScanResult(scanResult)
             };
 
-            Directory.CreateDirectory(Path.GetDirectoryName(path) ?? ".");
+            string directory = Path.GetDirectoryName(path);
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                directory = ".";
+            }
+            Directory.CreateDirectory(directory);
 
             if (compress)
             {

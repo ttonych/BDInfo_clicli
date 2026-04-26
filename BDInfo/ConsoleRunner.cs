@@ -52,6 +52,11 @@ namespace BDInfo
                 return false;
             }
 
+            if (!ShouldHandle(args))
+            {
+                return false;
+            }
+
             using (ConsoleWindow.EnsureAttached())
             {
                 CliOptions options;
@@ -99,6 +104,31 @@ namespace BDInfo
 
                 return true;
             }
+        }
+
+        private static bool ShouldHandle(string[] args)
+        {
+            bool hasOption = false;
+            int positionalCount = 0;
+
+            foreach (string arg in args)
+            {
+                if (string.IsNullOrWhiteSpace(arg))
+                {
+                    continue;
+                }
+
+                if (arg.StartsWith("-", StringComparison.Ordinal))
+                {
+                    hasOption = true;
+                }
+                else
+                {
+                    positionalCount++;
+                }
+            }
+
+            return hasOption || positionalCount > 1;
         }
 
         private static CliOptions ParseArguments(string[] args)
@@ -152,6 +182,14 @@ namespace BDInfo
                 {
                     string value = ExtractOptionValue(args, ref i, "-c", "--charts", allowMissingValue: true);
                     options.SaveCharts = true;
+                    if (string.IsNullOrWhiteSpace(value) &&
+                        i + 1 < args.Length &&
+                        IsChartFormatName(args[i + 1]))
+                    {
+                        i++;
+                        value = args[i];
+                    }
+
                     if (!string.IsNullOrWhiteSpace(value))
                     {
                         options.ChartFormat = value;
@@ -1563,11 +1601,15 @@ namespace BDInfo
 
             if (formats.Contains(ReportFormat.BdinfoJson))
             {
-                string reportPath = Path.Combine(destination, sanitizedBaseName + ".bdinfo");
-                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Json, compress);
-                writtenPaths.Add(reportPath);
+                string jsonFileName = formats.Contains(ReportFormat.Bdinfo)
+                    ? sanitizedBaseName + ".json.bdinfo"
+                    : sanitizedBaseName + ".bdinfo";
+                string jsonReportPath = Path.Combine(destination, jsonFileName);
+                BDInfoReportSerializer.Save(jsonReportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Json, compress);
+                writtenPaths.Add(jsonReportPath);
             }
-            else if (formats.Contains(ReportFormat.Bdinfo))
+
+            if (formats.Contains(ReportFormat.Bdinfo))
             {
                 string reportPath = Path.Combine(destination, sanitizedBaseName + ".bdinfo");
                 BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Xml, compress);
@@ -1661,6 +1703,28 @@ namespace BDInfo
             }
         }
 
+        private static bool IsChartFormatName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return false;
+            }
+
+            switch (name.Trim().ToLowerInvariant())
+            {
+                case "png":
+                case "jpg":
+                case "jpeg":
+                case "bmp":
+                case "gif":
+                case "tif":
+                case "tiff":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         private static string GetVersionString()
         {
             return Application.ProductVersion;
@@ -1678,7 +1742,7 @@ namespace BDInfo
             Console.WriteLine("  -m, --mpls=VALUE           Comma separated list of playlists to scan.");
             Console.WriteLine("  -w, --whole                Scan whole disc - every playlist.");
             Console.WriteLine("  -v, --version              Print the version.");
-            Console.WriteLine("  -c, --charts               Save all charts as image (select image format, default png)");
+            Console.WriteLine("  -c, --charts[=FORMAT]      Save all charts as image (png by default; also jpg, bmp, gif, tiff).");
             Console.WriteLine("  -r, --report               Choose report formats (txt, bdinfo, bdinfo-json). Use commas for multiple.");
             Console.WriteLine("  -z, --compress             Compress generated .bdinfo reports using ZIP.");
         }

@@ -5,6 +5,7 @@ on:
     branches: [ "**" ]
     tags: [ "v*.*.*" ]    # pushing a tag like v1.2.3 will create/update a GitHub Release
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,7 +19,7 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      # nuget.exe for classic packages.config restore.
+      # nuget.exe restore also supports this project's PackageReference dependencies.
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v2
 
@@ -37,6 +38,43 @@ jobs:
           $out = (Resolve-Path $dist).Path + "\"
           & msbuild BDInfo.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutDir="$out" /m
           Write-Host "Built to ${out}"
+
+      - name: Smoke test CLI entrypoint
+        shell: pwsh
+        run: |
+          $exe = Join-Path $PWD "dist\BDInfo.exe"
+          if (!(Test-Path $exe)) {
+            throw "BDInfo.exe was not built at $exe"
+          }
+
+          $help = & $exe --help
+          $exitCode = $LASTEXITCODE
+          $help | Write-Host
+
+          if ($exitCode -ne 0) {
+            throw "BDInfo.exe --help exited with code $exitCode"
+          }
+
+          if (($help -join "`n") -notmatch "Options:") {
+            throw "BDInfo.exe --help output did not contain the expected Options section"
+          }
+
+      - name: Verify build output
+        shell: pwsh
+        run: |
+          $required = @(
+            "BDInfo.exe",
+            "BDInfo.exe.config",
+            "DiscUtils.dll",
+            "ZedGraph.dll"
+          )
+
+          foreach ($file in $required) {
+            $path = Join-Path "dist" $file
+            if (!(Test-Path $path)) {
+              throw "Required build output is missing: $path"
+            }
+          }
 
       # Package everything from dist/ into a single ZIP at repository root.
       - name: Package ZIP for Release
