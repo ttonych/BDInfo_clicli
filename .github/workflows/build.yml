@@ -91,6 +91,7 @@ jobs:
 
       # Upload only one artifact with simplified paths (no /bin/ in structure).
       - name: Upload artifact (files only)
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/upload-artifact@v7
         with:
           name: BDInfo_clicli
