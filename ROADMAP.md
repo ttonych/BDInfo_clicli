@@ -74,6 +74,10 @@ Done when:
 
 Status: in progress.
 
+Progress:
+- Argument parsing is extracted into `CliArgumentParser`.
+- CLI report writing and output naming are extracted into `CliReportWriter`.
+
 Goal: reduce risk in `ConsoleRunner.cs` without changing behavior.
 
 Scope:

@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-using BDInfo.Reporting;
 
 namespace BDInfo
 {
@@ -195,7 +194,7 @@ namespace BDInfo
                     options.ReportFormats.Add(ReportFormat.Text);
                 }
 
-                List<string> reportPaths = GenerateReports(
+                List<string> reportPaths = CliReportWriter.WriteReports(
                     bdrom,
                     selectedPlaylists,
                     scanResult,
@@ -1277,66 +1276,6 @@ namespace BDInfo
                 Report("Scan complete", _totalBytes);
                 Console.WriteLine();
             }
-        }
-
-        private static List<string> GenerateReports(
-            BDROM bdrom,
-            List<TSPlaylistFile> playlists,
-            ScanBDROMResult scanResult,
-            string destination,
-            IReadOnlyCollection<ReportFormat> formats,
-            bool compress)
-        {
-            if (formats == null || formats.Count == 0)
-            {
-                formats = new[] { ReportFormat.Text };
-            }
-
-            string volumeLabel = string.IsNullOrWhiteSpace(bdrom.VolumeLabel)
-                ? "UNKNOWN"
-                : bdrom.VolumeLabel;
-
-            string sanitizedVolumeLabel = ToolBox.GetSafeFileName(volumeLabel);
-            if (string.IsNullOrWhiteSpace(sanitizedVolumeLabel))
-            {
-                sanitizedVolumeLabel = "BDINFO";
-            }
-
-            string sanitizedTextName = ToolBox.GetSafeFileName(string.Format(CultureInfo.InvariantCulture, "BDINFO.{0}.txt", sanitizedVolumeLabel));
-            string sanitizedBaseName = sanitizedVolumeLabel;
-
-            var writtenPaths = new List<string>();
-
-            if (formats.Contains(ReportFormat.Text))
-            {
-                using (var report = new FormReport())
-                {
-                    report.Generate(bdrom, playlists, scanResult);
-                    string reportText = report.ReportText;
-                    string reportPath = Path.Combine(destination, sanitizedTextName);
-                    File.WriteAllText(reportPath, reportText);
-                    writtenPaths.Add(reportPath);
-                }
-            }
-
-            if (formats.Contains(ReportFormat.BdinfoJson))
-            {
-                string jsonFileName = formats.Contains(ReportFormat.Bdinfo)
-                    ? sanitizedBaseName + ".json.bdinfo"
-                    : sanitizedBaseName + ".bdinfo";
-                string jsonReportPath = Path.Combine(destination, jsonFileName);
-                BDInfoReportSerializer.Save(jsonReportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Json, compress);
-                writtenPaths.Add(jsonReportPath);
-            }
-
-            if (formats.Contains(ReportFormat.Bdinfo))
-            {
-                string reportPath = Path.Combine(destination, sanitizedBaseName + ".bdinfo");
-                BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Xml, compress);
-                writtenPaths.Add(reportPath);
-            }
-
-            return writtenPaths;
         }
 
         private static int SaveCharts(IEnumerable<TSPlaylistFile> playlists, string directory, ImageFormat format, string extension)
