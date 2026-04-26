@@ -131,6 +131,7 @@
     <Compile Include="FormReport.Designer.cs">
       <DependentUpon>FormReport.cs</DependentUpon>
     </Compile>
+    <Compile Include="GuiReportExportSelection.cs" />
     <Compile Include="GuiReportLoader.cs" />
     <Compile Include="FormSettings.cs">
       <SubType>Form</SubType>
