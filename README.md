@@ -96,6 +96,7 @@ Required checks before publishing a branch:
 - `.bdinfo` round-trip smoke: `.\scripts\smoke-report-roundtrip.ps1 -BuildOutputPath .\BDInfo\bin\Release`
 - HDR10+ carryover smoke: `.\scripts\smoke-hdr10plus-carryover.ps1 -BuildOutputPath .\BDInfo\bin\Release`
 - Real-disc CLI smoke for CLI/report/chart changes: `.\scripts\smoke-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SourcePath V:\ -Playlist 00107`
+- Real-disc HDR10+ smoke when sample media is available: `.\scripts\smoke-hdr10plus-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SourcePath V:\ -Playlist 00800`
 - `.bdinfo` round-trip check for report serialization changes
 
 Codex/agent operating rules live in [`AGENTS.md`](AGENTS.md). Pull requests should use the repository PR template.
