@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -64,9 +64,9 @@ namespace BDInfo
             this.checkBoxDisplayChapterCount = new System.Windows.Forms.CheckBox();
             this.checkBoxMainWindowHRSizeFormat = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
-            // 
+            //
             // checkBoxFilterLoopingPlaylists
-            // 
+            //
             this.checkBoxFilterLoopingPlaylists.AutoSize = true;
             this.checkBoxFilterLoopingPlaylists.Checked = true;
             this.checkBoxFilterLoopingPlaylists.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -76,9 +76,9 @@ namespace BDInfo
             this.checkBoxFilterLoopingPlaylists.TabIndex = 3;
             this.checkBoxFilterLoopingPlaylists.Text = "Filter playlists that contain loops.";
             this.checkBoxFilterLoopingPlaylists.UseVisualStyleBackColor = true;
-            // 
+            //
             // checkBoxAutosaveReport
-            // 
+            //
             this.checkBoxAutosaveReport.AutoSize = true;
             this.checkBoxAutosaveReport.Location = new System.Drawing.Point(12, 107);
             this.checkBoxAutosaveReport.Name = "checkBoxAutosaveReport";
@@ -86,9 +86,9 @@ namespace BDInfo
             this.checkBoxAutosaveReport.TabIndex = 2;
             this.checkBoxAutosaveReport.Text = "Auto-save report on scan completion.";
             this.checkBoxAutosaveReport.UseVisualStyleBackColor = true;
-            // 
+            //
             // buttonCancel
-            // 
+            //
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Location = new System.Drawing.Point(126, 272);
             this.buttonCancel.Name = "buttonCancel";
@@ -97,9 +97,9 @@ namespace BDInfo
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
-            // 
+            //
             // buttonOK
-            // 
+            //
             this.buttonOK.Location = new System.Drawing.Point(45, 272);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
@@ -107,9 +107,9 @@ namespace BDInfo
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
-            // 
+            //
             // checkBoxGenerateStreamDiagnostics
-            // 
+            //
             this.checkBoxGenerateStreamDiagnostics.AutoSize = true;
             this.checkBoxGenerateStreamDiagnostics.Checked = true;
             this.checkBoxGenerateStreamDiagnostics.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -119,9 +119,9 @@ namespace BDInfo
             this.checkBoxGenerateStreamDiagnostics.TabIndex = 0;
             this.checkBoxGenerateStreamDiagnostics.Text = "Include stream diagnostics in report.";
             this.checkBoxGenerateStreamDiagnostics.UseVisualStyleBackColor = true;
-            // 
+            //
             // checkBoxKeepStreamOrder
-            // 
+            //
             this.checkBoxKeepStreamOrder.AutoSize = true;
             this.checkBoxKeepStreamOrder.Location = new System.Drawing.Point(12, 130);
             this.checkBoxKeepStreamOrder.Name = "checkBoxKeepStreamOrder";
@@ -129,9 +129,9 @@ namespace BDInfo
             this.checkBoxKeepStreamOrder.TabIndex = 4;
             this.checkBoxKeepStreamOrder.Text = "Keep original stream ordering.";
             this.checkBoxKeepStreamOrder.UseVisualStyleBackColor = true;
-            // 
+            //
             // checkBoxGenerateTextSummary
-            // 
+            //
             this.checkBoxGenerateTextSummary.AutoSize = true;
             this.checkBoxGenerateTextSummary.Checked = true;
             this.checkBoxGenerateTextSummary.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -141,9 +141,9 @@ namespace BDInfo
             this.checkBoxGenerateTextSummary.TabIndex = 1;
             this.checkBoxGenerateTextSummary.Text = "Include quick text summary in report.";
             this.checkBoxGenerateTextSummary.UseVisualStyleBackColor = true;
-            // 
+            //
             // checkBoxFilterShortPlaylists
-            // 
+            //
             this.checkBoxFilterShortPlaylists.AutoSize = true;
             this.checkBoxFilterShortPlaylists.Checked = true;
             this.checkBoxFilterShortPlaylists.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -153,27 +153,27 @@ namespace BDInfo
             this.checkBoxFilterShortPlaylists.TabIndex = 7;
             this.checkBoxFilterShortPlaylists.Text = "Filter playlists with length < ";
             this.checkBoxFilterShortPlaylists.UseVisualStyleBackColor = true;
-            // 
+            //
             // textBoxFilterShortPlaylistsValue
-            // 
+            //
             this.textBoxFilterShortPlaylistsValue.Location = new System.Drawing.Point(160, 174);
             this.textBoxFilterShortPlaylistsValue.MaxLength = 4;
             this.textBoxFilterShortPlaylistsValue.Name = "textBoxFilterShortPlaylistsValue";
             this.textBoxFilterShortPlaylistsValue.Size = new System.Drawing.Size(41, 20);
             this.textBoxFilterShortPlaylistsValue.TabIndex = 8;
             this.textBoxFilterShortPlaylistsValue.Text = "20";
-            // 
+            //
             // labelPlaylistLength
-            // 
+            //
             this.labelPlaylistLength.AutoSize = true;
             this.labelPlaylistLength.Location = new System.Drawing.Point(202, 178);
             this.labelPlaylistLength.Name = "labelPlaylistLength";
             this.labelPlaylistLength.Size = new System.Drawing.Size(24, 13);
             this.labelPlaylistLength.TabIndex = 9;
             this.labelPlaylistLength.Text = "sec";
-            // 
+            //
             // checkBoxUseImagePrefix
-            // 
+            //
             this.checkBoxUseImagePrefix.AutoSize = true;
             this.checkBoxUseImagePrefix.Location = new System.Drawing.Point(12, 199);
             this.checkBoxUseImagePrefix.Name = "checkBoxUseImagePrefix";
@@ -181,18 +181,18 @@ namespace BDInfo
             this.checkBoxUseImagePrefix.TabIndex = 10;
             this.checkBoxUseImagePrefix.Text = "Use image prefix";
             this.checkBoxUseImagePrefix.UseVisualStyleBackColor = true;
-            // 
+            //
             // textBoxUseImagePrefixValue
-            // 
+            //
             this.textBoxUseImagePrefixValue.Location = new System.Drawing.Point(113, 197);
             this.textBoxUseImagePrefixValue.MaxLength = 4;
             this.textBoxUseImagePrefixValue.Name = "textBoxUseImagePrefixValue";
             this.textBoxUseImagePrefixValue.Size = new System.Drawing.Size(113, 20);
             this.textBoxUseImagePrefixValue.TabIndex = 11;
             this.textBoxUseImagePrefixValue.Text = "video-";
-            // 
+            //
             // checkBoxEnableSSIF
-            // 
+            //
             this.checkBoxEnableSSIF.AutoSize = true;
             this.checkBoxEnableSSIF.Location = new System.Drawing.Point(12, 222);
             this.checkBoxEnableSSIF.Name = "checkBoxEnableSSIF";
@@ -200,9 +200,9 @@ namespace BDInfo
             this.checkBoxEnableSSIF.TabIndex = 12;
             this.checkBoxEnableSSIF.Text = "Enable SSIF scanning.";
             this.checkBoxEnableSSIF.UseVisualStyleBackColor = true;
-            // 
+            //
             // checkBoxExtendedStreamDiagnostics
-            // 
+            //
             this.checkBoxExtendedStreamDiagnostics.AutoSize = true;
             this.checkBoxExtendedStreamDiagnostics.Location = new System.Drawing.Point(12, 61);
             this.checkBoxExtendedStreamDiagnostics.Name = "checkBoxExtendedStreamDiagnostics";
@@ -210,9 +210,9 @@ namespace BDInfo
             this.checkBoxExtendedStreamDiagnostics.TabIndex = 13;
             this.checkBoxExtendedStreamDiagnostics.Text = "Extended video stream diagnostics.";
             this.checkBoxExtendedStreamDiagnostics.UseVisualStyleBackColor = true;
-            // 
+            //
             // checkBoxDisplayChapterCount
-            // 
+            //
             this.checkBoxDisplayChapterCount.AutoSize = true;
             this.checkBoxDisplayChapterCount.Location = new System.Drawing.Point(12, 245);
             this.checkBoxDisplayChapterCount.Name = "checkBoxDisplayChapterCount";
@@ -220,9 +220,9 @@ namespace BDInfo
             this.checkBoxDisplayChapterCount.TabIndex = 14;
             this.checkBoxDisplayChapterCount.Text = "Display chapter count in Playlist view";
             this.checkBoxDisplayChapterCount.UseVisualStyleBackColor = true;
-            // 
+            //
             // checkBoxMainWindowHRSizeFormat
-            // 
+            //
             this.checkBoxMainWindowHRSizeFormat.AutoSize = true;
             this.checkBoxMainWindowHRSizeFormat.Checked = true;
             this.checkBoxMainWindowHRSizeFormat.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -232,9 +232,9 @@ namespace BDInfo
             this.checkBoxMainWindowHRSizeFormat.TabIndex = 15;
             this.checkBoxMainWindowHRSizeFormat.Text = "Stream sizes in human readable format";
             this.checkBoxMainWindowHRSizeFormat.UseVisualStyleBackColor = true;
-            // 
+            //
             // FormSettings
-            // 
+            //
             this.AcceptButton = this.buttonOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

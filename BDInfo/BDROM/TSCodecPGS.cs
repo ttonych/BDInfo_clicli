@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -36,7 +36,7 @@ namespace BDInfo
             ref string tag)
         {
             byte SegmentType = buffer.ReadByte(false);
-            
+
             switch (SegmentType)
             {
                 case 0x15: // ODS: Object Definition Segment
@@ -47,7 +47,7 @@ namespace BDInfo
                     break;
                 case 0x80:
                     if (!stream.LastFrame.Finished)
-                        stream.LastFrame.Finished = true;   
+                        stream.LastFrame.Finished = true;
                     break;
                 default:
                     break;

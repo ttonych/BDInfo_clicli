@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -199,8 +199,8 @@ namespace BDInfo
         }
 
         private void listViewPlaylistFiles_SelectedIndexChanged(
-            object sender, 
-            EventArgs e)        
+            object sender,
+            EventArgs e)
         {
             TSPlaylistFile playlist = SelectedPlaylist;
             if (playlist != null)
@@ -210,7 +210,7 @@ namespace BDInfo
         }
 
         private void LoadPlaylist(
-            ListView listView, 
+            ListView listView,
             List<TSStreamClip> clips)
         {
             listView.Items.Clear();
@@ -321,21 +321,21 @@ namespace BDInfo
         }
 
         private void FormPlaylist_Load(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             ResetColumnWidths();
         }
 
         private void FormPlaylist_Resize(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             ResetColumnWidths();
         }
 
         private void buttonAdd_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             if (listViewStreamFiles.SelectedItems.Count == 0) return;
@@ -348,7 +348,7 @@ namespace BDInfo
                 {
                     StreamClips.Add(playlist.StreamClips[clipIndex]);
                 }
-                LoadPlaylist(listViewTargetFiles, StreamClips);                
+                LoadPlaylist(listViewTargetFiles, StreamClips);
                 LoadPlaylists();
             }
             CheckOK();
@@ -371,7 +371,7 @@ namespace BDInfo
         }
 
         private void buttonRemove_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             if (listViewTargetFiles.SelectedItems.Count == 0) return;
@@ -399,7 +399,7 @@ namespace BDInfo
         }
 
         private void buttonUp_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             if (listViewTargetFiles.SelectedItems.Count == 0) return;
@@ -416,13 +416,13 @@ namespace BDInfo
         }
 
         private void buttonDown_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             if (listViewTargetFiles.SelectedItems.Count == 0) return;
 
             int selectedIndex = listViewTargetFiles.SelectedIndices[0];
-            if (selectedIndex < listViewTargetFiles.Items.Count - 1 
+            if (selectedIndex < listViewTargetFiles.Items.Count - 1
                 && selectedIndex < StreamClips.Count - 1)
             {
                 TSStreamClip temp = StreamClips[selectedIndex + 1];
@@ -434,12 +434,12 @@ namespace BDInfo
         }
 
         private void buttonOK_Click(
-            object sender, 
+            object sender,
             EventArgs e)
-        {            
+        {
             DialogResult = DialogResult.OK;
 
-            TSPlaylistFile playlist = 
+            TSPlaylistFile playlist =
                 new TSPlaylistFile(BDROM, textBoxName.Text, StreamClips);
 
             BDROM.PlaylistFiles[playlist.Name] = playlist;
@@ -449,7 +449,7 @@ namespace BDInfo
         }
 
         private void buttonCancel_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
@@ -457,7 +457,7 @@ namespace BDInfo
         }
 
         private void listViewStreamFiles_SelectedIndexChanged(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             if (listViewStreamFiles.SelectedItems.Count > 0)
@@ -473,7 +473,7 @@ namespace BDInfo
         }
 
         private void listViewTargetFiles_SelectedIndexChanged(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             if (listViewTargetFiles.SelectedItems.Count > 0)
@@ -510,7 +510,7 @@ namespace BDInfo
         }
 
         private void listViewPlaylistFiles_ColumnClick(
-            object sender, 
+            object sender,
             ColumnClickEventArgs e)
         {
             if (e.Column == PlaylistColumnSorter.SortColumn)
