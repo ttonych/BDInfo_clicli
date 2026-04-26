@@ -231,3 +231,79 @@ These are not first in line unless a real disc exposes a bug:
 - Investigate known codec metadata limitations inherited from upstream BDInfo.
 - Consider enabling GitHub Issues if a public bug backlog becomes useful.
 - Consider adding sample sanitized report fixtures if licensing and size are acceptable.
+
+## Scanner Hardening And `clicli.2` Release
+
+This is the next working phase after the initial post-release maintenance queue. The goal is to make the smallest useful scanner hardening changes, verify them with the existing smoke scripts and available discs, then cut the next maintenance release.
+
+### 12. Add Defensive Playlist Bounds Checks
+
+Issue: [#50 Add defensive bounds checks for playlist chapter parsing](https://github.com/ttonych/BDInfo_clicli/issues/50)
+
+Status: next.
+
+Goal: reduce crash risk in playlist/chapter parsing without changing normal report output.
+
+Scope:
+- Harden `BDInfo/BDROM/TSPlaylistFile.cs` around chapter clip indexes and stream-entry length advances.
+- Preserve current behavior for supported chapter type `1`.
+- Avoid broad parser refactors.
+
+Done when:
+- Malformed or unusual chapter indexes are ignored or handled conservatively instead of throwing.
+- Existing report round-trip smoke still passes.
+- A real-disc smoke is run when a decrypted BD root is available.
+- Issue #50 is closed by the PR.
+
+### 13. Harden PMT Descriptor Parsing And Diagnostics
+
+Issue: [#49 Harden PMT descriptor parsing and diagnostics](https://github.com/ttonych/BDInfo_clicli/issues/49)
+
+Status: pending.
+
+Goal: make PMT descriptor handling safer and stop parser internals from writing unstructured diagnostics into console output.
+
+Scope:
+- Add bounded PMT descriptor parsing in `BDInfo/BDROM/TSStreamFile.cs`.
+- Preserve current behavior for malformed or unknown descriptors.
+- Avoid report output changes unless backed by sample media.
+- Keep this separate from playlist/chapter hardening.
+
+Done when:
+- PMT descriptor parsing is bounded.
+- Internal parser errors do not pollute CLI output.
+- Existing smoke scripts pass.
+- A suitable real-disc smoke is run or the remaining sample requirement is documented on #49.
+
+### 14. Full Verification Pass
+
+Status: pending.
+
+Goal: verify the scanner-hardening phase before tagging.
+
+Scope:
+- Run all required checks from `AGENTS.md`.
+- Run real-disc smoke on any available discs.
+- Confirm GitHub Actions are green on `UHD_Support`.
+- Check open issues for any regressions introduced by #50/#49.
+
+Done when:
+- Local verification is clean.
+- GitHub Actions are green.
+- Remaining issues are either unrelated or explicitly deferred.
+
+### 15. Release `v0.7.6.2-clicli.2`
+
+Status: pending.
+
+Goal: publish the next maintenance build after scanner hardening.
+
+Scope:
+- Tag the next release as `v0.7.6.2-clicli.2` unless a newer versioning decision is made.
+- Confirm the release workflow attaches `BDInfo_clicli.zip`.
+- Write release notes covering scanner hardening, smoke coverage, fixtures, HDR10+ verification, and project tracking.
+
+Done when:
+- The tag exists on GitHub.
+- The GitHub release has `BDInfo_clicli.zip`.
+- Release notes are accurate and linked to the relevant PRs/issues.
