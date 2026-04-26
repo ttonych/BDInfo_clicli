@@ -598,7 +598,7 @@ namespace BDInfo
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    Debug.WriteLine(ex.ToString());
                 }
 
                 logFile = new FileStream(Path.ChangeExtension(Path.Combine(logDir, logFileName), "txt"), FileMode.Create, FileAccess.Write);
@@ -927,69 +927,46 @@ namespace BDInfo
                                     parser.PMTTransferState = false;
                                     if (parser.PMTSectionNumber == parser.PMTLastSectionNumber)
                                     {
-                                        //Console.WriteLine("PMT Start: " + parser.PMTTemp);
-                                        try
+                                        int pmtPayloadEnd = (int)parser.PMTOffset - 4;
+                                        for (int k = 0; k + 5 <= pmtPayloadEnd;)
                                         {
-                                            for (int k = 0; k < (parser.PMTOffset - 4); k += 5)
+                                            byte streamType = PMT[k];
+
+                                            ushort streamPID = (ushort)
+                                                (((PMT[k + 1] & 0x1F) << 8) +
+                                                   PMT[k + 2]);
+
+                                            ushort streamInfoLength = (ushort)
+                                                (((PMT[k + 3] & 0xF) << 8) +
+                                                   PMT[k + 4]);
+
+                                            int streamInfoStart = k + 5;
+                                            int streamInfoEnd = streamInfoStart + streamInfoLength;
+                                            if (streamInfoEnd > pmtPayloadEnd)
                                             {
-                                                byte streamType = PMT[k];
-
-                                                ushort streamPID = (ushort)
-                                                    (((PMT[k + 1] & 0x1F) << 8) +
-                                                       PMT[k + 2]);
-
-                                                ushort streamInfoLength = (ushort)
-                                                    (((PMT[k + 3] & 0xF) << 8) +
-                                                       PMT[k + 4]);
-
-                                                /*
-                                                if (streamInfoLength == 2)
-                                                {
-                                                    // TODO: Cleanup
-                                                    //streamInfoLength = 0;
-                                                }
-
-                                                Console.WriteLine(string.Format(
-                                                    "Type: {0} PID: {1} Length: {2}",
-                                                    streamType, streamPID, streamInfoLength));
-                                                 */
-
-                                                if (!Streams.ContainsKey(streamPID))
-                                                {
-                                                    List<TSDescriptor> streamDescriptors =
-                                                        new List<TSDescriptor>();
-
-                                                    /*
-                                                     * TODO: Getting bad streamInfoLength
-                                                    if (streamInfoLength > 0)
-                                                    {
-                                                        for (int d = 0; d < streamInfoLength; d++)
-                                                        {
-                                                            byte name = PMT[k + d + 5];
-                                                            byte length = PMT[k + d + 6];
-                                                            TSDescriptor descriptor =
-                                                                new TSDescriptor(name, length);
-                                                            for (int v = 0; v < length; v++)
-                                                            {
-                                                                descriptor.Value[v] =
-                                                                    PMT[k + d + v + 7];
-                                                            }
-                                                            streamDescriptors.Add(descriptor);
-                                                            d += (length + 1);
-                                                        }
-                                                    }
-                                                    */
-                                                    CreateStream(streamPID, streamType, streamDescriptors);
-                                                    if (Streams[streamPID].IsGraphicsStream)
-                                                        Streams[streamPID].IsInitialized = !isFullScan;
-                                                }
-                                                k += streamInfoLength;
+                                                break;
                                             }
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            // TODO
-                                            Console.WriteLine(ex.Message);
+
+                                            if (!Streams.ContainsKey(streamPID))
+                                            {
+                                                List<TSDescriptor> streamDescriptors =
+                                                    ParsePMTStreamDescriptors(
+                                                        PMT,
+                                                        streamInfoStart,
+                                                        streamInfoEnd);
+
+                                                TSStream stream = CreateStream(
+                                                    streamPID,
+                                                    streamType,
+                                                    streamDescriptors);
+                                                if (stream != null &&
+                                                    stream.IsGraphicsStream)
+                                                {
+                                                    stream.IsInitialized = !isFullScan;
+                                                }
+                                            }
+
+                                            k = streamInfoEnd;
                                         }
                                     }
                                 }
@@ -1703,6 +1680,39 @@ namespace BDInfo
             }
 
             return stream;
+        }
+
+        private static List<TSDescriptor> ParsePMTStreamDescriptors(
+            byte[] pmt,
+            int start,
+            int end)
+        {
+            List<TSDescriptor> descriptors = new List<TSDescriptor>();
+            int pos = start;
+
+            while (pos < end)
+            {
+                if (pos + 2 > end)
+                {
+                    break;
+                }
+
+                byte name = pmt[pos++];
+                byte length = pmt[pos++];
+
+                if (pos + length > end)
+                {
+                    break;
+                }
+
+                TSDescriptor descriptor = new TSDescriptor(name, length);
+                Array.Copy(pmt, pos, descriptor.Value, 0, length);
+                descriptors.Add(descriptor);
+
+                pos += length;
+            }
+
+            return descriptors;
         }
     }
 }
