@@ -6,6 +6,9 @@ param(
     [string] $FirstPlaylist = '00800',
     [string] $SecondPlaylist,
     [string] $ReportFormats = 'txt,bdinfo,bdinfo-json',
+    [string] $SwapReadySignalPath,
+    [string] $DiscReadySignalPath,
+    [int] $DiscReadyPollSeconds = 2,
     [switch] $SelfTest,
     [switch] $SyntheticFirst,
     [switch] $WaitForDiscSwap,
@@ -52,6 +55,25 @@ function Set-SyntheticHdr10PlusState {
     }
 
     Write-Host 'Synthetic HDR10+ state set in current process.'
+}
+
+function Wait-ForDiscReadySignal([string] $ReadyPath, [string] $ContinuePath) {
+    $readyFullPath = Resolve-FullPath $ReadyPath
+    $continueFullPath = Resolve-FullPath $ContinuePath
+
+    $readyDirectory = Split-Path -Parent $readyFullPath
+    if ($readyDirectory) {
+        New-Item -ItemType Directory -Force -Path $readyDirectory | Out-Null
+    }
+
+    Set-Content -LiteralPath $readyFullPath -Value ([DateTime]::UtcNow.ToString('O'))
+    Write-Host "Waiting for disc-ready signal: $continueFullPath"
+
+    while (-not (Test-Path -LiteralPath $continueFullPath -PathType Leaf)) {
+        Start-Sleep -Seconds $DiscReadyPollSeconds
+    }
+
+    Remove-Item -LiteralPath $continueFullPath -Force
 }
 
 function Assert-DirectoryExists([string] $Path, [string] $Description) {
@@ -160,7 +182,22 @@ try {
         Assert-ReportsContainHdr10Plus $firstOutput $ReportFormats
     }
 
-    if ($WaitForDiscSwap) {
+    if ($DiscReadySignalPath) {
+        if ([string]::IsNullOrWhiteSpace($SwapReadySignalPath)) {
+            throw 'SwapReadySignalPath is required when DiscReadySignalPath is used.'
+        }
+
+        Write-Host ''
+        if ($SyntheticFirst) {
+            Write-Host 'Insert or keep a known non-HDR10+ disc without closing this PowerShell process.'
+        }
+        else {
+            Write-Host 'Swap to a known non-HDR10+ disc without closing this PowerShell process.'
+        }
+
+        Wait-ForDiscReadySignal $SwapReadySignalPath $DiscReadySignalPath
+    }
+    elseif ($WaitForDiscSwap) {
         Write-Host ''
         if ($SyntheticFirst) {
             Write-Host 'Insert or keep a known non-HDR10+ disc without closing this PowerShell process.'
