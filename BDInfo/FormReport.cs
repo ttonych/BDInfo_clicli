@@ -1164,7 +1164,13 @@ namespace BDInfo
             {
                 defaultName = "BDINFO";
             }
-            defaultName = ToolBox.GetSafeFileName(defaultName) + ".bdinfo";
+
+            defaultName = ToolBox.GetSafeFileName(defaultName);
+            if (string.IsNullOrWhiteSpace(defaultName))
+            {
+                defaultName = "BDINFO";
+            }
+            defaultName += ".bdinfo";
 
             using (SaveFileDialog dialog = new SaveFileDialog())
             {
