@@ -167,7 +167,7 @@ namespace BDInfo
                     continue;
                 }
 
-                if (IsOption(arg, "-m", "--mpls"))
+                if (IsOption(arg, "-m", "--mpls", allowShortValue: true))
                 {
                     string value = ExtractOptionValue(args, ref i, "-m", "--mpls");
                     if (string.IsNullOrWhiteSpace(value))
@@ -203,7 +203,7 @@ namespace BDInfo
                     continue;
                 }
 
-                if (IsOption(arg, "-r", "--report"))
+                if (IsOption(arg, "-r", "--report", allowShortValue: true))
                 {
                     string value = ExtractOptionValue(args, ref i, "-r", "--report");
                     if (string.IsNullOrWhiteSpace(value))
@@ -267,7 +267,7 @@ namespace BDInfo
                    || string.Equals(value, "--version", StringComparison.OrdinalIgnoreCase);
         }
 
-        private static bool IsOption(string value, string shortOption, string longOption)
+        private static bool IsOption(string value, string shortOption, string longOption, bool allowShortValue = false)
         {
             if (string.Equals(value, shortOption, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(value, longOption, StringComparison.OrdinalIgnoreCase))
@@ -289,6 +289,7 @@ namespace BDInfo
 
             if (!string.IsNullOrEmpty(shortOption)
                 && shortOption.Length == 2
+                && allowShortValue
                 && value.StartsWith(shortOption, StringComparison.OrdinalIgnoreCase)
                 && value.Length > shortOption.Length
                 && value[shortOption.Length] != '=')
