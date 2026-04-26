@@ -112,6 +112,11 @@ namespace BDInfo
                 newClip.RelativeTimeIn = TotalLength;
                 newClip.RelativeTimeOut = newClip.RelativeTimeIn + newClip.Length;
                 newClip.AngleIndex = clip.AngleIndex;
+                newClip.FileSize = clip.FileSize;
+                newClip.InterleavedFileSize = clip.InterleavedFileSize;
+                newClip.PayloadBytes = clip.PayloadBytes;
+                newClip.PacketCount = clip.PacketCount;
+                newClip.PacketSeconds = clip.PacketSeconds;
                 newClip.Chapters.Add(clip.TimeIn);
                 StreamClips.Add(newClip);
 
@@ -123,6 +128,10 @@ namespace BDInfo
                 {
                     Chapters.Add(newClip.RelativeTimeIn);
                 }
+            }
+            foreach (TSStreamClip clip in StreamClips)
+            {
+                clip.RelativeLength = TotalLength > 0 ? clip.Length / TotalLength : 0;
             }
             LoadStreamClips();
             IsInitialized = true;
