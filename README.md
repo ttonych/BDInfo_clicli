@@ -99,7 +99,7 @@ Required checks before publishing a branch:
 - Real-disc HDR10+ smoke when sample media is available: `.\scripts\smoke-hdr10plus-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SourcePath V:\ -Playlist 00800`
 - `.bdinfo` round-trip check for report serialization changes
 
-Manual HDR10+ carryover verification requires one process: scan an HDR10+ title, swap to a known non-HDR10+ disc without closing the process, scan the non-HDR10+ playlist, then export the second report and confirm it does not contain `HDR10+`. The same-process CLI path can be checked with `.\scripts\smoke-hdr10plus-swap-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -FirstSourcePath V:\ -FirstPlaylist 00800 -SecondSourcePath V:\ -WaitForDiscSwap`; when only a non-HDR10+ disc is available, use `-SyntheticFirst -SecondSourcePath V:\ -SecondPlaylist 00001`.
+Manual HDR10+ carryover verification requires one process: scan an HDR10+ title, swap to a known non-HDR10+ disc without closing the process, scan the non-HDR10+ playlist, then export the second report and confirm it does not contain `HDR10+`. The same-process CLI path can be checked with `.\scripts\smoke-hdr10plus-swap-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -FirstSourcePath V:\ -FirstPlaylist 00800 -SecondSourcePath V:\ -WaitForDiscSwap`; when only a non-HDR10+ disc is available, use `-SyntheticFirst -SecondSourcePath V:\ -SecondPlaylist 00001`. For noninteractive coordination, pass `-SwapReadySignalPath` and `-DiscReadySignalPath`.
 
 Codex/agent operating rules live in [`AGENTS.md`](AGENTS.md). Pull requests should use the repository PR template.
 

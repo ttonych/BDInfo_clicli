@@ -70,6 +70,12 @@ When only a non-HDR10+ disc is available, use the synthetic-first mode to seed H
 & .\scripts\smoke-hdr10plus-swap-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SyntheticFirst -SecondSourcePath V:\ -SecondPlaylist 00001
 ```
 
+For unattended coordination with this thread, use signal files so the smoke can pause after the first scan and continue after the disc swap:
+
+```powershell
+& .\scripts\smoke-hdr10plus-swap-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -FirstSourcePath V:\ -FirstPlaylist 00800 -SecondSourcePath V:\ -SecondPlaylist 00000 -SwapReadySignalPath .\tmp_swap\swap-ready.signal -DiscReadySignalPath .\tmp_swap\disc-ready.signal -KeepOutput
+```
+
 Clean temporary smoke output before committing.
 
 If report fixture models change intentionally, regenerate the synthetic committed fixtures with:
