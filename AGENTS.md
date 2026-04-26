@@ -58,6 +58,12 @@ When verifying the HDR10+ carryover bug with manual disc swapping, keep BDInfo r
 4. Export the second report and confirm it does not contain `HDR10+`.
 5. Record both disc/playlist IDs in the PR notes.
 
+The same-process swap can also be checked through the local PowerShell smoke. This script loads `BDInfo.exe` once and runs both scans through `ConsoleRunner` in that same PowerShell process:
+
+```powershell
+& .\scripts\smoke-hdr10plus-swap-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -FirstSourcePath V:\ -FirstPlaylist 00800 -SecondSourcePath V:\ -WaitForDiscSwap
+```
+
 Clean temporary smoke output before committing.
 
 ## Review Checklist
