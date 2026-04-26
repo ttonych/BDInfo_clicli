@@ -234,13 +234,13 @@ These are not first in line unless a real disc exposes a bug:
 
 ## Scanner Hardening And `clicli.2` Release
 
-This is the next working phase after the initial post-release maintenance queue. The goal is to make the smallest useful scanner hardening changes, verify them with the existing smoke scripts and available discs, then cut the next maintenance release.
+This phase followed the initial post-release maintenance queue. The goal was to make the smallest useful scanner hardening changes, verify them with the existing smoke scripts and available discs, then cut the next maintenance release.
 
 ### 12. Add Defensive Playlist Bounds Checks
 
 Issue: [#50 Add defensive bounds checks for playlist chapter parsing](https://github.com/ttonych/BDInfo_clicli/issues/50)
 
-Status: next.
+Status: done in [#53](https://github.com/ttonych/BDInfo_clicli/pull/53).
 
 Goal: reduce crash risk in playlist/chapter parsing without changing normal report output.
 
@@ -259,7 +259,7 @@ Done when:
 
 Issue: [#49 Harden PMT descriptor parsing and diagnostics](https://github.com/ttonych/BDInfo_clicli/issues/49)
 
-Status: pending.
+Status: done in [#54](https://github.com/ttonych/BDInfo_clicli/pull/54).
 
 Goal: make PMT descriptor handling safer and stop parser internals from writing unstructured diagnostics into console output.
 
@@ -277,7 +277,7 @@ Done when:
 
 ### 14. Full Verification Pass
 
-Status: pending.
+Status: done before `v0.7.6.2-clicli.2`.
 
 Goal: verify the scanner-hardening phase before tagging.
 
@@ -292,9 +292,18 @@ Done when:
 - GitHub Actions are green.
 - Remaining issues are either unrelated or explicitly deferred.
 
+Verification completed:
+- `git diff --check`.
+- Visual Studio MSBuild Release build.
+- `BDInfo.exe --help`.
+- `scripts/smoke-report-roundtrip.ps1`.
+- `scripts/smoke-hdr10plus-carryover.ps1`.
+- `scripts/smoke-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SourcePath V:\ -Playlist 00000 -ChartFormat jpg` on `THE_AFRICAN_QUEEN` / `00000.MPLS`.
+- GitHub Actions passed on `UHD_Support`.
+
 ### 15. Release `v0.7.6.2-clicli.2`
 
-Status: pending.
+Status: done.
 
 Goal: publish the next maintenance build after scanner hardening.
 
@@ -307,3 +316,7 @@ Done when:
 - The tag exists on GitHub.
 - The GitHub release has `BDInfo_clicli.zip`.
 - Release notes are accurate and linked to the relevant PRs/issues.
+
+Release:
+- [`v0.7.6.2-clicli.2`](https://github.com/ttonych/BDInfo_clicli/releases/tag/v0.7.6.2-clicli.2)
+- Includes `BDInfo_clicli.zip`.
