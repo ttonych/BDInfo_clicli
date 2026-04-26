@@ -7,6 +7,7 @@ param(
     [string] $SecondPlaylist,
     [string] $ReportFormats = 'txt,bdinfo,bdinfo-json',
     [switch] $SelfTest,
+    [switch] $SyntheticFirst,
     [switch] $WaitForDiscSwap,
     [switch] $KeepOutput
 )
@@ -29,6 +30,28 @@ function Invoke-BDInfoInProcess([string[]] $Arguments) {
     if ([Environment]::ExitCode -ne 0) {
         throw "BDInfo.exe exited with code $([Environment]::ExitCode)."
     }
+}
+
+function Invoke-HevcScan($Stream) {
+    $buffer = New-Object BDInfo.TSStreamBuffer
+    $buffer.BeginRead()
+    $tag = $null
+    [BDInfo.TSCodecHEVC]::Scan($Stream, $buffer, [ref] $tag)
+}
+
+function Set-SyntheticHdr10PlusState {
+    $hdrData = New-Object 'BDInfo.TSCodecHEVC+ExtendedDataSet'
+    $hdrData.IsHdr10Plus = $true
+    $hdrStream = New-Object BDInfo.TSVideoStream
+    $hdrStream.StreamType = [BDInfo.TSStreamType]::HEVC_VIDEO
+    $hdrStream.ExtendedData = $hdrData
+
+    Invoke-HevcScan $hdrStream
+    if (-not [BDInfo.TSCodecHEVC]::IsHdr10Plus) {
+        throw 'Synthetic HDR10+ scan did not set TSCodecHEVC.IsHdr10Plus.'
+    }
+
+    Write-Host 'Synthetic HDR10+ state set in current process.'
 }
 
 function Assert-DirectoryExists([string] $Path, [string] $Description) {
@@ -115,7 +138,7 @@ if ($SelfTest) {
     return
 }
 
-if (-not (Test-Path -LiteralPath $FirstSourcePath)) {
+if (-not $SyntheticFirst -and -not (Test-Path -LiteralPath $FirstSourcePath)) {
     throw "First source path was not found: $FirstSourcePath"
 }
 
@@ -128,13 +151,23 @@ try {
     $firstOutput = Join-Path $outputFullPath 'first-hdr10plus'
     $secondOutput = Join-Path $outputFullPath 'second-non-hdr10plus'
 
-    Invoke-BDInfoInProcess @($FirstSourcePath, $outputFullPath, '--list')
-    Invoke-BDInfoInProcess @($FirstSourcePath, $firstOutput, '-m', $FirstPlaylist, '-r', $ReportFormats)
-    Assert-ReportsContainHdr10Plus $firstOutput $ReportFormats
+    if ($SyntheticFirst) {
+        Set-SyntheticHdr10PlusState
+    }
+    else {
+        Invoke-BDInfoInProcess @($FirstSourcePath, $outputFullPath, '--list')
+        Invoke-BDInfoInProcess @($FirstSourcePath, $firstOutput, '-m', $FirstPlaylist, '-r', $ReportFormats)
+        Assert-ReportsContainHdr10Plus $firstOutput $ReportFormats
+    }
 
     if ($WaitForDiscSwap) {
         Write-Host ''
-        Write-Host 'Swap to a known non-HDR10+ disc without closing this PowerShell process.'
+        if ($SyntheticFirst) {
+            Write-Host 'Insert or keep a known non-HDR10+ disc without closing this PowerShell process.'
+        }
+        else {
+            Write-Host 'Swap to a known non-HDR10+ disc without closing this PowerShell process.'
+        }
         if ([string]::IsNullOrWhiteSpace($SecondPlaylist)) {
             $SecondPlaylist = Read-Host 'Enter the non-HDR10+ playlist number, for example 00107'
         }

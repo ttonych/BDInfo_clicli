@@ -149,6 +149,7 @@ Progress:
 - Added an automated smoke that verifies a fresh HEVC stream does not inherit HDR10+ state from a previous HEVC stream in the same process.
 - Added a local real-disc HDR10+ smoke script for sample media and verified `V:\` / `00800.MPLS` exports `HDR10+` in text, XML `.bdinfo`, and JSON `.bdinfo` reports with charts.
 - Added a same-process local swap smoke that scans HDR10+ media, pauses for a manual non-HDR10+ disc swap, then checks that the second report does not contain `HDR10+`.
+- Added a synthetic-first same-process mode and verified it against a real non-HDR10+ disc at `V:\` / `00001.MPLS`; the second text, XML `.bdinfo`, and JSON `.bdinfo` reports did not contain `HDR10+`.
 
 Goal: verify that the documented HDR10+ carryover fix still behaves correctly after the report/export/load refactors.
 

@@ -64,6 +64,12 @@ The same-process swap can also be checked through the local PowerShell smoke. Th
 & .\scripts\smoke-hdr10plus-swap-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -FirstSourcePath V:\ -FirstPlaylist 00800 -SecondSourcePath V:\ -WaitForDiscSwap
 ```
 
+When only a non-HDR10+ disc is available, use the synthetic-first mode to seed HDR10+ state before scanning the real disc in the same process:
+
+```powershell
+& .\scripts\smoke-hdr10plus-swap-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SyntheticFirst -SecondSourcePath V:\ -SecondPlaylist 00001
+```
+
 Clean temporary smoke output before committing.
 
 If report fixture models change intentionally, regenerate the synthetic committed fixtures with:
