@@ -47,7 +47,7 @@ You can now **export a BDInfo report to a single `.bdinfo` file** and later **op
 You can choose the **report format** when exporting: **JSON** or **XML**. The exported file uses the `.bdinfo` extension in both cases, and ZIP compression is optional.
 
 - **Export locations**: available in **GUI** (button **“Export Report…”**) and in the **CLI** (use `-r` / `--report`).
-- **Open/reload**: supported **only in the GUI**. Click **Report…** and select a previously saved `.bdinfo` file. BDInfo **automatically detects** whether it is JSON or XML.
+- **Open/reload**: supported **only in the GUI**. Click **Load Report...** and select a previously saved `.bdinfo` file. BDInfo **automatically detects** whether it is JSON or XML.
 - **Use case**: scan once on a server/headless box, then send the `.bdinfo` to someone who can open it in the GUI and review details/charts without access to the disc.
 
 ---
@@ -105,7 +105,7 @@ Codex/agent operating rules live in [`AGENTS.md`](AGENTS.md). Pull requests shou
 2. Select a disc or BDMV folder to scan.
 3. Inspect playlists, streams, and bitrates.
 4. Click **Export Report…** in the report viewer to save as **JSON** or **XML**.
-5. Later, click **Report…** to load a saved `.bdinfo` and review charts without rescanning.
+5. Later, click **Load Report...** to load a saved `.bdinfo` and review charts without rescanning.
 
 ### CLI (headless)
 Common options:
