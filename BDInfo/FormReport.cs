@@ -803,7 +803,9 @@ namespace BDInfo
                 double chapterMaxFrameSize = 0;
                 double chapterMaxFrameLocation = 0;
 
-                ushort diagPID  = playlist.VideoStreams[0].PID;
+                ushort? diagPID = playlist.VideoStreams.Count > 0
+                    ? playlist.VideoStreams[0].PID
+                    : (ushort?)null;
 
                 int chapterIndex = 0;
                 int clipIndex = 0;
@@ -837,9 +839,10 @@ namespace BDInfo
                     if (clip != null &&
                         clip.AngleIndex == 0 &&
                         file != null &&
-                        file.StreamDiagnostics.ContainsKey(diagPID))
+                        diagPID.HasValue &&
+                        file.StreamDiagnostics.ContainsKey(diagPID.Value))
                     {
-                        diagList = file.StreamDiagnostics[diagPID];
+                        diagList = file.StreamDiagnostics[diagPID.Value];
 
                         while (diagIndex < diagList.Count &&
                             chapterPosition < chapterEnd)
@@ -1125,8 +1128,14 @@ namespace BDInfo
             }
 
             textBoxReport.Select(0, 0);
-            comboBoxPlaylist.SelectedIndex = 0;
-            comboBoxChartType.SelectedIndex = 0;
+            if (comboBoxPlaylist.Items.Count > 0)
+            {
+                comboBoxPlaylist.SelectedIndex = 0;
+            }
+            if (comboBoxChartType.Items.Count > 0)
+            {
+                comboBoxChartType.SelectedIndex = 0;
+            }
         }
 
         private void buttonCopy_Click(
@@ -1260,6 +1269,12 @@ namespace BDInfo
             TSPlaylistFile playlist = (TSPlaylistFile)comboBoxPlaylist.SelectedItem;
 
             comboBoxAngle.Items.Clear();
+            comboBoxStream.Items.Clear();
+            if (playlist == null)
+            {
+                return;
+            }
+
             for (int i = 0; i <= playlist.AngleStreams.Count; i++)
             {
                 comboBoxAngle.Items.Add(i);
@@ -1269,7 +1284,6 @@ namespace BDInfo
                 comboBoxAngle.SelectedIndex = 0;
             }
 
-            comboBoxStream.Items.Clear();
             foreach (TSVideoStream videoStream in playlist.VideoStreams)
             {
                 comboBoxStream.Items.Add(videoStream);
