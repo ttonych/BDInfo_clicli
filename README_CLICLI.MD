@@ -62,7 +62,7 @@ Fixed an issue where loading an HDR10+ title first could cause a subsequent non�
 ## Requirements
 - Windows 7 or newer
 - Blu‑ray BD‑ROM drive (or a decrypted disc/folder already on disk)
-- .NET Framework **4.7.2** or later
+- .NET Framework **4.8**
 
 > **BDInfo will not work on copy‑protected discs.** Decrypt commercial Blu‑ray movies before scanning.
 
