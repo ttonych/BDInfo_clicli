@@ -72,6 +72,8 @@ Done when:
 
 ## 5. Split and Harden CLI Internals
 
+Status: in progress.
+
 Goal: reduce risk in `ConsoleRunner.cs` without changing behavior.
 
 Scope:

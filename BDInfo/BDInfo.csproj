@@ -137,6 +137,7 @@
     <Compile Include="FormSettings.Designer.cs">
       <DependentUpon>FormSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="CliArgumentParser.cs" />
     <Compile Include="ConsoleRunner.cs" />
     <Compile Include="ConsoleWindow.cs" />
     <Compile Include="Program.cs" />
