@@ -204,6 +204,29 @@ namespace BDInfo
             return label.Replace(" ", "_");
         }
 
+        private static void AddAggregatePoint(
+            PointPairList pointsMin,
+            PointPairList pointsAvg,
+            PointPairList pointsMax,
+            double pointMinutes,
+            double pointMin,
+            double pointAvg,
+            double pointMax,
+            int pointCount)
+        {
+            if (pointCount <= 0)
+            {
+                pointsMin.Add(pointMinutes, 0);
+                pointsAvg.Add(pointMinutes, 0);
+                pointsMax.Add(pointMinutes, 0);
+                return;
+            }
+
+            pointsMin.Add(pointMinutes, pointMin);
+            pointsAvg.Add(pointMinutes, pointAvg / pointCount);
+            pointsMax.Add(pointMinutes, pointMax);
+        }
+
         public void GenerateWindowChart(
             TSPlaylistFile playlist,
             ushort PID,
@@ -283,9 +306,7 @@ namespace BDInfo
                         if (pointPosition >= pointSeconds)
                         {
                             double pointMinutes = (pointSeconds - 1) / 60;
-                            pointsMin.Add(pointMinutes, pointMin);
-                            pointsMax.Add(pointMinutes, pointMax);
-                            pointsAvg.Add(pointMinutes, pointAvg / pointCount);
+                            AddAggregatePoint(pointsMin, pointsAvg, pointsMax, pointMinutes, pointMin, pointAvg, pointMax, pointCount);
                             pointMin = double.MaxValue;
                             pointMax = 0;
                             pointAvg = 0;
@@ -308,9 +329,7 @@ namespace BDInfo
                             pointSeconds += 1;
                         }
                         double pointMinutes = (pointSeconds - 1) / 60;
-                        pointsMin.Add(pointMinutes, pointMin);
-                        pointsAvg.Add(pointMinutes, pointAvg / pointCount);
-                        pointsMax.Add(pointMinutes, pointMax);
+                        AddAggregatePoint(pointsMin, pointsAvg, pointsMax, pointMinutes, pointMin, pointAvg, pointMax, pointCount);
                         pointMin = double.MaxValue;
                         pointMax = 0;
                         pointAvg = 0;
@@ -417,9 +436,7 @@ namespace BDInfo
                             pointSeconds += 1;
                         }
                         double pointMinutes = (pointSeconds - 1) / 60;
-                        pointsMin.Add(pointMinutes, pointMin);
-                        pointsAvg.Add(pointMinutes, pointAvg / pointCount);
-                        pointsMax.Add(pointMinutes, pointMax);
+                        AddAggregatePoint(pointsMin, pointsAvg, pointsMax, pointMinutes, pointMin, pointAvg, pointMax, pointCount);
                         pointMin = double.MaxValue;
                         pointMax = 0;
                         pointAvg = 0;
