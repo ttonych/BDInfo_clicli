@@ -138,6 +138,7 @@
       <DependentUpon>FormSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="CliArgumentParser.cs" />
+    <Compile Include="CliChartFormat.cs" />
     <Compile Include="CliReportWriter.cs" />
     <Compile Include="ConsoleRunner.cs" />
     <Compile Include="ConsoleWindow.cs" />

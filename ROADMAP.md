@@ -72,11 +72,12 @@ Done when:
 
 ## 5. Split and Harden CLI Internals
 
-Status: in progress.
+Status: done.
 
 Progress:
 - Argument parsing is extracted into `CliArgumentParser`.
 - CLI report writing and output naming are extracted into `CliReportWriter`.
+- CLI chart format parsing and validation are extracted into `CliChartFormat`.
 
 Goal: reduce risk in `ConsoleRunner.cs` without changing behavior.
 
