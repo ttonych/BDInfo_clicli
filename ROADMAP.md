@@ -137,6 +137,64 @@ Done when:
 - The release has a ZIP artifact.
 - Release notes summarize the CLI/report/automation fixes since the previous tag.
 
+## Post-release Maintenance
+
+These items should be handled after `v0.7.6.2-clicli.1`, one small PR at a time.
+
+### 8. Recheck HDR10+ Carryover Fix
+
+Goal: verify that the documented HDR10+ carryover fix still behaves correctly after the report/export/load refactors.
+
+Scope:
+- Find the exact stream metadata path that sets and clears HDR10+ state.
+- Reproduce the original carryover scenario when possible: scan or load an HDR10+ title, then scan or load a non-HDR10+ title in the same process.
+- Check both direct disc scan and saved `.bdinfo` load paths if suitable sample material is available.
+- Add a narrow automated check if the behavior can be represented without copyrighted sample media; otherwise document the manual verification steps.
+
+Done when:
+- HDR10+ does not leak from one title/stream/report into the next.
+- The README claim remains accurate or is corrected.
+- Any remaining manual-only requirement is written down clearly.
+
+### 9. Add Small Report Fixtures
+
+Goal: move more report behavior into CI without depending on `V:\`.
+
+Scope:
+- Decide whether synthetic `.bdinfo` fixtures can cover XML, JSON, compressed XML, and compressed JSON.
+- Keep fixtures small and free of real disc metadata that should not be committed.
+- Extend `smoke-report-roundtrip.ps1` or add a focused script when fixtures are useful.
+
+Done when:
+- CI checks representative `.bdinfo` files without requiring a real disc.
+- Local real-disc smoke remains available for scanner/chart coverage.
+
+### 10. Audit BDROM Parser TODOs
+
+Goal: identify high-risk parser/scanner TODOs before changing inherited scanner logic.
+
+Scope:
+- Review TODOs in `BDInfo/BDROM`.
+- Group them by risk: correctness, crash potential, metadata quality, and cosmetic cleanup.
+- Fix only small, well-understood issues immediately; move uncertain scanner behavior into documented follow-up items.
+
+Done when:
+- There is a prioritized parser/scanner issue list.
+- Any code changes are backed by local verification or explicit manual test notes.
+
+### 11. Project Tracking
+
+Goal: make future maintenance easier to track outside this working thread.
+
+Scope:
+- Decide whether GitHub Issues should be enabled.
+- If enabled, add labels such as `bug`, `cli`, `gui`, `report`, `scanner`, `release`, and `needs-sample`.
+- Convert confirmed backlog items into issues only when they are actionable.
+
+Done when:
+- Active work has a clear tracking location.
+- Non-actionable observations do not clutter the repository.
+
 ## Backlog
 
 These are not first in line unless a real disc exposes a bug:
