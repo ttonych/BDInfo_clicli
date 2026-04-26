@@ -100,6 +100,7 @@ Status: in progress.
 Progress:
 - GUI report export default filename generation is extracted into `ReportFileNameHelper`.
 - GUI `.bdinfo` load conversion is extracted into `GuiReportLoader`.
+- GUI report export format selection is extracted into `GuiReportExportSelection`.
 
 Goal: protect the GUI workflows that cannot be fully validated by CLI smoke.
 
