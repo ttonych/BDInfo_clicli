@@ -143,6 +143,11 @@ These items should be handled after `v0.7.6.2-clicli.1`, one small PR at a time.
 
 ### 8. Recheck HDR10+ Carryover Fix
 
+Status: in progress.
+
+Progress:
+- Added an automated smoke that verifies a fresh HEVC stream does not inherit HDR10+ state from a previous HEVC stream in the same process.
+
 Goal: verify that the documented HDR10+ carryover fix still behaves correctly after the report/export/load refactors.
 
 Scope:
