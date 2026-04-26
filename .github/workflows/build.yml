@@ -63,6 +63,10 @@ jobs:
             throw "BDInfo.exe --help output did not contain the expected Options section"
           }
 
+      - name: Smoke test report round-trip
+        shell: pwsh
+        run: .\scripts\smoke-report-roundtrip.ps1 -BuildOutputPath .\dist
+
       - name: Verify build output
         shell: pwsh
         run: |

@@ -4,6 +4,8 @@ This roadmap is the working order for future Codex-assisted maintenance. Each it
 
 ## 1. Add Automated `.bdinfo` Round-Trip Smoke
 
+Status: done.
+
 Goal: make the fork's main feature verifiable without relying only on manual GUI checks.
 
 Scope:

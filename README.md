@@ -91,6 +91,7 @@ Required checks before publishing a branch:
 - `git diff --check`
 - Visual Studio MSBuild Release build
 - `BDInfo.exe --help`
+- `.bdinfo` round-trip smoke: `.\scripts\smoke-report-roundtrip.ps1 -BuildOutputPath .\BDInfo\bin\Release`
 - Real-disc CLI smoke for CLI/report/chart changes
 - `.bdinfo` round-trip check for report serialization changes
 
