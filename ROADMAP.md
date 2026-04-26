@@ -117,6 +117,13 @@ Done when:
 
 ## 7. Release Readiness Pass
 
+Status: done.
+
+Progress:
+- Full local verification from `AGENTS.md` passed.
+- GitHub Actions is green on `UHD_Support`.
+- Release workflow created `v0.7.6.2-clicli.1` with `BDInfo_clicli.zip`.
+
 Goal: produce a clean tagged release only after the maintenance queue is stable.
 
 Scope:
