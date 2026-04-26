@@ -204,6 +204,14 @@ Done when:
 
 ### 11. Project Tracking
 
+Status: done.
+
+Progress:
+- Enabled GitHub Issues for `ttonych/BDInfo_clicli`.
+- Added repository labels: `cli`, `gui`, `report`, `scanner`, `release`, and `needs-sample`.
+- Created actionable scanner issues #49 and #50 from `docs/BDROM_TODO_AUDIT.md`.
+- Added `docs/PROJECT_TRACKING.md`.
+
 Goal: make future maintenance easier to track outside this working thread.
 
 Scope:
