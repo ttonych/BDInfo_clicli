@@ -61,15 +61,7 @@ namespace BDInfo
                 formats = new[] { ReportFormat.Text };
             }
 
-            string safeVolumeLabel = string.IsNullOrWhiteSpace(volumeLabel)
-                ? "UNKNOWN"
-                : volumeLabel;
-
-            string sanitizedVolumeLabel = ToolBox.GetSafeFileName(safeVolumeLabel);
-            if (string.IsNullOrWhiteSpace(sanitizedVolumeLabel))
-            {
-                sanitizedVolumeLabel = "BDINFO";
-            }
+            string sanitizedVolumeLabel = ReportFileNameHelper.CreateSafeBaseName(volumeLabel, "UNKNOWN", "BDINFO");
 
             string textFileName = ToolBox.GetSafeFileName(string.Format(CultureInfo.InvariantCulture, "BDINFO.{0}.txt", sanitizedVolumeLabel));
             string xmlFileName = sanitizedVolumeLabel + ".bdinfo";

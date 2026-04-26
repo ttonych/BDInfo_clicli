@@ -95,6 +95,11 @@ Done when:
 
 ## 6. Strengthen GUI Report Export and Load Coverage
 
+Status: in progress.
+
+Progress:
+- GUI report export default filename generation is extracted into `ReportFileNameHelper`.
+
 Goal: protect the GUI workflows that cannot be fully validated by CLI smoke.
 
 Scope:
