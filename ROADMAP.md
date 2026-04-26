@@ -185,6 +185,11 @@ Done when:
 
 ### 10. Audit BDROM Parser TODOs
 
+Status: done.
+
+Progress:
+- Added `docs/BDROM_TODO_AUDIT.md` with a prioritized parser/scanner TODO list and verification guidance.
+
 Goal: identify high-risk parser/scanner TODOs before changing inherited scanner logic.
 
 Scope:
