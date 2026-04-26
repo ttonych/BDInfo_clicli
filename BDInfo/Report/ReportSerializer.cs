@@ -587,6 +587,11 @@ namespace BDInfo.Reporting
             {
                 foreach (var fileException in data.FileExceptions)
                 {
+                    if (fileException == null)
+                    {
+                        continue;
+                    }
+
                     var message = fileException.Message ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(fileException.StackTrace))
                     {
