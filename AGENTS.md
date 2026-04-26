@@ -44,6 +44,12 @@ For CLI/report/export changes, also run a real-disc smoke when a decrypted BD ro
 & .\scripts\smoke-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SourcePath V:\ -Playlist 00107 -ChartFormat jpg
 ```
 
+For HDR10+ scanner changes, also run a real HDR10+ disc smoke when sample media is available:
+
+```powershell
+& .\scripts\smoke-hdr10plus-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SourcePath V:\ -Playlist 00800 -ChartFormat jpg
+```
+
 Clean temporary smoke output before committing.
 
 ## Review Checklist
