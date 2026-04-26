@@ -196,6 +196,11 @@ namespace BDInfo
         private string FixVolumeLabel(string label)
         {
             // TODO: Other Volume Label Tweaks?
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                return "UNKNOWN";
+            }
+
             return label.Replace(" ", "_");
         }
 
