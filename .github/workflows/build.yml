@@ -67,6 +67,10 @@ jobs:
         shell: pwsh
         run: .\scripts\smoke-report-roundtrip.ps1 -BuildOutputPath .\dist
 
+      - name: Smoke test HDR10+ carryover reset
+        shell: pwsh
+        run: .\scripts\smoke-hdr10plus-carryover.ps1 -BuildOutputPath .\dist
+
       - name: Verify build output
         shell: pwsh
         run: |
