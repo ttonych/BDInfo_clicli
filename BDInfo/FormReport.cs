@@ -1193,7 +1193,13 @@ namespace BDInfo
                                 compress = true;
                                 break;
                             case 5:
-                                using (var writer = new StreamWriter(dialog.FileName, false, Encoding.UTF8))
+                                string textFileName = dialog.FileName;
+                                if (!string.Equals(Path.GetExtension(textFileName), ".txt", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    textFileName = Path.ChangeExtension(textFileName, ".txt");
+                                }
+
+                                using (var writer = new StreamWriter(textFileName, false, Encoding.UTF8))
                                 {
                                     writer.Write(textBoxReport.Text);
                                 }
