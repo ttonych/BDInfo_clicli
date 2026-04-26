@@ -115,8 +115,7 @@ Common options:
 - `-w, --whole` – scan **all** playlists
 - `-r, --report` – choose report formats: `txt`, `bdinfo`, `bdinfo-json` (comma‑separate for multiple)
 - `-c, --charts[=FORMAT]` – save bitrate charts as images (default **png**; also `jpg`, `bmp`, `gif`, `tiff`)
-- `-z, --compress` – Compress generated .bdinfo reports using ZIP
-
+- `-z, --compress` – compress generated `.bdinfo` reports using ZIP
 
 ---
 

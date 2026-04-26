@@ -39,6 +39,8 @@ Done when:
 
 ## 3. Consolidate README Files
 
+Status: done.
+
 Goal: remove documentation drift between `README.md` and `README_CLICLI.MD`.
 
 Scope:
