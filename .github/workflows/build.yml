@@ -2,7 +2,7 @@ name: Build (BDInfo_clicli)
 
 on:
   push:
-    branches: [ "**" ]
+    branches: [ "UHD_Support" ]
     tags: [ "v*.*.*" ]    # pushing a tag like v1.2.3 will create/update a GitHub Release
   pull_request:
   workflow_dispatch:
