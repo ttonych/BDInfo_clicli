@@ -167,7 +167,7 @@ namespace BDInfo
                     continue;
                 }
 
-                if (IsOption(arg, "-m", "--mpls", allowShortValue: true))
+                if (IsOption(arg, "-m", "--mpls", allowShortValue: true, allowLongValue: true))
                 {
                     string value = ExtractOptionValue(args, ref i, "-m", "--mpls");
                     if (string.IsNullOrWhiteSpace(value))
@@ -178,7 +178,7 @@ namespace BDInfo
                     continue;
                 }
 
-                if (IsOption(arg, "-c", "--charts"))
+                if (IsOption(arg, "-c", "--charts", allowLongValue: true))
                 {
                     string value = ExtractOptionValue(args, ref i, "-c", "--charts", allowMissingValue: true);
                     options.SaveCharts = true;
@@ -203,7 +203,7 @@ namespace BDInfo
                     continue;
                 }
 
-                if (IsOption(arg, "-r", "--report", allowShortValue: true))
+                if (IsOption(arg, "-r", "--report", allowShortValue: true, allowLongValue: true))
                 {
                     string value = ExtractOptionValue(args, ref i, "-r", "--report");
                     if (string.IsNullOrWhiteSpace(value))
@@ -267,7 +267,7 @@ namespace BDInfo
                    || string.Equals(value, "--version", StringComparison.OrdinalIgnoreCase);
         }
 
-        private static bool IsOption(string value, string shortOption, string longOption, bool allowShortValue = false)
+        private static bool IsOption(string value, string shortOption, string longOption, bool allowShortValue = false, bool allowLongValue = false)
         {
             if (string.Equals(value, shortOption, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(value, longOption, StringComparison.OrdinalIgnoreCase))
@@ -276,6 +276,7 @@ namespace BDInfo
             }
 
             if (!string.IsNullOrEmpty(longOption)
+                && allowLongValue
                 && value.StartsWith(longOption + "=", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
