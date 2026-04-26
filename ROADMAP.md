@@ -155,6 +155,7 @@ Scope:
 - Find the exact stream metadata path that sets and clears HDR10+ state.
 - Reproduce the original carryover scenario when possible: scan or load an HDR10+ title, then scan or load a non-HDR10+ title in the same process.
 - Check both direct disc scan and saved `.bdinfo` load paths if suitable sample material is available.
+- For manual disc swapping, keep one BDInfo process open: scan HDR10+ `V:\` / `00800.MPLS`, swap to a known non-HDR10+ disc, scan its playlist, export the second report, and confirm `HDR10+` is absent.
 - Add a narrow automated check if the behavior can be represented without copyrighted sample media; otherwise document the manual verification steps.
 
 Done when:

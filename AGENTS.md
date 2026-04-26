@@ -50,6 +50,14 @@ For HDR10+ scanner changes, also run a real HDR10+ disc smoke when sample media 
 & .\scripts\smoke-hdr10plus-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SourcePath V:\ -Playlist 00800 -ChartFormat jpg
 ```
 
+When verifying the HDR10+ carryover bug with manual disc swapping, keep BDInfo running in the same process:
+
+1. Open the GUI and scan an HDR10+ title, for example `V:\` / `00800.MPLS`.
+2. Confirm the first report shows `HDR10+`.
+3. Without closing BDInfo, swap to a non-HDR10+ disc and scan a known non-HDR10+ playlist.
+4. Export the second report and confirm it does not contain `HDR10+`.
+5. Record both disc/playlist IDs in the PR notes.
+
 Clean temporary smoke output before committing.
 
 ## Review Checklist
