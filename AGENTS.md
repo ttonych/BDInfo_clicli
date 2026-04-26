@@ -34,6 +34,7 @@ For any code change:
 git diff --check
 & 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe' BDInfo.sln /p:Configuration=Release /p:Platform='Any CPU' /m
 & .\BDInfo\bin\Release\BDInfo.exe --help
+& .\scripts\smoke-report-roundtrip.ps1 -BuildOutputPath .\BDInfo\bin\Release
 ```
 
 For CLI/report/export changes, also run a real-disc smoke when a decrypted BD root is available, for example `V:\`:
