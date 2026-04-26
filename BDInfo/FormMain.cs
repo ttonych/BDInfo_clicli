@@ -28,7 +28,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using BDInfo.Reporting;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace BDInfo
@@ -402,7 +401,6 @@ namespace BDInfo
         private class InitBDROMResult
         {
             public Exception Exception;
-            public BDInfoReportData ReportData;
         }
 
         private void InitBDROM(
@@ -468,10 +466,10 @@ namespace BDInfo
 
                 if (isReport)
                 {
-                    BDInfoReportData reportData = BDInfoReportSerializer.Load(path);
-                    BDROM = BDInfoReportSerializer.CreateBDROM(reportData);
-                    ScanResult = BDInfoReportSerializer.CreateScanResult(reportData.ScanResult);
-                    e.Result = new InitBDROMResult { ReportData = reportData };
+                    GuiReportLoadResult reportLoadResult = GuiReportLoader.Load(path);
+                    BDROM = reportLoadResult.BDROM;
+                    ScanResult = reportLoadResult.ScanResult;
+                    e.Result = new InitBDROMResult();
                 }
                 else
                 {
