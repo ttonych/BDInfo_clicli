@@ -1649,6 +1649,7 @@ namespace BDInfo
 
             foreach (TSPlaylistFile playlist in playlists)
             {
+                bool qualifyNames = playlist.VideoStreams.Count > 1 || playlist.AngleStreams.Count > 0;
                 foreach (TSVideoStream videoStream in playlist.VideoStreams)
                 {
                     for (int angleIndex = 0; angleIndex <= playlist.AngleStreams.Count; angleIndex++)
@@ -1661,7 +1662,10 @@ namespace BDInfo
                                 {
                                     chart.CreateControl();
                                     chart.Generate(chartType, playlist, videoStream.PID, angleIndex);
-                                    chart.SaveChartImage(directory, format, extension);
+                                    string qualifier = qualifyNames
+                                        ? string.Format(CultureInfo.InvariantCulture, "pid-{0:X4}-angle-{1}", videoStream.PID, angleIndex)
+                                        : null;
+                                    chart.SaveChartImage(directory, format, extension, qualifier);
                                     savedCount++;
                                 }
                             }
