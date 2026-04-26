@@ -95,12 +95,13 @@ Done when:
 
 ## 6. Strengthen GUI Report Export and Load Coverage
 
-Status: in progress.
+Status: done.
 
 Progress:
 - GUI report export default filename generation is extracted into `ReportFileNameHelper`.
 - GUI `.bdinfo` load conversion is extracted into `GuiReportLoader`.
 - GUI report export format selection is extracted into `GuiReportExportSelection`.
+- README describes GUI export defaults, export formats, and `.bdinfo` load behavior.
 
 Goal: protect the GUI workflows that cannot be fully validated by CLI smoke.
 

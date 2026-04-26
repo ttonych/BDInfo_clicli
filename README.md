@@ -44,10 +44,12 @@ Options:
 
 ### 2) Export & reload reports (.bdinfo)
 You can now **export a BDInfo report to a single `.bdinfo` file** and later **open it in the GUI** to browse playlists, streams, and **see charts as if you just scanned the disc**.
-You can choose the **report format** when exporting: **JSON** or **XML**. The exported file uses the `.bdinfo` extension in both cases, and ZIP compression is optional.
+You can choose the **report format** when exporting: **JSON** or **XML**. The exported file uses the `.bdinfo` extension in both cases, and ZIP compression is optional. The GUI export dialog also supports a plain text report (`.txt`).
 
 - **Export locations**: available in **GUI** (button **“Export Report…”**) and in the **CLI** (use `-r` / `--report`).
-- **Open/reload**: supported **only in the GUI**. Click **Load Report...** and select a previously saved `.bdinfo` file. BDInfo **automatically detects** whether it is JSON or XML.
+- **GUI export defaults**: the suggested `.bdinfo` filename is based on the disc volume label. Empty or fully unsafe labels fall back to `BDINFO.bdinfo`.
+- **GUI export formats**: **XML `.bdinfo`**, **JSON `.bdinfo`**, **compressed XML `.bdinfo`**, **compressed JSON `.bdinfo`**, and **text `.txt`** are available from the export dialog.
+- **Open/reload**: supported **only in the GUI**. Click **Load Report...** and select a previously saved `.bdinfo` file. BDInfo **automatically detects** JSON vs XML and also loads ZIP-compressed `.bdinfo` reports.
 - **Use case**: scan once on a server/headless box, then send the `.bdinfo` to someone who can open it in the GUI and review details/charts without access to the disc.
 
 ---
@@ -105,8 +107,8 @@ Codex/agent operating rules live in [`AGENTS.md`](AGENTS.md). Pull requests shou
 1. Launch **BDInfo.exe**.
 2. Select a disc or BDMV folder to scan.
 3. Inspect playlists, streams, and bitrates.
-4. Click **Export Report…** in the report viewer to save as **JSON** or **XML**.
-5. Later, click **Load Report...** to load a saved `.bdinfo` and review charts without rescanning.
+4. Click **Export Report…** in the report viewer to save as **XML `.bdinfo`**, **JSON `.bdinfo`**, compressed `.bdinfo`, or text `.txt`.
+5. Later, click **Load Report...** to load a saved XML, JSON, or compressed `.bdinfo` and review charts without rescanning.
 
 ### CLI (headless)
 Common options:
