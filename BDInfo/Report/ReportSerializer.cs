@@ -294,7 +294,7 @@ namespace BDInfo.Reporting
             {
                 foreach (var interleavedData in report.Disc.InterleavedFiles)
                 {
-                    if (string.IsNullOrWhiteSpace(interleavedData.Name))
+                    if (interleavedData == null || string.IsNullOrWhiteSpace(interleavedData.Name))
                     {
                         continue;
                     }
@@ -309,7 +309,7 @@ namespace BDInfo.Reporting
             {
                 foreach (var clipFileData in report.Disc.StreamClipFiles)
                 {
-                    if (string.IsNullOrWhiteSpace(clipFileData.Name))
+                    if (clipFileData == null || string.IsNullOrWhiteSpace(clipFileData.Name))
                     {
                         continue;
                     }
@@ -326,7 +326,10 @@ namespace BDInfo.Reporting
                         foreach (var streamData in clipFileData.Streams)
                         {
                             var stream = CreateStream(streamData);
-                            clipFile.Streams[stream.PID] = stream;
+                            if (stream != null)
+                            {
+                                clipFile.Streams[stream.PID] = stream;
+                            }
                         }
                         LinkAudioCoreStreams(clipFile.Streams.Values, clipFileData.Streams);
                     }
@@ -339,7 +342,7 @@ namespace BDInfo.Reporting
             {
                 foreach (var streamFileData in report.Disc.StreamFiles)
                 {
-                    if (string.IsNullOrWhiteSpace(streamFileData.Name))
+                    if (streamFileData == null || string.IsNullOrWhiteSpace(streamFileData.Name))
                     {
                         continue;
                     }
@@ -357,7 +360,10 @@ namespace BDInfo.Reporting
                         foreach (var streamData in streamFileData.Streams)
                         {
                             var stream = CreateStream(streamData);
-                            streamFile.Streams[stream.PID] = stream;
+                            if (stream != null)
+                            {
+                                streamFile.Streams[stream.PID] = stream;
+                            }
                         }
                         LinkAudioCoreStreams(streamFile.Streams.Values, streamFileData.Streams);
                     }
@@ -401,7 +407,7 @@ namespace BDInfo.Reporting
             {
                 foreach (var playlistData in report.Disc.Playlists)
                 {
-                    if (string.IsNullOrWhiteSpace(playlistData.Name))
+                    if (playlistData == null || string.IsNullOrWhiteSpace(playlistData.Name))
                     {
                         continue;
                     }
@@ -428,6 +434,11 @@ namespace BDInfo.Reporting
                     {
                         foreach (var clipData in playlistData.StreamClips)
                         {
+                            if (clipData == null)
+                            {
+                                continue;
+                            }
+
                             var streamFile = ResolveStreamFile(bdrom, clipData.StreamFileName);
                             var clipFile = ResolveStreamClipFile(bdrom, clipData.StreamClipFileName);
                             var clip = new TSStreamClip(streamFile, clipFile)
@@ -470,6 +481,11 @@ namespace BDInfo.Reporting
                             {
                                 foreach (var entry in angleClipData.Clips)
                                 {
+                                    if (entry == null)
+                                    {
+                                        continue;
+                                    }
+
                                     if (clipLookup.TryGetValue(entry.ClipName ?? string.Empty, out var clip))
                                     {
                                         angleClips[entry.RelativeStart] = clip;
@@ -491,7 +507,10 @@ namespace BDInfo.Reporting
                                 foreach (var streamData in angleStreamData.Streams)
                                 {
                                     var stream = CreateStream(streamData);
-                                    angleStreams[stream.PID] = stream;
+                                    if (stream != null)
+                                    {
+                                        angleStreams[stream.PID] = stream;
+                                    }
                                 }
                                 LinkAudioCoreStreams(angleStreams.Values, angleStreamData.Streams);
                             }
@@ -505,7 +524,10 @@ namespace BDInfo.Reporting
                         foreach (var streamData in playlistData.Streams)
                         {
                             var stream = CreateStream(streamData);
-                            playlist.Streams[stream.PID] = stream;
+                            if (stream != null)
+                            {
+                                playlist.Streams[stream.PID] = stream;
+                            }
                         }
                         LinkAudioCoreStreams(playlist.Streams.Values, playlistData.Streams);
                     }
@@ -516,7 +538,10 @@ namespace BDInfo.Reporting
                         foreach (var streamData in playlistData.PlaylistStreams)
                         {
                             var stream = CreateStream(streamData);
-                            playlist.PlaylistStreams[stream.PID] = stream;
+                            if (stream != null)
+                            {
+                                playlist.PlaylistStreams[stream.PID] = stream;
+                            }
                         }
                         LinkAudioCoreStreams(playlist.PlaylistStreams.Values, playlistData.PlaylistStreams);
                     }
