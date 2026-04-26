@@ -1159,18 +1159,7 @@ namespace BDInfo
                 return;
             }
 
-            string defaultName = ReportBDROM.VolumeLabel;
-            if (string.IsNullOrWhiteSpace(defaultName))
-            {
-                defaultName = "BDINFO";
-            }
-
-            defaultName = ToolBox.GetSafeFileName(defaultName);
-            if (string.IsNullOrWhiteSpace(defaultName))
-            {
-                defaultName = "BDINFO";
-            }
-            defaultName += ".bdinfo";
+            string defaultName = ReportFileNameHelper.CreateGuiDefaultReportFileName(ReportBDROM.VolumeLabel);
 
             using (SaveFileDialog dialog = new SaveFileDialog())
             {
