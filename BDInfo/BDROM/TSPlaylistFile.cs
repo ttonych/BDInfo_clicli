@@ -535,6 +535,11 @@ namespace BDInfo
                     chapterIndex < chapterCount;
                     chapterIndex++)
                 {
+                    if (!HasBytes(data, pos, 14))
+                    {
+                        break;
+                    }
+
                     int chapterType = data[pos+1];
 
                     if (chapterType == 1)
@@ -547,6 +552,13 @@ namespace BDInfo
                             ((long)data[pos + 5] << 16) +
                             ((long)data[pos + 6] << 8) +
                             ((long)data[pos + 7]);
+
+                        if (streamFileIndex < 0 ||
+                            streamFileIndex >= chapterClips.Count)
+                        {
+                            pos += 14;
+                            continue;
+                        }
 
                         TSStreamClip streamClip = chapterClips[streamFileIndex];
 
@@ -623,43 +635,101 @@ namespace BDInfo
         {
             TSStream stream = null;
 
-            int start = pos;
+            if (!HasBytes(data, pos, 2))
+            {
+                pos = data.Length;
+                return null;
+            }
 
             int headerLength = data[pos++];
             int headerPos = pos;
-            int headerType = data[pos++];
+            int headerEnd = headerPos + headerLength;
+
+            if (!HasBytes(data, headerPos, headerLength))
+            {
+                pos = data.Length;
+                return null;
+            }
+
+            bool headerParsed = headerLength >= 1;
+            int headerType = 0;
+            if (headerParsed)
+            {
+                headerType = data[pos++];
+            }
 
             int pid = 0;
             int subpathid = 0;
             int subclipid = 0;
 
-            switch (headerType)
+            if (headerParsed)
             {
-                case 1:
-                    pid = ReadInt16(data, ref pos);
-                    break;
-                case 2:
-                    subpathid = data[pos++];
-                    subclipid = data[pos++];
-                    pid = ReadInt16(data, ref pos);
-                    break;
-                case 3:
-                    subpathid = data[pos++];
-                    pid = ReadInt16(data, ref pos);
-                    break;
-                case 4:
-                    subpathid = data[pos++];
-                    subclipid = data[pos++];
-                    pid = ReadInt16(data, ref pos);
-                    break;
-                default:
-                    break;
+                switch (headerType)
+                {
+                    case 1:
+                        if (!HasSectionBytes(data, pos, 2, headerEnd))
+                        {
+                            headerParsed = false;
+                            break;
+                        }
+                        pid = ReadInt16(data, ref pos);
+                        break;
+                    case 2:
+                        if (!HasSectionBytes(data, pos, 4, headerEnd))
+                        {
+                            headerParsed = false;
+                            break;
+                        }
+                        subpathid = data[pos++];
+                        subclipid = data[pos++];
+                        pid = ReadInt16(data, ref pos);
+                        break;
+                    case 3:
+                        if (!HasSectionBytes(data, pos, 3, headerEnd))
+                        {
+                            headerParsed = false;
+                            break;
+                        }
+                        subpathid = data[pos++];
+                        pid = ReadInt16(data, ref pos);
+                        break;
+                    case 4:
+                        if (!HasSectionBytes(data, pos, 4, headerEnd))
+                        {
+                            headerParsed = false;
+                            break;
+                        }
+                        subpathid = data[pos++];
+                        subclipid = data[pos++];
+                        pid = ReadInt16(data, ref pos);
+                        break;
+                    default:
+                        break;
+                }
             }
 
-            pos = headerPos + headerLength;
+            pos = headerEnd;
+
+            if (!HasBytes(data, pos, 1))
+            {
+                pos = data.Length;
+                return null;
+            }
 
             int streamLength = data[pos++];
             int streamPos = pos;
+            int streamEnd = streamPos + streamLength;
+
+            if (!HasBytes(data, streamPos, streamLength))
+            {
+                pos = data.Length;
+                return null;
+            }
+            if (streamLength < 1)
+            {
+                pos = streamEnd;
+                return null;
+            }
 
             TSStreamType streamType = (TSStreamType)data[pos++];
             switch (streamType)
@@ -673,6 +743,11 @@ namespace BDInfo
                 case TSStreamType.MPEG1_VIDEO:
                 case TSStreamType.MPEG2_VIDEO:
                 case TSStreamType.VC1_VIDEO:
+
+                    if (!HasSectionBytes(data, pos, 2, streamEnd))
+                    {
+                        break;
+                    }
 
                     TSVideoFormat videoFormat = (TSVideoFormat)
                         (data[pos] >> 4);
@@ -712,6 +787,11 @@ namespace BDInfo
                 case TSStreamType.MPEG2_AAC_AUDIO:
                 case TSStreamType.MPEG4_AAC_AUDIO:
 
+                    if (!HasSectionBytes(data, pos, 4, streamEnd))
+                    {
+                        break;
+                    }
+
                     int audioFormat = ReadByte(data, ref pos);
 
                     TSChannelLayout channelLayout = (TSChannelLayout)
@@ -741,6 +821,11 @@ namespace BDInfo
                 case TSStreamType.INTERACTIVE_GRAPHICS:
                 case TSStreamType.PRESENTATION_GRAPHICS:
 
+                    if (!HasSectionBytes(data, pos, 4, streamEnd))
+                    {
+                        break;
+                    }
+
                     string graphicsLanguage = ToolBox.ReadString(data, 3, ref pos);
 
                     stream = new TSGraphicsStream();
@@ -761,6 +846,11 @@ namespace BDInfo
                     break;
 
                 case TSStreamType.SUBTITLE:
+
+                    if (!HasSectionBytes(data, pos, 4, streamEnd))
+                    {
+                        break;
+                    }
 
                     int code = ReadByte(data, ref pos); // TODO
                     string textLanguage = ToolBox.ReadString(data, 3, ref pos);
@@ -784,13 +874,38 @@ namespace BDInfo
 
             pos = streamPos + streamLength;
 
-            if (stream != null)
+            if (stream != null && headerParsed)
             {
                 stream.PID = (ushort)pid;
                 stream.StreamType = streamType;
             }
+            else
+            {
+                stream = null;
+            }
 
             return stream;
+        }
+
+        private static bool HasBytes(
+            byte[] data,
+            int pos,
+            int count)
+        {
+            return data != null &&
+                pos >= 0 &&
+                count >= 0 &&
+                pos <= data.Length - count;
+        }
+
+        private static bool HasSectionBytes(
+            byte[] data,
+            int pos,
+            int count,
+            int sectionEnd)
+        {
+            return HasBytes(data, pos, count) &&
+                pos + count <= sectionEnd;
         }
 
         private void LoadStreamClips()
