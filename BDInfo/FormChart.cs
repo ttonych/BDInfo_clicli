@@ -152,7 +152,8 @@ namespace BDInfo
         public string SaveChartImage(
             string directory,
             ImageFormat format,
-            string extension)
+            string extension,
+            string nameQualifier = null)
         {
             if (string.IsNullOrWhiteSpace(directory))
             {
@@ -173,6 +174,14 @@ namespace BDInfo
 
             string baseName = Path.GetFileNameWithoutExtension(DefaultFileName);
             string safeName = ToolBox.GetSafeFileName(baseName);
+            if (!string.IsNullOrWhiteSpace(nameQualifier))
+            {
+                string safeQualifier = ToolBox.GetSafeFileName(nameQualifier);
+                if (!string.IsNullOrWhiteSpace(safeQualifier))
+                {
+                    safeName += "-" + safeQualifier;
+                }
+            }
             string fileName = safeName + extension;
             string fullPath = Path.Combine(directory, fileName);
 
