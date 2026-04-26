@@ -40,13 +40,7 @@ git diff --check
 For CLI/report/export changes, also run a real-disc smoke when a decrypted BD root is available, for example `V:\`:
 
 ```powershell
-$out = 'C:\dev\BDInfo_clicli\tmp_smoke_V'
-if (Test-Path $out) { Remove-Item -LiteralPath $out -Recurse -Force }
-New-Item -ItemType Directory -Path $out | Out-Null
-
-& .\BDInfo\bin\Release\BDInfo.exe V:\ $out --list
-& .\BDInfo\bin\Release\BDInfo.exe V:\ "$out\plain" -m 00016 -r txt,bdinfo,bdinfo-json --charts jpg
-& .\BDInfo\bin\Release\BDInfo.exe V:\ "$out\compressed" -m 00016 -r bdinfo,bdinfo-json --compress
+& .\scripts\smoke-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SourcePath V:\ -Playlist 00107 -ChartFormat jpg
 ```
 
 Clean temporary smoke output before committing.

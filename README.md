@@ -92,7 +92,7 @@ Required checks before publishing a branch:
 - Visual Studio MSBuild Release build
 - `BDInfo.exe --help`
 - `.bdinfo` round-trip smoke: `.\scripts\smoke-report-roundtrip.ps1 -BuildOutputPath .\BDInfo\bin\Release`
-- Real-disc CLI smoke for CLI/report/chart changes
+- Real-disc CLI smoke for CLI/report/chart changes: `.\scripts\smoke-local.ps1 -BuildOutputPath .\BDInfo\bin\Release -SourcePath V:\ -Playlist 00107`
 - `.bdinfo` round-trip check for report serialization changes
 
 Codex/agent operating rules live in [`AGENTS.md`](AGENTS.md). Pull requests should use the repository PR template.
