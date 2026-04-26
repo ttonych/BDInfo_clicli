@@ -166,6 +166,11 @@ Done when:
 
 ### 9. Add Small Report Fixtures
 
+Status: done.
+
+Progress:
+- Added deterministic synthetic `.bdinfo` fixtures for XML, JSON, compressed XML, and compressed JSON report round-trip coverage.
+
 Goal: move more report behavior into CI without depending on `V:\`.
 
 Scope:

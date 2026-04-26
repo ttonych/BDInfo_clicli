@@ -66,6 +66,12 @@ The same-process swap can also be checked through the local PowerShell smoke. Th
 
 Clean temporary smoke output before committing.
 
+If report fixture models change intentionally, regenerate the synthetic committed fixtures with:
+
+```powershell
+& .\scripts\smoke-report-roundtrip.ps1 -BuildOutputPath .\BDInfo\bin\Release -UpdateFixtures
+```
+
 ## Review Checklist
 
 Before finalizing a PR, verify:

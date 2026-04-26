@@ -1,6 +1,8 @@
 param(
     [string] $BuildOutputPath = (Join-Path $PSScriptRoot '..\BDInfo\bin\Release'),
     [string] $OutputPath = (Join-Path $PSScriptRoot '..\tmp_report_roundtrip'),
+    [string] $FixturePath = (Join-Path $PSScriptRoot '..\tests\fixtures\report-roundtrip'),
+    [switch] $UpdateFixtures,
     [switch] $KeepOutput
 )
 
@@ -66,6 +68,7 @@ function Write-CompressedReportFile($Report, [string] $Path, [string] $Format) {
     try {
         $entryName = if ($Format -eq 'Json') { 'report.json' } else { 'report.xml' }
         $entry = $archive.CreateEntry($entryName, [IO.Compression.CompressionLevel]::Optimal)
+        $entry.LastWriteTime = [DateTimeOffset]::Parse('2026-01-01T00:00:00Z')
         $entryStream = $entry.Open()
         try {
             $tempPath = [IO.Path]::GetTempFileName()
@@ -244,11 +247,36 @@ function New-SampleReport {
 
     $report = New-Object BDInfo.Reporting.BDInfoReportData
     $report.Version = 'smoke'
-    $report.CreatedUtc = [DateTime]::UtcNow
+    $report.CreatedUtc = [DateTime]::Parse('2026-01-01T00:00:00Z').ToUniversalTime()
     $report.SourcePath = 'synthetic'
     $report.Disc = $disc
     $report.ScanResult = $scan
     $report
+}
+
+function Write-SampleFixtureSet($Report, [string] $Directory) {
+    New-Item -ItemType Directory -Force -Path $Directory | Out-Null
+
+    Get-ChildItem -LiteralPath $Directory -Filter '*.bdinfo' -File -ErrorAction SilentlyContinue |
+        Remove-Item -Force
+
+    Write-ReportFile $Report (Join-Path $Directory 'sample-xml.bdinfo') 'Xml'
+    Write-ReportFile $Report (Join-Path $Directory 'sample-json.bdinfo') 'Json'
+    Write-CompressedReportFile $Report (Join-Path $Directory 'sample-xml-compressed.bdinfo') 'Xml'
+    Write-CompressedReportFile $Report (Join-Path $Directory 'sample-json-compressed.bdinfo') 'Json'
+}
+
+function Test-ReportFixtureDirectory([string] $Directory) {
+    if (-not (Test-Path -LiteralPath $Directory -PathType Container)) {
+        throw "Report fixture directory was not found: $Directory"
+    }
+
+    $files = Get-ChildItem -LiteralPath $Directory -Filter '*.bdinfo' -File -ErrorAction SilentlyContinue
+    Assert-True (($files | Measure-Object).Count -gt 0) "No .bdinfo report fixtures were found in $Directory"
+
+    foreach ($file in $files) {
+        Test-ReportLoad $file.FullName | Out-Null
+    }
 }
 
 function Test-ReportLoad([string] $Path) {
@@ -288,6 +316,7 @@ function Test-ReportLoad([string] $Path) {
 
 $buildOutputFullPath = Resolve-FullPath $BuildOutputPath
 $outputFullPath = Resolve-FullPath $OutputPath
+$fixtureFullPath = Resolve-FullPath $FixturePath
 $exePath = Join-Path $buildOutputFullPath 'BDInfo.exe'
 
 if (-not (Test-Path -LiteralPath $exePath)) {
@@ -310,6 +339,12 @@ New-Item -ItemType Directory -Force -Path $outputFullPath | Out-Null
 
 try {
     $report = New-SampleReport
+
+    if ($UpdateFixtures) {
+        Write-SampleFixtureSet $report $fixtureFullPath
+    }
+
+    Test-ReportFixtureDirectory $fixtureFullPath
 
     $seedXmlPath = Join-Path $outputFullPath 'seed-xml.bdinfo'
     $seedJsonPath = Join-Path $outputFullPath 'seed-json.bdinfo'
