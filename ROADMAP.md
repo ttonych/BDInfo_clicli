@@ -22,6 +22,8 @@ Done when:
 
 ## 2. Add Shared Local Smoke Scripts
 
+Status: done.
+
 Goal: stop relying on copied command blocks for the `V:\` real-disc smoke.
 
 Scope:
