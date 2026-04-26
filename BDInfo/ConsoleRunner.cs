@@ -100,8 +100,7 @@ namespace BDInfo
 
             bool requiresReportDestination = !options.ListPlaylists || NeedsFurtherProcessing(options);
             string reportDestination = null;
-            ImageFormat chartFormat = null;
-            string chartExtension = null;
+            CliChartImageFormat chartFormat = null;
 
             Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "BDInfo v{0}", GetVersionString()));
             Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Source: {0}", bdPath));
@@ -126,7 +125,7 @@ namespace BDInfo
 
                 if (options.SaveCharts)
                 {
-                    (chartFormat, chartExtension) = GetImageFormat(options.ChartFormat);
+                    chartFormat = CliChartFormat.Resolve(options.ChartFormat);
                 }
             }
 
@@ -208,13 +207,13 @@ namespace BDInfo
 
                 if (options.SaveCharts)
                 {
-                    if (chartFormat == null || string.IsNullOrEmpty(chartExtension))
+                    if (chartFormat == null)
                     {
-                        (chartFormat, chartExtension) = GetImageFormat(options.ChartFormat);
+                        chartFormat = CliChartFormat.Resolve(options.ChartFormat);
                     }
 
                     string chartsDirectory = Path.Combine(reportDestination, "charts");
-                    int chartsSaved = SaveCharts(selectedPlaylists, chartsDirectory, chartFormat, chartExtension);
+                    int chartsSaved = SaveCharts(selectedPlaylists, chartsDirectory, chartFormat.ImageFormat, chartFormat.Extension);
                     Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Charts saved to: {0} ({1} files)", chartsDirectory, chartsSaved));
                 }
             }
@@ -1315,32 +1314,6 @@ namespace BDInfo
             }
 
             return savedCount;
-        }
-
-        private static (ImageFormat format, string extension) GetImageFormat(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return (ImageFormat.Png, ".png");
-            }
-
-            switch (name.Trim().ToLowerInvariant())
-            {
-                case "png":
-                    return (ImageFormat.Png, ".png");
-                case "jpg":
-                case "jpeg":
-                    return (ImageFormat.Jpeg, ".jpg");
-                case "bmp":
-                    return (ImageFormat.Bmp, ".bmp");
-                case "gif":
-                    return (ImageFormat.Gif, ".gif");
-                case "tif":
-                case "tiff":
-                    return (ImageFormat.Tiff, ".tiff");
-                default:
-                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Unsupported chart image format: {0}", name));
-            }
         }
 
         private static string GetVersionString()

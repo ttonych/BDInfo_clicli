@@ -108,7 +108,7 @@ namespace BDInfo
                     options.SaveCharts = true;
                     if (string.IsNullOrWhiteSpace(value) &&
                         i + 1 < args.Length &&
-                        IsChartFormatName(args[i + 1]))
+                        CliChartFormat.IsKnownName(args[i + 1]))
                     {
                         i++;
                         value = args[i];
@@ -312,26 +312,5 @@ namespace BDInfo
             }
         }
 
-        private static bool IsChartFormatName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return false;
-            }
-
-            switch (name.Trim().ToLowerInvariant())
-            {
-                case "png":
-                case "jpg":
-                case "jpeg":
-                case "bmp":
-                case "gif":
-                case "tif":
-                case "tiff":
-                    return true;
-                default:
-                    return false;
-            }
-        }
     }
 }
