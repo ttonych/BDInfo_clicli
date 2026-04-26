@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -53,9 +53,9 @@ namespace BDInfo
             this.GraphControl = new ZedGraph.ZedGraphControl();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // statusStrip
-            // 
+            //
             this.statusStrip.AutoSize = false;
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatus});
@@ -64,15 +64,15 @@ namespace BDInfo
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(809, 22);
             this.statusStrip.TabIndex = 1;
-            // 
+            //
             // toolStripStatus
-            // 
+            //
             this.toolStripStatus.Name = "toolStripStatus";
             this.toolStripStatus.Size = new System.Drawing.Size(50, 15);
             this.toolStripStatus.Text = "Position";
-            // 
+            //
             // GraphControl
-            // 
+            //
             this.GraphControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -87,9 +87,9 @@ namespace BDInfo
             this.GraphControl.ScrollMinY2 = 0;
             this.GraphControl.Size = new System.Drawing.Size(785, 370);
             this.GraphControl.TabIndex = 0;
-            // 
+            //
             // FormChart
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(809, 407);

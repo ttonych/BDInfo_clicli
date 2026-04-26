@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -63,7 +63,7 @@ namespace BDInfo
                                                     BDROM.VolumeLabel);
 
                 reportName = ToolBox.GetSafeFileName(reportName);
-                
+
                 reportFile = File.CreateText(Path.Combine(Environment.CurrentDirectory, reportName));
             }
             textBoxReport.Text = "";
@@ -113,7 +113,7 @@ namespace BDInfo
             if (extraFeatures.Count > 0)
             {
                 report += string.Format(    CultureInfo.InvariantCulture,
-                                            "{0,-16}{1}\r\n", "Extras:", 
+                                            "{0,-16}{1}\r\n", "Extras:",
                                             string.Join(", ", extraFeatures.ToArray()));
             }
             report += string.Format(    CultureInfo.InvariantCulture,
@@ -152,13 +152,13 @@ namespace BDInfo
                 {
                     Exception fileException = scanResult.FileExceptions[fileName];
                     report += string.Format(    CultureInfo.InvariantCulture,
-                                                "\r\n{0}\t{1}\r\n", 
+                                                "\r\n{0}\t{1}\r\n",
                                                 fileName, fileException.Message);
                     report += string.Format(    CultureInfo.InvariantCulture,
-                                                "{0}\r\n", 
+                                                "{0}\r\n",
                                                 fileException.StackTrace);
                 }
-            }            
+            }
 
             foreach (TSPlaylistFile playlist in playlists)
             {
@@ -245,7 +245,7 @@ namespace BDInfo
                                                         angleTimeSpan.Minutes,
                                                         angleTimeSpan.Seconds,
                                                         angleTimeSpan.Milliseconds));
-                        
+
                         angleTotalSizes.Add(string.Format(CultureInfo.InvariantCulture, "{0:N0}", angleTotalSize));
 
                         angleTotalLengths.Add(totalLength);
@@ -287,7 +287,7 @@ namespace BDInfo
 
                     if (audioStream.BitRate > 0)
                     {
-                        audio1 += string.Format(    CultureInfo.InvariantCulture, 
+                        audio1 += string.Format(    CultureInfo.InvariantCulture,
                                                     " {0} kbps",
                                                     (int)Math.Round((double)audioStream.BitRate/ 1000));
                     }
@@ -449,17 +449,17 @@ namespace BDInfo
                     {
                         report += "\r\n";
                         report += string.Format(CultureInfo.InvariantCulture,
-                                                "{0,-24}{1} (h:m:s.ms) / {2} (h:m:s.ms)\r\n", 
+                                                "{0,-24}{1} (h:m:s.ms) / {2} (h:m:s.ms)\r\n",
                                                 string.Format(CultureInfo.InvariantCulture, "Angle {0} Length:", angleIndex + 1),
                                                 angleLengths[angleIndex], angleTotalLengths[angleIndex]);
 
                         report += string.Format(CultureInfo.InvariantCulture,
-                                                "{0,-24}{1:N0} bytes / {2:N0} bytes\r\n", 
+                                                "{0,-24}{1:N0} bytes / {2:N0} bytes\r\n",
                                                 string.Format(CultureInfo.InvariantCulture, "Angle {0} Size:", angleIndex + 1),
                                                 angleSizes[angleIndex], angleTotalSizes[angleIndex]);
 
                         report += string.Format(CultureInfo.InvariantCulture,
-                                                "{0,-24}{1} Mbps / {2} Mbps\r\n", 
+                                                "{0,-24}{1} Mbps / {2} Mbps\r\n",
                                                 string.Format(CultureInfo.InvariantCulture, "Angle {0} Total Bitrate:", angleIndex + 1),
                                                 angleBitrates[angleIndex], angleTotalBitrates[angleIndex], angleIndex);
                     }
@@ -1011,7 +1011,7 @@ namespace BDInfo
                 }
 
                 if (BDInfoSettings.GenerateStreamDiagnostics)
-                {                        
+                {
                     report += "\r\n";
                     report += "STREAM DIAGNOSTICS:\r\n";
                     report += "\r\n";
@@ -1054,7 +1054,7 @@ namespace BDInfo
                         {
                             if (!playlist.Streams.ContainsKey(clipStream.PID)) continue;
 
-                            TSStream playlistStream = 
+                            TSStream playlistStream =
                                 playlist.Streams[clipStream.PID];
 
                             string clipBitRate = string.Format( CultureInfo.InvariantCulture,
@@ -1066,8 +1066,8 @@ namespace BDInfo
                             {
                                 clipSeconds =
                                     clip.StreamFile.Length.ToString("F3", CultureInfo.InvariantCulture);
-                                clipBitRate = string.Format(CultureInfo.InvariantCulture, 
-                                                            "{0,7:N0} kbps", 
+                                clipBitRate = string.Format(CultureInfo.InvariantCulture,
+                                                            "{0,7:N0} kbps",
                                                             Math.Round((double)clipStream.PayloadBytes * 8 / clip.StreamFile.Length / 1000));
                             }
                             string language = "";
@@ -1083,7 +1083,7 @@ namespace BDInfo
                                                     string.Format(CultureInfo.InvariantCulture, "{0} (0x{1:X})", clipStream.PID, clipStream.PID),
                                                     string.Format(CultureInfo.InvariantCulture, "0x{0:X2}", (byte)clipStream.StreamType),
                                                     clipStream.CodecShortName,
-                                                    language,                                
+                                                    language,
                                                     clipSeconds,
                                                     clipBitRate,
                                                     string.Format(CultureInfo.InvariantCulture, "{0,14:N0}", clipStream.PayloadBytes),
@@ -1301,7 +1301,7 @@ namespace BDInfo
         }
 
         private void buttonChart_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             if (Playlists == null ||
@@ -1313,7 +1313,7 @@ namespace BDInfo
                 return;
             }
 
-            TSPlaylistFile playlist = 
+            TSPlaylistFile playlist =
                 (TSPlaylistFile)comboBoxPlaylist.SelectedItem;
             TSVideoStream videoStream =
                 (TSVideoStream)comboBoxStream.SelectedItem;
@@ -1330,7 +1330,7 @@ namespace BDInfo
         }
 
         private void FormReport_FormClosed(
-            object sender, 
+            object sender,
             FormClosedEventArgs e)
         {
             GC.Collect();

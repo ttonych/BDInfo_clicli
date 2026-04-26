@@ -1,0 +1,25 @@
+* text=auto
+
+*.cs text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.ps1 text eol=lf
+*.DotSettings text eol=lf
+.gitignore text eol=lf
+LICENSE text eol=lf
+
+*.sln text eol=crlf
+*.csproj text eol=crlf
+*.resx text eol=crlf
+*.config text eol=crlf
+*.manifest text eol=crlf
+*.settings text eol=crlf
+*.txt text eol=crlf
+
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.zip binary

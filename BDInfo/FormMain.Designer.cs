@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -95,7 +95,7 @@ namespace BDInfo
             this.splitContainerInner.Panel2.SuspendLayout();
             this.splitContainerInner.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // buttonBrowse
             //
             this.buttonBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -106,28 +106,28 @@ namespace BDInfo
             this.buttonBrowse.Text = "Browse...";
             this.buttonBrowse.UseVisualStyleBackColor = true;
             this.buttonBrowse.Click += new System.EventHandler(this.buttonBrowse_Click);
-            // 
+            //
             // textBoxSource
-            // 
-            this.textBoxSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.textBoxSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxSource.Location = new System.Drawing.Point(17, 24);
             this.textBoxSource.Name = "textBoxSource";
             this.textBoxSource.Size = new System.Drawing.Size(508, 20);
             this.textBoxSource.TabIndex = 0;
             this.textBoxSource.TextChanged += new System.EventHandler(this.textBoxSource_TextChanged);
-            // 
+            //
             // labelSource
-            // 
+            //
             this.labelSource.AutoSize = true;
             this.labelSource.Location = new System.Drawing.Point(14, 8);
             this.labelSource.Name = "labelSource";
             this.labelSource.Size = new System.Drawing.Size(141, 13);
             this.labelSource.TabIndex = 3;
             this.labelSource.Text = "Select the Source BD-ROM:";
-            // 
+            //
             // buttonSettings
-            // 
+            //
             this.buttonSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonSettings.Location = new System.Drawing.Point(663, 548);
             this.buttonSettings.Name = "buttonSettings";
@@ -136,9 +136,9 @@ namespace BDInfo
             this.buttonSettings.Text = "Settings...";
             this.buttonSettings.UseVisualStyleBackColor = true;
             this.buttonSettings.Click += new System.EventHandler(this.buttonSettings_Click);
-            // 
+            //
             // labelTimeRemainingElapsed
-            // 
+            //
             this.labelTimeRemainingElapsed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelTimeRemainingElapsed.AutoSize = true;
             this.labelTimeRemainingElapsed.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -147,9 +147,9 @@ namespace BDInfo
             this.labelTimeRemainingElapsed.Size = new System.Drawing.Size(135, 13);
             this.labelTimeRemainingElapsed.TabIndex = 35;
             this.labelTimeRemainingElapsed.Text = "Time Remaining / Elapsed:";
-            // 
+            //
             // labelTimeDivider
-            // 
+            //
             this.labelTimeDivider.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelTimeDivider.AutoSize = true;
             this.labelTimeDivider.Location = new System.Drawing.Point(703, 503);
@@ -157,9 +157,9 @@ namespace BDInfo
             this.labelTimeDivider.Size = new System.Drawing.Size(12, 13);
             this.labelTimeDivider.TabIndex = 34;
             this.labelTimeDivider.Text = "/";
-            // 
+            //
             // labelTimeElapsed
-            // 
+            //
             this.labelTimeElapsed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelTimeElapsed.AutoSize = true;
             this.labelTimeElapsed.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -168,9 +168,9 @@ namespace BDInfo
             this.labelTimeElapsed.Size = new System.Drawing.Size(49, 13);
             this.labelTimeElapsed.TabIndex = 33;
             this.labelTimeElapsed.Text = "00:00:00";
-            // 
+            //
             // labelTimeRemaining
-            // 
+            //
             this.labelTimeRemaining.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelTimeRemaining.AutoSize = true;
             this.labelTimeRemaining.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -179,27 +179,27 @@ namespace BDInfo
             this.labelTimeRemaining.Size = new System.Drawing.Size(49, 13);
             this.labelTimeRemaining.TabIndex = 32;
             this.labelTimeRemaining.Text = "00:00:00";
-            // 
+            //
             // progressBarScan
-            // 
-            this.progressBarScan.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.progressBarScan.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBarScan.Location = new System.Drawing.Point(17, 519);
             this.progressBarScan.Name = "progressBarScan";
             this.progressBarScan.Size = new System.Drawing.Size(754, 23);
             this.progressBarScan.TabIndex = 31;
-            // 
+            //
             // labelPlaylistFiles
-            // 
+            //
             this.labelPlaylistFiles.AutoSize = true;
             this.labelPlaylistFiles.Location = new System.Drawing.Point(14, 55);
             this.labelPlaylistFiles.Name = "labelPlaylistFiles";
             this.labelPlaylistFiles.Size = new System.Drawing.Size(86, 13);
             this.labelPlaylistFiles.TabIndex = 28;
             this.labelPlaylistFiles.Text = "Select Playlist(s):";
-            // 
+            //
             // buttonViewReport
-            // 
+            //
             this.buttonViewReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonViewReport.Enabled = false;
             this.buttonViewReport.Location = new System.Drawing.Point(485, 548);
@@ -209,9 +209,9 @@ namespace BDInfo
             this.buttonViewReport.Text = "View Report...";
             this.buttonViewReport.UseVisualStyleBackColor = true;
             this.buttonViewReport.Click += new System.EventHandler(this.buttonViewReport_Click);
-            // 
+            //
             // buttonScan
-            // 
+            //
             this.buttonScan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonScan.Enabled = false;
             this.buttonScan.Location = new System.Drawing.Point(368, 548);
@@ -221,10 +221,10 @@ namespace BDInfo
             this.buttonScan.Text = "Scan Bitrates";
             this.buttonScan.UseVisualStyleBackColor = true;
             this.buttonScan.Click += new System.EventHandler(this.buttonScan_Click);
-            // 
+            //
             // textBoxDetails
-            // 
-            this.textBoxDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.textBoxDetails.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxDetails.Enabled = false;
             this.textBoxDetails.Location = new System.Drawing.Point(16, 438);
@@ -234,18 +234,18 @@ namespace BDInfo
             this.textBoxDetails.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.textBoxDetails.Size = new System.Drawing.Size(754, 59);
             this.textBoxDetails.TabIndex = 10;
-            // 
+            //
             // labelProgress
-            // 
+            //
             this.labelProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.labelProgress.AutoSize = true;
             this.labelProgress.Location = new System.Drawing.Point(14, 503);
             this.labelProgress.Name = "labelProgress";
             this.labelProgress.Size = new System.Drawing.Size(0, 13);
             this.labelProgress.TabIndex = 37;
-            // 
+            //
             // buttonSelectAll
-            // 
+            //
             this.buttonSelectAll.Enabled = false;
             this.buttonSelectAll.Location = new System.Drawing.Point(106, 50);
             this.buttonSelectAll.Name = "buttonSelectAll";
@@ -254,9 +254,9 @@ namespace BDInfo
             this.buttonSelectAll.Text = "Select All";
             this.buttonSelectAll.UseVisualStyleBackColor = true;
             this.buttonSelectAll.Click += new System.EventHandler(this.buttonSelectAll_Click);
-            // 
+            //
             // buttonUnselectAll
-            // 
+            //
             this.buttonUnselectAll.Enabled = false;
             this.buttonUnselectAll.Location = new System.Drawing.Point(187, 50);
             this.buttonUnselectAll.Name = "buttonUnselectAll";
@@ -265,9 +265,9 @@ namespace BDInfo
             this.buttonUnselectAll.Text = "Unselect All";
             this.buttonUnselectAll.UseVisualStyleBackColor = true;
             this.buttonUnselectAll.Click += new System.EventHandler(this.buttonUnselectAll_Click);
-            // 
+            //
             // buttonCustomPlaylist
-            // 
+            //
             this.buttonCustomPlaylist.Enabled = false;
             this.buttonCustomPlaylist.Location = new System.Drawing.Point(268, 50);
             this.buttonCustomPlaylist.Name = "buttonCustomPlaylist";
@@ -276,47 +276,47 @@ namespace BDInfo
             this.buttonCustomPlaylist.Text = "Custom...";
             this.buttonCustomPlaylist.UseVisualStyleBackColor = true;
             this.buttonCustomPlaylist.Click += new System.EventHandler(this.buttonCustomPlaylist_Click);
-            // 
+            //
             // splitContainerOuter
-            // 
-            this.splitContainerOuter.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.splitContainerOuter.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainerOuter.Location = new System.Drawing.Point(17, 79);
             this.splitContainerOuter.Name = "splitContainerOuter";
             this.splitContainerOuter.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
+            //
             // splitContainerOuter.Panel1
-            // 
+            //
             this.splitContainerOuter.Panel1.Controls.Add(this.splitContainerInner);
-            // 
+            //
             // splitContainerOuter.Panel2
-            // 
+            //
             this.splitContainerOuter.Panel2.Controls.Add(this.listViewStreams);
             this.splitContainerOuter.Size = new System.Drawing.Size(753, 353);
             this.splitContainerOuter.SplitterDistance = 199;
             this.splitContainerOuter.TabIndex = 38;
-            // 
+            //
             // splitContainerInner
-            // 
+            //
             this.splitContainerInner.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainerInner.Location = new System.Drawing.Point(0, 0);
             this.splitContainerInner.Name = "splitContainerInner";
             this.splitContainerInner.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
+            //
             // splitContainerInner.Panel1
-            // 
+            //
             this.splitContainerInner.Panel1.Controls.Add(this.listViewPlaylistFiles);
-            // 
+            //
             // splitContainerInner.Panel2
-            // 
+            //
             this.splitContainerInner.Panel2.Controls.Add(this.listViewStreamFiles);
             this.splitContainerInner.Size = new System.Drawing.Size(753, 199);
             this.splitContainerInner.SplitterDistance = 97;
             this.splitContainerInner.TabIndex = 0;
-            // 
+            //
             // listViewPlaylistFiles
-            // 
+            //
             this.listViewPlaylistFiles.CheckBoxes = true;
             this.listViewPlaylistFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderPlaylistName,
@@ -337,36 +337,36 @@ namespace BDInfo
             this.listViewPlaylistFiles.View = System.Windows.Forms.View.Details;
             this.listViewPlaylistFiles.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listViewPlaylistFiles_ColumnClick);
             this.listViewPlaylistFiles.SelectedIndexChanged += new System.EventHandler(this.listViewPlaylistFiles_SelectedIndexChanged);
-            // 
+            //
             // columnHeaderPlaylistName
-            // 
+            //
             this.columnHeaderPlaylistName.Text = "Playlist File";
             this.columnHeaderPlaylistName.Width = 103;
-            // 
+            //
             // columnHeaderPlaylistGroup
-            // 
+            //
             this.columnHeaderPlaylistGroup.Text = "Group";
-            // 
+            //
             // columnHeaderPlaylistLength
-            // 
+            //
             this.columnHeaderPlaylistLength.Text = "Length";
             this.columnHeaderPlaylistLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderPlaylistLength.Width = 73;
-            // 
+            //
             // columnHeaderPlaylistEstimatedBytes
-            // 
+            //
             this.columnHeaderPlaylistEstimatedBytes.Text = "Estimated Size";
             this.columnHeaderPlaylistEstimatedBytes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderPlaylistEstimatedBytes.Width = 98;
-            // 
+            //
             // columnHeaderPlaylistMeasuredBytes
-            // 
+            //
             this.columnHeaderPlaylistMeasuredBytes.Text = "Measured Size";
             this.columnHeaderPlaylistMeasuredBytes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderPlaylistMeasuredBytes.Width = 125;
-            // 
+            //
             // listViewStreamFiles
-            // 
+            //
             this.listViewStreamFiles.Activation = System.Windows.Forms.ItemActivation.OneClick;
             this.listViewStreamFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderFileName,
@@ -386,36 +386,36 @@ namespace BDInfo
             this.listViewStreamFiles.TabIndex = 8;
             this.listViewStreamFiles.UseCompatibleStateImageBehavior = false;
             this.listViewStreamFiles.View = System.Windows.Forms.View.Details;
-            // 
+            //
             // columnHeaderFileName
-            // 
+            //
             this.columnHeaderFileName.Text = "Stream File";
             this.columnHeaderFileName.Width = 82;
-            // 
+            //
             // columnHeaderIndex
-            // 
+            //
             this.columnHeaderIndex.Text = "Index";
-            // 
+            //
             // columnHeaderFileLength
-            // 
+            //
             this.columnHeaderFileLength.Text = "Length";
             this.columnHeaderFileLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderFileLength.Width = 77;
-            // 
+            //
             // columnHeaderFileEstimatedBytes
-            // 
+            //
             this.columnHeaderFileEstimatedBytes.Text = "Estimated Size";
             this.columnHeaderFileEstimatedBytes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderFileEstimatedBytes.Width = 119;
-            // 
+            //
             // columnHeaderFileMeasuredBytes
-            // 
+            //
             this.columnHeaderFileMeasuredBytes.Text = "Measured Size";
             this.columnHeaderFileMeasuredBytes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderFileMeasuredBytes.Width = 125;
-            // 
+            //
             // listViewStreams
-            // 
+            //
             this.listViewStreams.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderStreamCodec,
             this.columnHeaderStreamLanguage,
@@ -433,29 +433,29 @@ namespace BDInfo
             this.listViewStreams.TabIndex = 9;
             this.listViewStreams.UseCompatibleStateImageBehavior = false;
             this.listViewStreams.View = System.Windows.Forms.View.Details;
-            // 
+            //
             // columnHeaderStreamCodec
-            // 
+            //
             this.columnHeaderStreamCodec.Text = "Codec";
             this.columnHeaderStreamCodec.Width = 103;
-            // 
+            //
             // columnHeaderStreamLanguage
-            // 
+            //
             this.columnHeaderStreamLanguage.Text = "Language";
             this.columnHeaderStreamLanguage.Width = 151;
-            // 
+            //
             // columnHeaderBitrate
-            // 
+            //
             this.columnHeaderBitrate.Text = "Bit Rate";
             this.columnHeaderBitrate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
+            //
             // columnHeaderDescription
-            // 
+            //
             this.columnHeaderDescription.Text = "Description";
             this.columnHeaderDescription.Width = 306;
-            // 
+            //
             // buttonRescan
-            // 
+            //
             this.buttonRescan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonRescan.Enabled = false;
             this.buttonRescan.Location = new System.Drawing.Point(710, 22);
@@ -465,9 +465,9 @@ namespace BDInfo
             this.buttonRescan.Text = "Rescan";
             this.buttonRescan.UseVisualStyleBackColor = true;
             this.buttonRescan.Click += new System.EventHandler(this.buttonRescan_Click);
-            // 
+            //
             // buttonIsoBrowse
-            // 
+            //
             this.buttonIsoBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonIsoBrowse.Location = new System.Drawing.Point(599, 22);
             this.buttonIsoBrowse.Name = "buttonIsoBrowse";
@@ -487,9 +487,9 @@ namespace BDInfo
             this.buttonLoadReport.Text = "Load Report...";
             this.buttonLoadReport.UseVisualStyleBackColor = true;
             this.buttonLoadReport.Click += new System.EventHandler(this.buttonBrowse_Click);
-            // 
+            //
             // FormMain
-            // 
+            //
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;

@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -112,7 +112,7 @@ namespace BDInfo
             public ushort DPBOutputDelayLengthMinus1;
 
             public XXLCommon(bool subPicHRDParamsPresentFlag, ushort duCPBRemovalDelayIncrementLengthMinus1,
-                             ushort dpbOutputDelayDULengthMinus1, ushort initialCPBRemovalDelayLengthMinus1, 
+                             ushort dpbOutputDelayDULengthMinus1, ushort initialCPBRemovalDelayLengthMinus1,
                              ushort auCPBRemovalDelayLengthMinus1, ushort dpbOutputDelayLengthMinus1)
             {
                 SubPicHRDParamsPresentFlag = subPicHRDParamsPresentFlag;
@@ -504,7 +504,7 @@ namespace BDInfo
                         syncByteFound = true;
                         break;
                     }
-                        
+
                     buffer.BSSkipBytes((int) (streamPos - buffer.Position));
 
                     if (buffer.ReadByte() == 0x0 &&
@@ -555,7 +555,7 @@ namespace BDInfo
                                 VideoParameterSet(buffer);
                             break;
                         case 33:
-                                SeqParameterSet(buffer); 
+                                SeqParameterSet(buffer);
                             break;
                         case 34:
                                 PicParameterSet(buffer);
@@ -593,7 +593,7 @@ namespace BDInfo
             ExtendedData.IsHdr10Plus = IsHdr10Plus;
 
             stream.ExtendedData = ExtendedData;
-            
+
             // TODO: profile to string
             if (SeqParameterSets.Count > 0 && !stream.IsInitialized)
             {
@@ -682,7 +682,7 @@ namespace BDInfo
                             {
                                 ExtendedFormatInfo.Add(TransferCharacteristics(seqParameterSet.VUIParameters.TransferCharacteristics));
                                 ExtendedFormatInfo.Add(MatrixCoefficients(seqParameterSet.VUIParameters.MatrixCoefficients));
-                                
+
                             }
                         }
                     }
@@ -722,7 +722,7 @@ namespace BDInfo
             bool dependentSliceSegmentFlag = false;
 
             _firstSliceSegmentInPicFlag = buffer.ReadBool();
-            
+
             if (nalUnitType >= 16 && nalUnitType <= 23)
                 tempBool = buffer.ReadBool(); // no_output_of_prior_pics_flag
 
@@ -749,16 +749,16 @@ namespace BDInfo
                 uint sliceType = buffer.ReadExp(true);
                 switch (sliceType)
                 {
-                    case 0: 
+                    case 0:
                         tag = "P";
                         break;
                     case 1:
                         tag = "B";
                         break;
-                    case 2: 
+                    case 2:
                         tag = "I";
                         break;
-                    default: 
+                    default:
                         break;
                 }
             }
@@ -792,7 +792,7 @@ namespace BDInfo
             for (var layerSetPos = 1; layerSetPos <= vpsNumLayerSetsMinus1; layerSetPos++)
                 for (var layerId = 0; layerId <= vpsMaxLayerID; layerId++)
                     buffer.BSSkipBits(1, true); //layer_id_included_flag
-                    
+
             var vpsTimingInfoPresentFlag = buffer.ReadBool(true);
             if (vpsTimingInfoPresentFlag)
             {
@@ -914,7 +914,7 @@ namespace BDInfo
             SeqParameterSets[(int) spsSeqParameterSetID] = new SeqParameterSetStruct(vuiParametersItem,
                                                                                      _profileSpace,
                                                                                      _tierFlag,
-                                                                                     _profileIDC, 
+                                                                                     _profileIDC,
                                                                                      _levelIDC,
                                                                                      picWidthInLumaSamples,
                                                                                      picHeightInLumaSamples,
@@ -1185,7 +1185,7 @@ namespace BDInfo
                 return;
             }
 
-            if (seqParameterSetItem.VUIParameters?.FrameFieldInfoPresentFlag ?? 
+            if (seqParameterSetItem.VUIParameters?.FrameFieldInfoPresentFlag ??
                 (seqParameterSetItem.GeneralProgressiveSourceFlag && seqParameterSetItem.GeneralInterlacedSourceFlag))
             {
                 buffer.BSSkipBits(7, true); //pic_struct, source_scan_type, duplicate_flag
@@ -1235,7 +1235,7 @@ namespace BDInfo
 
             Meta.Luminance[1] = buffer.ReadBits4(32, true);
             Meta.Luminance[0] = buffer.ReadBits4(32, true);
-            
+
             //Reordering to RGB
             int R = 4, G = 4, B = 4;
             for (int c = 0; c < 3; c++)
@@ -1301,10 +1301,10 @@ namespace BDInfo
                                                                (double)Meta.Primaries[B * 2] / 50000, (double)Meta.Primaries[(B * 2) + 1] / 50000,
                                                                (double)Meta.Primaries[3 * 2] / 50000, (double)Meta.Primaries[(3 * 2) + 1] / 50000);
             }
-                            
+
 
             MasteringDisplayLuminance = string.Format(CultureInfo.InvariantCulture,
-                                                      "min: {0:0.0000} cd/m2, max: " + 
+                                                      "min: {0:0.0000} cd/m2, max: " +
                                                       ((Meta.Luminance[1] - ((int)Meta.Luminance[1]) == 0) ? "{1:0}" : "{1:0.0000}") +
                                                       " cd/m2",
                                                       (double)Meta.Luminance[0] / 10000, (double)Meta.Luminance[1] / 10000);
@@ -1390,7 +1390,7 @@ namespace BDInfo
                 buffer.SkipExpMulti(5, true);
             }
 
-            vuiParametersItem = new VUIParametersStruct(nal, vcl, xxlCommon, numUnitsInTick, timeScale, sarWidth, sarHeight, aspectRatioIDC, videoFormat, 
+            vuiParametersItem = new VUIParametersStruct(nal, vcl, xxlCommon, numUnitsInTick, timeScale, sarWidth, sarHeight, aspectRatioIDC, videoFormat,
                                                         videoFullRangeFlag, colourPrimaries, transferCharacteristics, matrixCoefficients, aspectRatioInfoPresentFlag,
                                                         videoSignalTypePresentFlag, frameFieldInfoPresentFlag, colourDescriptionPresentFlag, timingInfoPresentFlag);
         }

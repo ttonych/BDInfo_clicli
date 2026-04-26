@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -97,7 +97,7 @@ namespace BDInfo
 
                 byte[] fileType = new byte[8];
                 Array.Copy(data, 0, fileType, 0, fileType.Length);
-                
+
                 FileType = ASCIIEncoding.ASCII.GetString(fileType);
                 if (FileType != "HDMV0100" &&
                     FileType != "HDMV0200" &&
@@ -107,7 +107,7 @@ namespace BDInfo
                         "Clip info file {0} has an unknown file type {1}.",
                         FileInfo.Name, FileType));
                 }
-#if DEBUG                
+#if DEBUG
                 Debug.WriteLine(string.Format(
                     "\tFileType: {0}", FileType));
 #endif
@@ -139,9 +139,9 @@ namespace BDInfo
                     TSStream stream = null;
 
                     ushort PID = (ushort)
-                        ((clipData[streamOffset] << 8) + 
+                        ((clipData[streamOffset] << 8) +
                           clipData[streamOffset + 1]);
-                    
+
                     streamOffset += 2;
 
                     TSStreamType streamType = (TSStreamType)
@@ -272,7 +272,7 @@ namespace BDInfo
                     }
 
                     streamOffset += clipData[streamOffset] + 1;
-                }                
+                }
                 IsValid = true;
             }
             finally

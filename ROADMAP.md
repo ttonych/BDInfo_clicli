@@ -55,6 +55,8 @@ Done when:
 
 ## 4. Normalize Repository Text Formatting
 
+Status: done.
+
 Goal: reduce noisy diffs and make future patches safer.
 
 Scope:

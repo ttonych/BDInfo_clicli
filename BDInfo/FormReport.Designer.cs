@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -60,7 +60,7 @@ namespace BDInfo
             this.labelPlaylist = new System.Windows.Forms.Label();
             this.comboBoxPlaylist = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
-            // 
+            //
             // buttonCopy
             //
             this.buttonCopy.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
@@ -82,9 +82,9 @@ namespace BDInfo
             this.buttonExport.Text = "Export Report...";
             this.buttonExport.UseVisualStyleBackColor = true;
             this.buttonExport.Click += new System.EventHandler(this.buttonExport_Click);
-            // 
+            //
             // textBoxReport
-            // 
+            //
             this.textBoxReport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -98,9 +98,9 @@ namespace BDInfo
             this.textBoxReport.TabIndex = 5;
             this.textBoxReport.WordWrap = false;
             this.textBoxReport.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxReport_KeyDown);
-            // 
+            //
             // buttonChart
-            // 
+            //
             this.buttonChart.Location = new System.Drawing.Point(452, 22);
             this.buttonChart.Name = "buttonChart";
             this.buttonChart.Size = new System.Drawing.Size(122, 23);
@@ -108,18 +108,18 @@ namespace BDInfo
             this.buttonChart.Text = "Generate Chart...";
             this.buttonChart.UseVisualStyleBackColor = true;
             this.buttonChart.Click += new System.EventHandler(this.buttonChart_Click);
-            // 
+            //
             // labelChartType
-            // 
+            //
             this.labelChartType.AutoSize = true;
             this.labelChartType.Location = new System.Drawing.Point(266, 8);
             this.labelChartType.Name = "labelChartType";
             this.labelChartType.Size = new System.Drawing.Size(62, 13);
             this.labelChartType.TabIndex = 47;
             this.labelChartType.Text = "Chart Type:";
-            // 
+            //
             // comboBoxChartType
-            // 
+            //
             this.comboBoxChartType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxChartType.FormattingEnabled = true;
             this.comboBoxChartType.Items.AddRange(new object[] {
@@ -133,54 +133,54 @@ namespace BDInfo
             this.comboBoxChartType.Name = "comboBoxChartType";
             this.comboBoxChartType.Size = new System.Drawing.Size(180, 21);
             this.comboBoxChartType.TabIndex = 3;
-            // 
+            //
             // labelStream
-            // 
+            //
             this.labelStream.AutoSize = true;
             this.labelStream.Location = new System.Drawing.Point(117, 8);
             this.labelStream.Name = "labelStream";
             this.labelStream.Size = new System.Drawing.Size(43, 13);
             this.labelStream.TabIndex = 45;
             this.labelStream.Text = "Stream:";
-            // 
+            //
             // comboBoxStream
-            // 
+            //
             this.comboBoxStream.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxStream.FormattingEnabled = true;
             this.comboBoxStream.Location = new System.Drawing.Point(117, 24);
             this.comboBoxStream.Name = "comboBoxStream";
             this.comboBoxStream.Size = new System.Drawing.Size(99, 21);
             this.comboBoxStream.TabIndex = 1;
-            // 
+            //
             // labelAngle
-            // 
+            //
             this.labelAngle.AutoSize = true;
             this.labelAngle.Location = new System.Drawing.Point(222, 8);
             this.labelAngle.Name = "labelAngle";
             this.labelAngle.Size = new System.Drawing.Size(37, 13);
             this.labelAngle.TabIndex = 43;
             this.labelAngle.Text = "Angle:";
-            // 
+            //
             // comboBoxAngle
-            // 
+            //
             this.comboBoxAngle.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxAngle.FormattingEnabled = true;
             this.comboBoxAngle.Location = new System.Drawing.Point(222, 24);
             this.comboBoxAngle.Name = "comboBoxAngle";
             this.comboBoxAngle.Size = new System.Drawing.Size(38, 21);
             this.comboBoxAngle.TabIndex = 2;
-            // 
+            //
             // labelPlaylist
-            // 
+            //
             this.labelPlaylist.AutoSize = true;
             this.labelPlaylist.Location = new System.Drawing.Point(12, 8);
             this.labelPlaylist.Name = "labelPlaylist";
             this.labelPlaylist.Size = new System.Drawing.Size(42, 13);
             this.labelPlaylist.TabIndex = 41;
             this.labelPlaylist.Text = "Playlist:";
-            // 
+            //
             // comboBoxPlaylist
-            // 
+            //
             this.comboBoxPlaylist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxPlaylist.FormattingEnabled = true;
             this.comboBoxPlaylist.Location = new System.Drawing.Point(12, 24);
@@ -188,9 +188,9 @@ namespace BDInfo
             this.comboBoxPlaylist.Size = new System.Drawing.Size(99, 21);
             this.comboBoxPlaylist.TabIndex = 0;
             this.comboBoxPlaylist.SelectedIndexChanged += new System.EventHandler(this.comboBoxPlaylist_SelectedIndexChanged);
-            // 
+            //
             // FormReport
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(692, 492);

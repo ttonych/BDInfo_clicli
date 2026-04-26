@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -48,9 +48,9 @@ namespace BDInfo
         }
 
         private void GraphControl_ContextMenuBuilder(
-            ZedGraphControl sender, 
-            ContextMenuStrip menuStrip, 
-            Point mousePt, 
+            ZedGraphControl sender,
+            ContextMenuStrip menuStrip,
+            Point mousePt,
             ZedGraphControl.ContextMenuObjectState objState)
         {
             for (int i = 0; i < menuStrip.Items.Count; i++)
@@ -78,7 +78,7 @@ namespace BDInfo
         }
 
         private void FormChart_FormClosed(
-            object sender, 
+            object sender,
             FormClosedEventArgs e)
         {
             GraphControl.Dispose();
@@ -422,7 +422,7 @@ namespace BDInfo
                     if (frameSize < pointMin) pointMin = frameSize;
                     if (frameSize > pointMax) pointMax = frameSize;
 
-                    pointCount++; 
+                    pointCount++;
                     pointAvg += frameSize;
 
                     if (pointPosition >= pointSeconds)
@@ -584,7 +584,7 @@ namespace BDInfo
                 GraphControl.GraphPane.XAxis.Type = AxisType.Text;
                 GraphControl.AxisChange();
 
-                GraphControl.GraphPane.YAxis.Scale.Max += 
+                GraphControl.GraphPane.YAxis.Scale.Max +=
                     GraphControl.GraphPane.YAxis.Scale.MajorStep;
 
                 BarItem.CreateBarLabels(GraphControl.GraphPane, false, "f0");
@@ -651,13 +651,13 @@ namespace BDInfo
         }
 
         private void AddPieSlice(
-            string frameType, 
-            double frameCount, 
-            double totalFrameCount, 
+            string frameType,
+            double frameCount,
+            double totalFrameCount,
             int rgb)
         {
             string label = string.Format(
-                " {0} Frames \n {1:N0} \n ({2:F2}%) ", 
+                " {0} Frames \n {1:N0} \n ({2:F2}%) ",
                 frameType, frameCount, frameCount / totalFrameCount * 100);
 
             Color color = Color.FromArgb(rgb, rgb, rgb);
@@ -667,7 +667,7 @@ namespace BDInfo
         }
 
         private void GraphControl_MouseMove(
-            object sender, 
+            object sender,
             MouseEventArgs e)
         {
             ZedGraphControl graph = (ZedGraphControl)sender;
@@ -678,14 +678,14 @@ namespace BDInfo
             {
                 double x, y;
                 pane.ReverseTransform(pt, out x, out y);
-                
+
                 TimeSpan time = new TimeSpan(
                     0, 0, 0, 0, (int)Math.Round(x * 1000 * 60));
-                
+
                 toolStripStatus.Text = string.Format(
                     "Time: {0} ({1}) Value: {2}",
                     string.Format("{0:F3} sec", x),
-                    string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D2}", 
+                    string.Format("{0:D2}:{1:D2}:{2:D2}.{3:D2}",
                     time.Hours, time.Minutes, time.Seconds, time.Milliseconds),
                     string.Format("{0:F2} {1}", y, UnitText));
             }

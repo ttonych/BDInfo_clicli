@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -160,7 +160,7 @@ namespace BDInfo
         }
 
         private void buttonBrowse_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             string path = null;
@@ -184,7 +184,7 @@ namespace BDInfo
                     openDialog.Title = "Select a BluRay .ISO file:";
                     openDialog.Filters.Add(new CommonFileDialogFilter("ISO-Image", "iso"));
                 }
-                
+
 
                 if (!string.IsNullOrEmpty(textBoxSource.Text))
                 {
@@ -205,7 +205,7 @@ namespace BDInfo
                     ex.Message,
                     Environment.NewLine);
 
-                MessageBox.Show(msg, "BDInfo Error", 
+                MessageBox.Show(msg, "BDInfo Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -231,7 +231,7 @@ namespace BDInfo
         }
 
         private void buttonSettings_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             FormSettings settings = new FormSettings();
@@ -255,7 +255,7 @@ namespace BDInfo
         }
 
         private void buttonCustomPlaylist_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             string name = string.Format(CultureInfo.InvariantCulture,
@@ -272,28 +272,28 @@ namespace BDInfo
         }
 
         private void buttonScan_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             ScanBDROM();
         }
 
         private void buttonViewReport_Click(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             GenerateReport();
         }
 
         private void listViewPlaylistFiles_SelectedIndexChanged(
-            object sender, 
+            object sender,
             EventArgs e)
         {
             LoadPlaylist();
         }
 
         private void listViewPlaylistFiles_ColumnClick(
-            object sender, 
+            object sender,
             ColumnClickEventArgs e)
         {
             if (e.Column == PlaylistColumnSorter.SortColumn)
@@ -350,7 +350,7 @@ namespace BDInfo
         }
 
         private void FormMain_FormClosing(
-            object sender, 
+            object sender,
             FormClosingEventArgs e)
         {
             BDInfoSettings.LastPath = textBoxSource.Text;
@@ -366,7 +366,7 @@ namespace BDInfo
                 BDInfo.Properties.Settings.Default.WindowSize = RestoreBounds.Size;
                 BDInfo.Properties.Settings.Default.WindowLocation = RestoreBounds.Location;
             }
-            
+
 
             BDInfoSettings.SaveSettings();
 
@@ -493,9 +493,9 @@ namespace BDInfo
         protected bool BDROM_PlaylistFileScanError(TSPlaylistFile playlistFile, Exception ex)
         {
             DialogResult result = MessageBox.Show(string.Format(CultureInfo.InvariantCulture,
-                "An error occurred while scanning the playlist file {0}.\n\nThe disc may be copy-protected or damaged.\n\nDo you want to continue scanning the playlist files?", playlistFile.Name), 
+                "An error occurred while scanning the playlist file {0}.\n\nThe disc may be copy-protected or damaged.\n\nDo you want to continue scanning the playlist files?", playlistFile.Name),
                 "BDInfo Scan Error", MessageBoxButtons.YesNo);
-            
+
             if (result == DialogResult.Yes) return true;
             else return false;
         }
@@ -521,7 +521,7 @@ namespace BDInfo
         }
 
         private void InitBDROMProgress(
-            object sender, 
+            object sender,
             ProgressChangedEventArgs e)
         {
         }
@@ -592,7 +592,7 @@ namespace BDInfo
             }
             else
             {
-                textBoxDetails.Text += string.Format(CultureInfo.InvariantCulture, 
+                textBoxDetails.Text += string.Format(CultureInfo.InvariantCulture,
                                                     "Detected BDMV Folder: {0} (Disc Label: {1}){3}ISO Image: {2}{3}",
                                                     BDROM.DiscDirectoryBDMV.FullName,
                                                     BDROM.VolumeLabel,
@@ -634,7 +634,7 @@ namespace BDInfo
                 textBoxDetails.Text += "Detected Features: " + string.Join(", ", features.ToArray()) + Environment.NewLine;
             }
 
-            textBoxDetails.Text += string.Format(CultureInfo.InvariantCulture, 
+            textBoxDetails.Text += string.Format(CultureInfo.InvariantCulture,
                                                 "Disc Size: {0:N0} bytes ({1}){2}",
                                                 BDROM.Size,
                                                 ToolBox.FormatFileSize(BDROM.Size),
@@ -731,7 +731,7 @@ namespace BDInfo
                     playlistName.Tag = playlist.Name;
 
                     if (playlist.Chapters != null && playlist.Chapters.Count > 1 && BDInfoSettings.DisplayChapterCount)
-                        playlistName.Text += string.Format(CultureInfo.InvariantCulture, 
+                        playlistName.Text += string.Format(CultureInfo.InvariantCulture,
                             " [{0:D2} Chapters]",
                             playlist.Chapters.Count);
 
@@ -763,7 +763,7 @@ namespace BDInfo
                     {
                         playlistSize.Text = "-";
                         playlistSize.Tag = playlist.FileSize;
-                    }                    
+                    }
 
                     ListViewItem.ListViewSubItem playlistSize2 =
                         new ListViewItem.ListViewSubItem();
@@ -865,7 +865,7 @@ namespace BDInfo
                         Tag = clip.Length
                     };
 
-                ListViewItem.ListViewSubItem clipSize = 
+                ListViewItem.ListViewSubItem clipSize =
                     new ListViewItem.ListViewSubItem();
                 if (BDInfoSettings.EnableSSIF &&
                     clip.InterleavedFileSize > 0)
@@ -906,14 +906,14 @@ namespace BDInfo
                         clipSize2
                     };
 
-                ListViewItem streamFileItem = 
+                ListViewItem streamFileItem =
                     new ListViewItem(streamFileSubItems, 0);
                 listViewStreamFiles.Items.Add(streamFileItem);
             }
 
             foreach (TSStream stream in playlist.SortedStreams)
             {
-                ListViewItem.ListViewSubItem codec = 
+                ListViewItem.ListViewSubItem codec =
                     new ListViewItem.ListViewSubItem();
                 codec.Text = stream.CodecName;
                 if (stream.AngleIndex > 0)
@@ -935,7 +935,7 @@ namespace BDInfo
                         Tag = stream.LanguageName
                     };
 
-                ListViewItem.ListViewSubItem bitrate = 
+                ListViewItem.ListViewSubItem bitrate =
                     new ListViewItem.ListViewSubItem();
 
                 if (stream.AngleIndex > 0)
@@ -965,7 +965,7 @@ namespace BDInfo
                     bitrate.Tag = stream.BitRate;
                 }
 
-                ListViewItem.ListViewSubItem description = 
+                ListViewItem.ListViewSubItem description =
                     new ListViewItem.ListViewSubItem();
                 description.Text = stream.Description;
                 description.Tag = stream.Description;
@@ -979,7 +979,7 @@ namespace BDInfo
                         description
                     };
 
-                ListViewItem streamItem = 
+                ListViewItem streamItem =
                     new ListViewItem(streamSubItems, 0);
                 streamItem.Tag = stream.PID;
                 listViewStreams.Items.Add(streamItem);
@@ -1036,7 +1036,7 @@ namespace BDInfo
                 string playlistName = (string)item.SubItems[0].Tag;
                 if (BDROM.PlaylistFiles.ContainsKey(playlistName))
                 {
-                    TSPlaylistFile playlist = 
+                    TSPlaylistFile playlist =
                         BDROM.PlaylistFiles[playlistName];
                     item.SubItems[4].Text = ToolBox.FormatFileSize(playlist.TotalAngleSize);
                     item.SubItems[4].Tag = playlist.TotalAngleSize;
@@ -1114,7 +1114,7 @@ namespace BDInfo
             public long FinishedBytes = 0;
             public DateTime TimeStarted = DateTime.Now;
             public TSStreamFile StreamFile = null;
-            public Dictionary<string, List<TSPlaylistFile>> PlaylistMap = 
+            public Dictionary<string, List<TSPlaylistFile>> PlaylistMap =
                 new Dictionary<string, List<TSPlaylistFile>>();
             public Exception Exception = null;
         }
@@ -1168,7 +1168,7 @@ namespace BDInfo
                     string playlistName = (string)item.SubItems[0].Tag;
                     if (BDROM.PlaylistFiles.ContainsKey(playlistName))
                     {
-                        TSPlaylistFile playlist = 
+                        TSPlaylistFile playlist =
                             BDROM.PlaylistFiles[playlistName];
 
                         foreach (TSStreamClip clip
@@ -1193,7 +1193,7 @@ namespace BDInfo
         }
 
         private void ScanBDROMWork(
-            object sender, 
+            object sender,
             DoWorkEventArgs e)
         {
             ScanResult = new ScanBDROMResult {ScanException = new Exception("Scan is still running.")};
@@ -1222,7 +1222,7 @@ namespace BDInfo
                         else
                             scanState.TotalBytes += streamFile.DFileInfo.Length;
                     }
-                    
+
                     if (!scanState.PlaylistMap.ContainsKey(streamFile.Name))
                     {
                         scanState.PlaylistMap[streamFile.Name] = new List<TSPlaylistFile>();
@@ -1252,7 +1252,7 @@ namespace BDInfo
                 foreach (TSStreamFile streamFile in streamFiles)
                 {
                     scanState.StreamFile = streamFile;
-                    
+
                     Thread thread = new Thread(ScanBDROMThread);
                     thread.Start(scanState);
                     while (thread.IsAlive)
@@ -1307,7 +1307,7 @@ namespace BDInfo
         {
             try
             {
-                if (ScanBDROMWorker.IsBusy && 
+                if (ScanBDROMWorker.IsBusy &&
                     !ScanBDROMWorker.CancellationPending)
                 {
                     ScanBDROMWorker.ReportProgress(0, state);
@@ -1317,7 +1317,7 @@ namespace BDInfo
         }
 
         private void ScanBDROMProgress(
-            object sender, 
+            object sender,
             ProgressChangedEventArgs e)
         {
             ScanBDROMState scanState = (ScanBDROMState)e.UserState;
@@ -1374,7 +1374,7 @@ namespace BDInfo
         }
 
         private void ScanBDROMCompleted(
-            object sender, 
+            object sender,
             RunWorkerCompletedEventArgs e)
         {
             buttonScan.Enabled = false;
@@ -1466,7 +1466,7 @@ namespace BDInfo
         }
 
         private void GenerateReportWork(
-            object sender, 
+            object sender,
             DoWorkEventArgs e)
         {
             try
@@ -1483,7 +1483,7 @@ namespace BDInfo
         }
 
         private void GenerateReportProgress(
-            object sender, 
+            object sender,
             ProgressChangedEventArgs e)
         {
         }
@@ -1625,16 +1625,16 @@ namespace BDInfo
         }
 
         public int Compare(
-            object x, 
+            object x,
             object y)
         {
             ListViewItem listviewX = (ListViewItem)x;
             ListViewItem listviewY = (ListViewItem)y;
-            
+
             int compareResult = ObjectCompare.Compare(
-                listviewX.SubItems[ColumnToSort].Tag, 
+                listviewX.SubItems[ColumnToSort].Tag,
                 listviewY.SubItems[ColumnToSort].Tag);
-            
+
             if (OrderOfSort == SortOrder.Ascending)
             {
                 return compareResult;

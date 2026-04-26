@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -70,7 +70,7 @@ namespace BDInfo
                 new int[] {0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, // reserved
                 new int[] {0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, // reserved
                 new int[] {0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, // reserved
-            }, 
+            },
             new [] // MPEG Version 2
             {
                 new int[] {0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, // MPEG Version 2 Layer 0
@@ -147,7 +147,7 @@ namespace BDInfo
 
             stream.ChannelCount = MPAChannels[channelMode];
             stream.LFE = 0;
-            
+
             stream.ExtendedData = $"{MPAVersion[audioVersionID]} {MPALayer[layerIndex]}";
 
             stream.IsVBR = false;

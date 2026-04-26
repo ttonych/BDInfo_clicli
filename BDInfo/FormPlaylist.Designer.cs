@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -86,18 +86,18 @@ namespace BDInfo
             this.splitContainerInner.SuspendLayout();
             this.groupBoxCustomPlaylist.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // textBoxName
-            // 
-            this.textBoxName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.textBoxName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxName.Location = new System.Drawing.Point(12, 13);
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(399, 20);
             this.textBoxName.TabIndex = 0;
-            // 
+            //
             // buttonOK
-            // 
+            //
             this.buttonOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.buttonOK.Enabled = false;
             this.buttonOK.Location = new System.Drawing.Point(214, 459);
@@ -107,9 +107,9 @@ namespace BDInfo
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
-            // 
+            //
             // buttonCancel
-            // 
+            //
             this.buttonCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Location = new System.Drawing.Point(295, 459);
@@ -119,29 +119,29 @@ namespace BDInfo
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
-            // 
+            //
             // splitContainerOuter
-            // 
-            this.splitContainerOuter.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.splitContainerOuter.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainerOuter.Location = new System.Drawing.Point(12, 39);
             this.splitContainerOuter.Name = "splitContainerOuter";
             this.splitContainerOuter.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
+            //
             // splitContainerOuter.Panel1
-            // 
+            //
             this.splitContainerOuter.Panel1.Controls.Add(this.groupBoxSourcePlaylist);
-            // 
+            //
             // splitContainerOuter.Panel2
-            // 
+            //
             this.splitContainerOuter.Panel2.Controls.Add(this.groupBoxCustomPlaylist);
             this.splitContainerOuter.Size = new System.Drawing.Size(560, 414);
             this.splitContainerOuter.SplitterDistance = 257;
             this.splitContainerOuter.TabIndex = 21;
-            // 
+            //
             // groupBoxSourcePlaylist
-            // 
+            //
             this.groupBoxSourcePlaylist.Controls.Add(this.buttonAddAll);
             this.groupBoxSourcePlaylist.Controls.Add(this.splitContainerInner);
             this.groupBoxSourcePlaylist.Controls.Add(this.buttonAdd);
@@ -152,9 +152,9 @@ namespace BDInfo
             this.groupBoxSourcePlaylist.TabIndex = 21;
             this.groupBoxSourcePlaylist.TabStop = false;
             this.groupBoxSourcePlaylist.Text = "Source Playlist:";
-            // 
+            //
             // buttonAddAll
-            // 
+            //
             this.buttonAddAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonAddAll.Enabled = false;
             this.buttonAddAll.Location = new System.Drawing.Point(283, 228);
@@ -164,29 +164,29 @@ namespace BDInfo
             this.buttonAddAll.Text = "Add All";
             this.buttonAddAll.UseVisualStyleBackColor = true;
             this.buttonAddAll.Click += new System.EventHandler(this.buttonAddAll_Click);
-            // 
+            //
             // splitContainerInner
-            // 
-            this.splitContainerInner.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.splitContainerInner.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainerInner.Location = new System.Drawing.Point(6, 19);
             this.splitContainerInner.Name = "splitContainerInner";
             this.splitContainerInner.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
+            //
             // splitContainerInner.Panel1
-            // 
+            //
             this.splitContainerInner.Panel1.Controls.Add(this.listViewPlaylistFiles);
-            // 
+            //
             // splitContainerInner.Panel2
-            // 
+            //
             this.splitContainerInner.Panel2.Controls.Add(this.listViewStreamFiles);
             this.splitContainerInner.Size = new System.Drawing.Size(548, 203);
             this.splitContainerInner.SplitterDistance = 100;
             this.splitContainerInner.TabIndex = 22;
-            // 
+            //
             // listViewPlaylistFiles
-            // 
+            //
             this.listViewPlaylistFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderPlaylistName,
             this.columnHeaderPlaylistLength,
@@ -204,32 +204,32 @@ namespace BDInfo
             this.listViewPlaylistFiles.View = System.Windows.Forms.View.Details;
             this.listViewPlaylistFiles.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listViewPlaylistFiles_ColumnClick);
             this.listViewPlaylistFiles.SelectedIndexChanged += new System.EventHandler(this.listViewPlaylistFiles_SelectedIndexChanged);
-            // 
+            //
             // columnHeaderPlaylistName
-            // 
+            //
             this.columnHeaderPlaylistName.Text = "Playlist File";
             this.columnHeaderPlaylistName.Width = 103;
-            // 
+            //
             // columnHeaderPlaylistLength
-            // 
+            //
             this.columnHeaderPlaylistLength.Text = "Length";
             this.columnHeaderPlaylistLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderPlaylistLength.Width = 73;
-            // 
+            //
             // columnHeaderPlaylistEstimatedBytes
-            // 
+            //
             this.columnHeaderPlaylistEstimatedBytes.Text = "Estimated Size";
             this.columnHeaderPlaylistEstimatedBytes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderPlaylistEstimatedBytes.Width = 98;
-            // 
+            //
             // columnHeaderPlaylistMeasuredBytes
-            // 
+            //
             this.columnHeaderPlaylistMeasuredBytes.Text = "Measured Size";
             this.columnHeaderPlaylistMeasuredBytes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderPlaylistMeasuredBytes.Width = 125;
-            // 
+            //
             // listViewStreamFiles
-            // 
+            //
             this.listViewStreamFiles.Activation = System.Windows.Forms.ItemActivation.OneClick;
             this.listViewStreamFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderFileName,
@@ -248,33 +248,33 @@ namespace BDInfo
             this.listViewStreamFiles.UseCompatibleStateImageBehavior = false;
             this.listViewStreamFiles.View = System.Windows.Forms.View.Details;
             this.listViewStreamFiles.SelectedIndexChanged += new System.EventHandler(this.listViewStreamFiles_SelectedIndexChanged);
-            // 
+            //
             // columnHeaderFileName
-            // 
+            //
             this.columnHeaderFileName.Text = "Stream File";
             this.columnHeaderFileName.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderFileName.Width = 82;
-            // 
+            //
             // columnHeaderFileLength
-            // 
+            //
             this.columnHeaderFileLength.Text = "Length";
             this.columnHeaderFileLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderFileLength.Width = 77;
-            // 
+            //
             // columnHeaderFileEstimatedBytes
-            // 
+            //
             this.columnHeaderFileEstimatedBytes.Text = "Estimated Size";
             this.columnHeaderFileEstimatedBytes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderFileEstimatedBytes.Width = 119;
-            // 
+            //
             // columnHeaderFileMeasuredBytes
-            // 
+            //
             this.columnHeaderFileMeasuredBytes.Text = "Measured Size";
             this.columnHeaderFileMeasuredBytes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeaderFileMeasuredBytes.Width = 125;
-            // 
+            //
             // buttonAdd
-            // 
+            //
             this.buttonAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonAdd.Enabled = false;
             this.buttonAdd.Location = new System.Drawing.Point(202, 228);
@@ -284,9 +284,9 @@ namespace BDInfo
             this.buttonAdd.Text = "Add";
             this.buttonAdd.UseVisualStyleBackColor = true;
             this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
-            // 
+            //
             // groupBoxCustomPlaylist
-            // 
+            //
             this.groupBoxCustomPlaylist.Controls.Add(this.buttonDown);
             this.groupBoxCustomPlaylist.Controls.Add(this.buttonUp);
             this.groupBoxCustomPlaylist.Controls.Add(this.buttonRemove);
@@ -298,9 +298,9 @@ namespace BDInfo
             this.groupBoxCustomPlaylist.TabIndex = 20;
             this.groupBoxCustomPlaylist.TabStop = false;
             this.groupBoxCustomPlaylist.Text = "Custom Playlist:";
-            // 
+            //
             // buttonDown
-            // 
+            //
             this.buttonDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.buttonDown.Enabled = false;
             this.buttonDown.Location = new System.Drawing.Point(87, 122);
@@ -310,9 +310,9 @@ namespace BDInfo
             this.buttonDown.Text = "Move Down";
             this.buttonDown.UseVisualStyleBackColor = true;
             this.buttonDown.Click += new System.EventHandler(this.buttonDown_Click);
-            // 
+            //
             // buttonUp
-            // 
+            //
             this.buttonUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.buttonUp.Enabled = false;
             this.buttonUp.Location = new System.Drawing.Point(6, 122);
@@ -322,9 +322,9 @@ namespace BDInfo
             this.buttonUp.Text = "Move Up";
             this.buttonUp.UseVisualStyleBackColor = true;
             this.buttonUp.Click += new System.EventHandler(this.buttonUp_Click);
-            // 
+            //
             // buttonRemove
-            // 
+            //
             this.buttonRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonRemove.Enabled = false;
             this.buttonRemove.Location = new System.Drawing.Point(243, 122);
@@ -334,12 +334,12 @@ namespace BDInfo
             this.buttonRemove.Text = "Remove";
             this.buttonRemove.UseVisualStyleBackColor = true;
             this.buttonRemove.Click += new System.EventHandler(this.buttonRemove_Click);
-            // 
+            //
             // listViewTargetFiles
-            // 
+            //
             this.listViewTargetFiles.Activation = System.Windows.Forms.ItemActivation.OneClick;
-            this.listViewTargetFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.listViewTargetFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listViewTargetFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
@@ -357,33 +357,33 @@ namespace BDInfo
             this.listViewTargetFiles.UseCompatibleStateImageBehavior = false;
             this.listViewTargetFiles.View = System.Windows.Forms.View.Details;
             this.listViewTargetFiles.SelectedIndexChanged += new System.EventHandler(this.listViewTargetFiles_SelectedIndexChanged);
-            // 
+            //
             // columnHeader1
-            // 
+            //
             this.columnHeader1.Text = "Stream File";
             this.columnHeader1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeader1.Width = 82;
-            // 
+            //
             // columnHeader2
-            // 
+            //
             this.columnHeader2.Text = "Length";
             this.columnHeader2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeader2.Width = 77;
-            // 
+            //
             // columnHeader3
-            // 
+            //
             this.columnHeader3.Text = "Estimated Size";
             this.columnHeader3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeader3.Width = 119;
-            // 
+            //
             // columnHeader4
-            // 
+            //
             this.columnHeader4.Text = "Measured Size";
             this.columnHeader4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeader4.Width = 125;
-            // 
+            //
             // checkBoxFilterIncompatible
-            // 
+            //
             this.checkBoxFilterIncompatible.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBoxFilterIncompatible.AutoSize = true;
             this.checkBoxFilterIncompatible.Checked = true;
@@ -395,9 +395,9 @@ namespace BDInfo
             this.checkBoxFilterIncompatible.Text = "Filter incombatible playlists";
             this.checkBoxFilterIncompatible.UseVisualStyleBackColor = true;
             this.checkBoxFilterIncompatible.CheckedChanged += new System.EventHandler(this.checkBoxFilterIncompatible_CheckedChanged);
-            // 
+            //
             // FormPlaylist
-            // 
+            //
             this.AcceptButton = this.buttonOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

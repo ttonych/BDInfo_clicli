@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -46,7 +46,7 @@ namespace BDInfo
 
         public List<double> Chapters = new List<double>();
 
-        public Dictionary<ushort, TSStream> Streams = 
+        public Dictionary<ushort, TSStream> Streams =
             new Dictionary<ushort, TSStream>();
         public Dictionary<ushort, TSStream> PlaylistStreams =
             new Dictionary<ushort, TSStream>();
@@ -54,19 +54,19 @@ namespace BDInfo
             new List<TSStreamClip>();
         public List<Dictionary<ushort, TSStream>> AngleStreams =
             new List<Dictionary<ushort, TSStream>>();
-        public List<Dictionary<double, TSStreamClip>> AngleClips = 
+        public List<Dictionary<double, TSStreamClip>> AngleClips =
             new List<Dictionary<double, TSStreamClip>>();
         public int AngleCount = 0;
 
-        public List<TSStream> SortedStreams = 
+        public List<TSStream> SortedStreams =
             new List<TSStream>();
-        public List<TSVideoStream> VideoStreams = 
+        public List<TSVideoStream> VideoStreams =
             new List<TSVideoStream>();
-        public List<TSAudioStream> AudioStreams = 
+        public List<TSAudioStream> AudioStreams =
             new List<TSAudioStream>();
-        public List<TSTextStream> TextStreams = 
+        public List<TSTextStream> TextStreams =
             new List<TSTextStream>();
-        public List<TSGraphicsStream> GraphicsStreams = 
+        public List<TSGraphicsStream> GraphicsStreams =
             new List<TSGraphicsStream>();
 
         public TSPlaylistFile(
@@ -313,7 +313,7 @@ namespace BDInfo
                 // misc flags
                 pos = 0x38;
                 byte miscFlags = ReadByte(data, ref pos);
-                
+
                 // MVC_Base_view_R_flag is stored in 4th bit
                 MVCBaseViewR = (miscFlags & 0x10) != 0;
 
@@ -451,8 +451,8 @@ namespace BDInfo
 
 #if DEBUG
                     Debug.WriteLine(string.Format(
-                        "{0} : {1} -> V:{2} A:{3} PG:{4} IG:{5} 2A:{6} 2V:{7} PIP:{8}", 
-                        Name, streamFileName, streamCountVideo, streamCountAudio, streamCountPG, streamCountIG, 
+                        "{0} : {1} -> V:{2} A:{3} PG:{4} IG:{5} 2A:{6} 2V:{7} PIP:{8}",
+                        Name, streamFileName, streamCountVideo, streamCountAudio, streamCountPG, streamCountIG,
                         streamCountSecondaryAudio, streamCountSecondaryVideo, streamCountPIP));
 #endif
 
@@ -516,7 +516,7 @@ namespace BDInfo
                     }
                     /*
                      * TODO
-                     * 
+                     *
                     for (int i = 0; i < streamCountPIP; i++)
                     {
                         TSStream stream = CreatePlaylistStream(data, ref pos);
@@ -909,7 +909,7 @@ namespace BDInfo
                         {
                             ((TSVideoStream)stream).EncodingProfile =
                                 ((TSVideoStream)clipStream).EncodingProfile;
-                            ((TSVideoStream) stream).ExtendedData = 
+                            ((TSVideoStream) stream).ExtendedData =
                                 ((TSVideoStream) clipStream).ExtendedData;
                         }
                         else if (stream.IsAudioStream &&
@@ -962,7 +962,7 @@ namespace BDInfo
                         {
                             TSGraphicsStream graphicsStream = (TSGraphicsStream)stream;
                             TSGraphicsStream clipGraphicsStream = (TSGraphicsStream)clipStream;
-                            
+
                             graphicsStream.Captions = clipGraphicsStream.Captions;
                             graphicsStream.ForcedCaptions = clipGraphicsStream.ForcedCaptions;
                             graphicsStream.Width = clipGraphicsStream.Width;
@@ -1078,7 +1078,7 @@ namespace BDInfo
         }
 
         public static int CompareVideoStreams(
-            TSVideoStream x, 
+            TSVideoStream x,
             TSVideoStream y)
         {
             if (x == null && y == null)
@@ -1119,7 +1119,7 @@ namespace BDInfo
         }
 
         public static int CompareAudioStreams(
-            TSAudioStream x, 
+            TSAudioStream x,
             TSAudioStream y)
         {
             if (x == y)

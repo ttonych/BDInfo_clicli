@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -107,7 +107,7 @@ namespace BDInfo
                     _skippedBytes++;
                 }
             }
-            
+
             _stream.Position = streamPos + 1;
             return tempByte;
 #else

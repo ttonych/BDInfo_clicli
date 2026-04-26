@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -69,11 +69,11 @@ namespace BDInfo
         public FileStream IoStream = null;
         public UdfReader CdReader = null;
 
-        public Dictionary<string, TSPlaylistFile> PlaylistFiles = 
+        public Dictionary<string, TSPlaylistFile> PlaylistFiles =
             new Dictionary<string, TSPlaylistFile>();
         public Dictionary<string, TSStreamClipFile> StreamClipFiles =
             new Dictionary<string, TSStreamClipFile>();
-        public Dictionary<string, TSStreamFile> StreamFiles = 
+        public Dictionary<string, TSStreamFile> StreamFiles =
             new Dictionary<string, TSStreamFile>();
         public Dictionary<string, TSInterleavedFile> InterleavedFiles =
             new Dictionary<string, TSInterleavedFile>();
@@ -118,7 +118,7 @@ namespace BDInfo
                 DirectoryBDMV = GetDirectoryBDMV(path);
             else
                 DiscDirectoryBDMV = GetDiscDirectoryBDMV();
-            
+
             if ((!IsImage && DirectoryBDMV == null) || (IsImage && DiscDirectoryBDMV == null))
             {
                 throw new Exception("Unable to locate BD structure.");
@@ -434,11 +434,11 @@ namespace BDInfo
             {
                 DiscTitle = null;
             }
-            finally 
+            finally
             {
                 fileStream.Close();
             }
-            
+
         }
 
         public void Scan()
@@ -690,13 +690,13 @@ namespace BDInfo
         {
             string label = "";
             if (!IsImage)
-            { 
+            {
                 uint serialNumber = 0;
                 uint maxLength = 0;
                 uint volumeFlags = new uint();
                 StringBuilder volumeLabel = new StringBuilder(256);
                 StringBuilder fileSystemName = new StringBuilder(256);
-                
+
                 try
                 {
                     long result = GetVolumeInformation(
@@ -786,12 +786,12 @@ namespace BDInfo
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern long GetVolumeInformation(
-            string PathName, 
-            StringBuilder VolumeNameBuffer, 
+            string PathName,
+            StringBuilder VolumeNameBuffer,
             uint VolumeNameSize,
             ref uint VolumeSerialNumber,
             ref uint MaximumComponentLength,
-            ref uint FileSystemFlags, 
+            ref uint FileSystemFlags,
             StringBuilder FileSystemNameBuffer,
             uint FileSystemNameSize);
     }

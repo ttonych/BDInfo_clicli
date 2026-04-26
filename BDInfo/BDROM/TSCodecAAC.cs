@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // BDInfo - Blu-ray Video and Audio Analysis Tool
 // Copyright © 2010 Cinema Squid
 //
@@ -91,7 +91,7 @@ namespace BDInfo
                 stream.SampleRate = AACSampleRates[samplingRateIndex];
             else
                 stream.SampleRate = 0;
-            
+
 
             if (channelMode <= AACChannelsSize)
             {
@@ -103,7 +103,7 @@ namespace BDInfo
                 stream.ChannelCount = 0;
                 stream.AudioMode = TSAudioMode.Unknown;
             }
-                
+
             if (channelMode >=7 && channelMode <= 8)
             {
                 stream.ChannelCount--;
@@ -111,7 +111,7 @@ namespace BDInfo
             }
             else
                 stream.LFE = 0;
-            
+
             stream.ExtendedData = $"{AACID[audioVersionID]} {GetAACProfile(profileObjectType)}";
 
             stream.IsVBR = true;
