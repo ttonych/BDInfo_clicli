@@ -1,32 +1,34 @@
 # BDROM Parser TODO Audit
 
-This audit covers TODOs and nearby scanner/parser risks in `BDInfo/BDROM` as of the post-release maintenance pass after `v0.7.6.2-clicli.1`.
+This audit covers TODOs and nearby scanner/parser risks in `BDInfo/BDROM` as of the post-release maintenance pass after `v0.7.6.2-clicli.2`.
 
 The goal is to avoid opportunistic scanner edits without sample media. Parser changes should stay small, be backed by a fixture or a real-disc note, and avoid changing report output silently.
 
 ## Priority Order
 
-### P1: PMT Descriptor Parsing And Parser Error Handling
+### Done: PMT Descriptor Parsing And Parser Error Handling
 
 Files:
 - `BDInfo/BDROM/TSStreamFile.cs`
 
-Risk:
-- PMT stream descriptors are currently not parsed because the existing code notes bad `streamInfoLength` values.
-- The surrounding catch writes exception text directly to console output, which can pollute CLI reports and gives the GUI no structured signal.
-- Re-enabling descriptor parsing without strict bounds checks could mis-detect streams or throw on malformed/private PMT sections.
+Completed in [#54](https://github.com/ttonych/BDInfo_clicli/pull/54):
+- PMT stream descriptors are parsed through bounded `ES_info_length` handling.
+- Malformed PMT stream-info lengths stop that PMT payload parse conservatively.
+- Parser internals no longer write PMT exceptions directly to stdout.
 
-Recommended next PR:
-- Add a bounded helper for PMT descriptor parsing.
-- Keep the current behavior for unknown or malformed descriptors.
-- Replace direct console writes with a structured parser warning path if one is added, or suppress only this internal parser diagnostic.
-- Verify with `smoke-report-roundtrip.ps1`, `smoke-local.ps1`, and a real disc with private/descriptive streams if available.
+Remaining risk:
+- Descriptor data is still internal and not surfaced in reports.
+- Any behavior change based on descriptor contents should be sample-driven.
 
-### P2: Playlist Stream And Chapter Completeness
+### Partially Done: Playlist Stream And Chapter Completeness
 
 Files:
 - `BDInfo/BDROM/TSPlaylistFile.cs`
 - `BDInfo/BDROM/TSStreamClipFile.cs`
+
+Completed in [#53](https://github.com/ttonych/BDInfo_clicli/pull/53):
+- Added defensive bounds checks around playlist chapter clip indexes.
+- Added conservative bounds checks around playlist stream-entry header and payload lengths.
 
 Risk:
 - MVC stream entries are explicitly TODO in both playlist and clip metadata parsing.
@@ -36,7 +38,6 @@ Risk:
 - Short trailing chapters are filtered by a simple `> 1.0` second rule.
 
 Recommended next PRs:
-- First, add defensive bounds checks around chapter clip indexes and stream entry lengths.
 - Treat MVC/PiP parsing as sample-driven work; do not infer behavior without 3D/PiP sample discs.
 - Document any unsupported chapter type encountered during a real-disc smoke before changing report behavior.
 
@@ -101,7 +102,13 @@ Recommended next PR:
 
 ## Current Recommendation
 
-Do not start with broad parser rewrites. The safest next code change is the PMT parser diagnostic/descriptor path, but only if it can be bounded and verified without changing normal report output. The next safest maintenance step is to add defensive bounds checks in playlist chapter parsing.
+Do not start with broad parser rewrites. The remaining scanner/parser items are sample-sensitive and should wait for a real disc, a saved report mismatch, or a crash that makes the next behavior change concrete.
+
+The safest next maintenance work is outside parser semantics:
+- improve release and verification automation,
+- keep tracking docs current,
+- add sample inventory notes when a relevant disc is available,
+- create focused issues only when the next action is clear.
 
 ## Verification Baseline
 
