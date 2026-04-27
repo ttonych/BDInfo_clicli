@@ -314,6 +314,28 @@ function Test-ReportLoad([string] $Path) {
     }
 }
 
+function Test-SnapshotV2Archive([string] $Path) {
+    $archive = [IO.Compression.ZipFile]::OpenRead($Path)
+    try {
+        $entry = $archive.GetEntry('snapshot.json')
+        Assert-True ($null -ne $entry) "Snapshot v2 archive is missing snapshot.json: $Path"
+        $stream = $entry.Open()
+        try {
+            $reader = New-Object IO.StreamReader($stream, [Text.Encoding]::UTF8)
+            $json = $reader.ReadToEnd()
+            Assert-True ($json -match '"format"\s*:\s*"BDInfo_clicli"') "Snapshot v2 format marker was not written."
+            Assert-True ($json -match '"schemaVersion"\s*:\s*2') "Snapshot v2 schema version was not written."
+            Assert-True ($json -match '"payloadKind"\s*:\s*"reportSnapshot"') "Snapshot v2 payload kind was not written."
+        }
+        finally {
+            $stream.Dispose()
+        }
+    }
+    finally {
+        $archive.Dispose()
+    }
+}
+
 $buildOutputFullPath = Resolve-FullPath $BuildOutputPath
 $outputFullPath = Resolve-FullPath $OutputPath
 $fixtureFullPath = Resolve-FullPath $FixturePath
@@ -362,6 +384,7 @@ try {
     $savedJsonPath = Join-Path $outputFullPath 'saved-json.bdinfo'
     $savedZipXmlPath = Join-Path $outputFullPath 'saved-xml-compressed.bdinfo'
     $savedZipJsonPath = Join-Path $outputFullPath 'saved-json-compressed.bdinfo'
+    $savedSnapshotV2Path = Join-Path $outputFullPath 'saved-snapshot-v2.bdinfo'
 
     [BDInfo.Reporting.BDInfoReportSerializer]::Save(
         $savedXmlPath,
@@ -391,11 +414,19 @@ try {
         $seedXml.ScanResult,
         [BDInfo.Reporting.BDInfoReportFormat]::Json,
         $true)
+    [BDInfo.Reporting.BDInfoReportSerializer]::SaveSnapshotV2(
+        $savedSnapshotV2Path,
+        $seedXml.BDROM,
+        $seedXml.BDROM.PlaylistFiles.Values,
+        $seedXml.ScanResult,
+        $true)
 
     Test-ReportLoad $savedXmlPath | Out-Null
     Test-ReportLoad $savedJsonPath | Out-Null
     Test-ReportLoad $savedZipXmlPath | Out-Null
     Test-ReportLoad $savedZipJsonPath | Out-Null
+    Test-SnapshotV2Archive $savedSnapshotV2Path
+    Test-ReportLoad $savedSnapshotV2Path | Out-Null
 
     Write-Host "BDInfo report round-trip smoke passed: $outputFullPath"
 }

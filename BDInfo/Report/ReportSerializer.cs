@@ -19,9 +19,19 @@ namespace BDInfo.Reporting
 
     public static class BDInfoReportSerializer
     {
+        public const string SnapshotFormat = "BDInfo_clicli";
+        public const int SnapshotSchemaVersion = 2;
+        public const string SnapshotPayloadKind = "reportSnapshot";
+
         private static readonly DataContractSerializer XmlSerializer = new DataContractSerializer(typeof(BDInfoReportData));
         private static readonly DataContractJsonSerializer JsonSerializer = new DataContractJsonSerializer(
             typeof(BDInfoReportData),
+            new DataContractJsonSerializerSettings
+            {
+                UseSimpleDictionaryFormat = true
+            });
+        private static readonly DataContractJsonSerializer SnapshotJsonSerializer = new DataContractJsonSerializer(
+            typeof(BDInfoSnapshotData),
             new DataContractJsonSerializerSettings
             {
                 UseSimpleDictionaryFormat = true
@@ -46,14 +56,7 @@ namespace BDInfo.Reporting
             }
 
             var playlistList = playlists.ToList();
-            var report = new BDInfoReportData
-            {
-                CreatedUtc = DateTime.UtcNow,
-                Version = typeof(BDInfoReportSerializer).Assembly.GetName().Version?.ToString(),
-                SourcePath = GetSourcePath(bdrom),
-                Disc = BuildDiscData(bdrom, playlistList),
-                ScanResult = ConvertScanResult(scanResult)
-            };
+            var report = BuildReportData(bdrom, playlistList, scanResult);
 
             string directory = Path.GetDirectoryName(path);
             if (string.IsNullOrWhiteSpace(directory))
@@ -80,6 +83,54 @@ namespace BDInfo.Reporting
                 using (var stream = File.Create(path))
                 {
                     WriteReport(stream, report, format);
+                }
+            }
+        }
+
+        public static void SaveSnapshotV2(
+            string path,
+            BDROM bdrom,
+            IEnumerable<TSPlaylistFile> playlists,
+            ScanBDROMResult scanResult,
+            bool compress = true)
+        {
+            if (bdrom == null)
+            {
+                throw new ArgumentNullException(nameof(bdrom));
+            }
+
+            if (playlists == null)
+            {
+                throw new ArgumentNullException(nameof(playlists));
+            }
+
+            var report = BuildReportData(bdrom, playlists.ToList(), scanResult);
+            var snapshot = CreateSnapshot(report);
+
+            string directory = Path.GetDirectoryName(path);
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                directory = ".";
+            }
+            Directory.CreateDirectory(directory);
+
+            if (compress)
+            {
+                using (var fileStream = File.Create(path))
+                using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Create))
+                {
+                    var entry = archive.CreateEntry("snapshot.json", CompressionLevel.Optimal);
+                    using (var entryStream = entry.Open())
+                    {
+                        WriteSnapshot(entryStream, snapshot);
+                    }
+                }
+            }
+            else
+            {
+                using (var stream = File.Create(path))
+                {
+                    WriteSnapshot(stream, snapshot);
                 }
             }
         }
@@ -203,6 +254,8 @@ namespace BDInfo.Reporting
             }
 
             var entry = archive.Entries
+                .FirstOrDefault(e => string.Equals(e.Name, "snapshot.json", StringComparison.OrdinalIgnoreCase))
+                       ?? archive.Entries
                 .FirstOrDefault(e => string.Equals(e.Name, "report.json", StringComparison.OrdinalIgnoreCase))
                        ?? archive.Entries
                 .FirstOrDefault(e => string.Equals(e.Name, "report.xml", StringComparison.OrdinalIgnoreCase));
@@ -248,15 +301,31 @@ namespace BDInfo.Reporting
             }
         }
 
+        private static void WriteSnapshot(Stream stream, BDInfoSnapshotData snapshot)
+        {
+            using (var writer = JsonReaderWriterFactory.CreateJsonWriter(
+                       stream,
+                       Encoding.UTF8,
+                       ownsStream: false,
+                       indent: true,
+                       indentChars: "  "))
+            {
+                SnapshotJsonSerializer.WriteObject(writer, snapshot);
+                writer.Flush();
+            }
+
+            if (stream.CanSeek)
+            {
+                stream.SetLength(stream.Position);
+            }
+        }
+
         private static BDInfoReportData ReadReport(Stream stream, BDInfoReportFormat format)
         {
             switch (format)
             {
                 case BDInfoReportFormat.Json:
-                    using (var reader = JsonReaderWriterFactory.CreateJsonReader(stream, Encoding.UTF8, XmlDictionaryReaderQuotas.Max, null))
-                    {
-                        return (BDInfoReportData)JsonSerializer.ReadObject(reader);
-                    }
+                    return ReadJsonReport(stream);
 
                 default:
                     using (var reader = XmlReader.Create(stream))
@@ -264,6 +333,78 @@ namespace BDInfo.Reporting
                         return (BDInfoReportData)XmlSerializer.ReadObject(reader);
                     }
             }
+        }
+
+        private static BDInfoReportData ReadJsonReport(Stream stream)
+        {
+            byte[] data;
+            using (var buffer = new MemoryStream())
+            {
+                stream.CopyTo(buffer);
+                data = buffer.ToArray();
+            }
+
+            using (var snapshotStream = new MemoryStream(data))
+            using (var snapshotReader = JsonReaderWriterFactory.CreateJsonReader(snapshotStream, Encoding.UTF8, XmlDictionaryReaderQuotas.Max, null))
+            {
+                try
+                {
+                    var snapshot = (BDInfoSnapshotData)SnapshotJsonSerializer.ReadObject(snapshotReader);
+                    if (IsSnapshotV2(snapshot))
+                    {
+                        return snapshot.Payload;
+                    }
+                }
+                catch (SerializationException)
+                {
+                }
+            }
+
+            using (var reportStream = new MemoryStream(data))
+            using (var reader = JsonReaderWriterFactory.CreateJsonReader(reportStream, Encoding.UTF8, XmlDictionaryReaderQuotas.Max, null))
+            {
+                return (BDInfoReportData)JsonSerializer.ReadObject(reader);
+            }
+        }
+
+        private static bool IsSnapshotV2(BDInfoSnapshotData snapshot)
+        {
+            return snapshot != null &&
+                string.Equals(snapshot.Format, SnapshotFormat, StringComparison.Ordinal) &&
+                snapshot.SchemaVersion == SnapshotSchemaVersion &&
+                string.Equals(snapshot.PayloadKind, SnapshotPayloadKind, StringComparison.Ordinal) &&
+                snapshot.Payload != null;
+        }
+
+        private static BDInfoSnapshotData CreateSnapshot(BDInfoReportData report)
+        {
+            return new BDInfoSnapshotData
+            {
+                Format = SnapshotFormat,
+                SchemaVersion = SnapshotSchemaVersion,
+                PayloadKind = SnapshotPayloadKind,
+                CreatedBy = string.Format(
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    "BDInfo_clicli {0}",
+                    typeof(BDInfoReportSerializer).Assembly.GetName().Version),
+                CreatedAt = report.CreatedUtc.ToString("o", System.Globalization.CultureInfo.InvariantCulture),
+                Payload = report
+            };
+        }
+
+        private static BDInfoReportData BuildReportData(
+            BDROM bdrom,
+            List<TSPlaylistFile> playlists,
+            ScanBDROMResult scanResult)
+        {
+            return new BDInfoReportData
+            {
+                CreatedUtc = DateTime.UtcNow,
+                Version = typeof(BDInfoReportSerializer).Assembly.GetName().Version?.ToString(),
+                SourcePath = GetSourcePath(bdrom),
+                Disc = BuildDiscData(bdrom, playlists),
+                ScanResult = ConvertScanResult(scanResult)
+            };
         }
 
         public static BDROM CreateBDROM(BDInfoReportData report)

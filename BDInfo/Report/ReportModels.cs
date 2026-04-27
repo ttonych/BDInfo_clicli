@@ -257,4 +257,15 @@ namespace BDInfo.Reporting
         [DataMember] public BDROMData Disc;
         [DataMember] public ScanResultData ScanResult;
     }
+
+    [DataContract]
+    public class BDInfoSnapshotData
+    {
+        [DataMember(Name = "format")] public string Format;
+        [DataMember(Name = "schemaVersion")] public int SchemaVersion;
+        [DataMember(Name = "payloadKind")] public string PayloadKind;
+        [DataMember(Name = "createdBy")] public string CreatedBy;
+        [DataMember(Name = "createdAt")] public string CreatedAt;
+        [DataMember(Name = "payload")] public BDInfoReportData Payload;
+    }
 }
