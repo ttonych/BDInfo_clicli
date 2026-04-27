@@ -412,7 +412,7 @@ Done when:
 
 ### 21. Align GUI Export Semantics
 
-Status: next.
+Status: done.
 
 Goal: make GUI export defaults match the Snapshot v2 policy.
 

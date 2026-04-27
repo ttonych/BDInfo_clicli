@@ -48,9 +48,9 @@ You can now **export a BDInfo report to a single `.bdinfo` file** and later **op
 CLI `-r bdinfo` now writes Snapshot v2 compressed JSON. The legacy proof-of-concept **JSON** and **XML** snapshot formats remain available through explicit CLI format names and the current GUI export dialog. The GUI export dialog also supports a plain text report (`.txt`).
 
 - **Export locations**: available in **GUI** (button **“Export Report…”**) and in the **CLI** (use `-r` / `--report`).
-- **GUI export defaults**: the suggested `.bdinfo` filename is based on the disc volume label. Empty or fully unsafe labels fall back to `BDINFO.bdinfo`.
+- **GUI export defaults**: text `.txt` is the default export. The suggested filename is based on the disc volume label; empty or fully unsafe labels fall back to `BDINFO.txt`.
 - **CLI export formats**: `txt`, `bdinfo` (Snapshot v2 compressed JSON), `bdinfo-json` (legacy JSON), and `bdinfo-xml` (legacy XML).
-- **GUI export formats today**: **XML `.bdinfo`**, **JSON `.bdinfo`**, **compressed XML `.bdinfo`**, **compressed JSON `.bdinfo`**, and **text `.txt`** are available from the export dialog.
+- **GUI export formats**: **text `.txt`**, **Snapshot v2 `.bdinfo`**, legacy **JSON `.json.bdinfo`**, and legacy **XML `.xml.bdinfo`** are available from the export dialog. Legacy JSON/XML also have compressed variants.
 - **Open/reload**: supported **only in the GUI**. Click **Load Report...** and select a previously saved `.bdinfo` file. BDInfo detects Snapshot v2 compressed JSON, legacy JSON/XML, and ZIP-compressed legacy `.bdinfo` reports.
 - **Use case**: scan once on a server/headless box, then send the `.bdinfo` to someone who can open it in the GUI and review details/charts without access to the disc.
 
@@ -122,7 +122,7 @@ Codex/agent operating rules live in [`AGENTS.md`](AGENTS.md). Pull requests shou
 1. Launch **BDInfo.exe**.
 2. Select a disc or BDMV folder to scan.
 3. Inspect playlists, streams, and bitrates.
-4. Click **Export Report…** in the report viewer to save the current legacy **XML `.bdinfo`**, **JSON `.bdinfo`**, compressed `.bdinfo`, or text `.txt`.
+4. Click **Export Report…** in the report viewer to save text `.txt`, Snapshot v2 `.bdinfo`, or explicit legacy JSON/XML snapshots.
 5. Later, click **Load Report...** to load a saved Snapshot v2, legacy XML/JSON, or compressed `.bdinfo` and review charts without rescanning.
 
 ### CLI (headless)
