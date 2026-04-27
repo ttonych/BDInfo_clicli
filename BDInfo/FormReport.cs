@@ -1159,18 +1159,19 @@ namespace BDInfo
                 return;
             }
 
-            string defaultName = ReportFileNameHelper.CreateGuiDefaultReportFileName(ReportBDROM.VolumeLabel);
+            string defaultName = ReportFileNameHelper.CreateGuiDefaultTextReportFileName(ReportBDROM.VolumeLabel);
 
             using (SaveFileDialog dialog = new SaveFileDialog())
             {
                 dialog.Filter = string.Join("|",
-                    "BDInfo Report (XML) (*.bdinfo)", "*.bdinfo",
-                    "BDInfo Report (JSON) (*.bdinfo)", "*.bdinfo",
-                    "BDInfo Report (XML, compressed) (*.bdinfo)", "*.bdinfo",
-                    "BDInfo Report (JSON, compressed) (*.bdinfo)", "*.bdinfo",
                     "BDInfo Report (Text) (*.txt)", "*.txt",
+                    "BDInfo Snapshot v2 (*.bdinfo)", "*.bdinfo",
+                    "BDInfo Report (legacy JSON) (*.json.bdinfo)", "*.json.bdinfo",
+                    "BDInfo Report (legacy JSON, compressed) (*.json.bdinfo)", "*.json.bdinfo",
+                    "BDInfo Report (legacy XML) (*.xml.bdinfo)", "*.xml.bdinfo",
+                    "BDInfo Report (legacy XML, compressed) (*.xml.bdinfo)", "*.xml.bdinfo",
                     "All files (*.*)", "*.*");
-                dialog.DefaultExt = "bdinfo";
+                dialog.DefaultExt = "txt";
                 dialog.FileName = defaultName;
 
                 if (dialog.ShowDialog(this) == DialogResult.OK)
@@ -1193,13 +1194,26 @@ namespace BDInfo
                             return;
                         }
 
-                        BDInfoReportSerializer.Save(
-                            exportOptions.FileName,
-                            ReportBDROM,
-                            ReportPlaylists,
-                            ReportScanResult,
-                            exportOptions.Format,
-                            exportOptions.Compress);
+                        if (exportOptions.IsSnapshot)
+                        {
+                            BDInfoReportSerializer.SaveSnapshotV2(
+                                exportOptions.FileName,
+                                ReportBDROM,
+                                ReportPlaylists,
+                                ReportScanResult,
+                                compress: true);
+                        }
+                        else
+                        {
+                            BDInfoReportSerializer.Save(
+                                exportOptions.FileName,
+                                ReportBDROM,
+                                ReportPlaylists,
+                                ReportScanResult,
+                                exportOptions.Format,
+                                exportOptions.Compress);
+                        }
+
                         MessageBox.Show(this,
                             "Report exported successfully.",
                             "BDInfo",

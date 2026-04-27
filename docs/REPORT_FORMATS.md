@@ -24,13 +24,13 @@ The `.bdinfo` file is an application snapshot, not a public stable API.
 Current user-visible behavior during the Snapshot v2 transition:
 - CLI `-r bdinfo` writes Snapshot v2 compressed JSON `.bdinfo`.
 - CLI `-r bdinfo-json` and `-r bdinfo-xml` write legacy proof-of-concept JSON/XML snapshots.
-- The GUI export dialog still exposes legacy XML/JSON snapshot options until the GUI follow-up is completed.
+- The GUI export dialog defaults to text, offers Snapshot v2 `.bdinfo`, and keeps legacy JSON/XML under explicit labels.
 - The GUI loader auto-detects Snapshot v2, JSON, XML, and ZIP-compressed `.bdinfo` files.
 
 Target policy:
 - The canonical snapshot format is compressed JSON `.bdinfo`.
 - CLI `-r bdinfo` means canonical compressed JSON `.bdinfo`.
-- GUI text export remains the default human-readable export.
+- GUI text export is the default human-readable export.
 - Raw JSON can remain available as a development/debug export.
 - XML is deprecated. Do not extend XML unless a specific compatibility need is identified.
 - Support for old proof-of-concept XML/JSON `.bdinfo` files is best effort only; do not block Snapshot v2 on preserving old POC shapes.

@@ -23,5 +23,10 @@ namespace BDInfo
         {
             return CreateSafeBaseName(volumeLabel, "BDINFO", "BDINFO") + ".bdinfo";
         }
+
+        public static string CreateGuiDefaultTextReportFileName(string volumeLabel)
+        {
+            return CreateSafeBaseName(volumeLabel, "BDINFO", "BDINFO") + ".txt";
+        }
     }
 }

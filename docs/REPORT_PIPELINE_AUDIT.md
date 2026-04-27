@@ -80,15 +80,16 @@ Files:
 - `BDInfo/GuiReportLoader.cs`
 
 Current behavior:
-- GUI export dialog first filter is XML `.bdinfo`.
-- GUI text export is filter 5, not the default.
-- GUI default extension is `.bdinfo`.
+- GUI export dialog first filter is text `.txt`.
+- GUI Snapshot v2 export is available as compressed JSON `.bdinfo`.
+- Legacy JSON/XML exports are available under explicit legacy labels and distinct `.json.bdinfo` / `.xml.bdinfo` suffixes.
+- GUI default extension is `.txt`.
 - GUI loader accepts any `.bdinfo`, then delegates format detection to `BDInfoReportSerializer.Load`.
 
-Policy gap:
-- Target policy says GUI default export should be text.
-- Snapshot export should still be available, but canonical Snapshot v2 should be compressed JSON.
-- XML export should be deprecated, hidden, or removed as a deliberate follow-up decision.
+Policy status:
+- GUI default export is text.
+- Snapshot export uses canonical Snapshot v2 compressed JSON.
+- XML remains visible only as an explicit legacy export.
 
 ### Charts
 
