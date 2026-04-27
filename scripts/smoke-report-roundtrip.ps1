@@ -97,6 +97,46 @@ function Write-CompressedReportFile($Report, [string] $Path, [string] $Format) {
     }
 }
 
+function Write-SnapshotV2FixtureFile($Report, [string] $Path) {
+    $directory = Split-Path -Parent $Path
+    if ($directory) {
+        New-Item -ItemType Directory -Force -Path $directory | Out-Null
+    }
+
+    if (Test-Path -LiteralPath $Path) {
+        Remove-Item -LiteralPath $Path -Force
+    }
+
+    $snapshot = New-Object BDInfo.Reporting.BDInfoSnapshotData
+    $snapshot.Format = [BDInfo.Reporting.BDInfoReportSerializer]::SnapshotFormat
+    $snapshot.SchemaVersion = [BDInfo.Reporting.BDInfoReportSerializer]::SnapshotSchemaVersion
+    $snapshot.PayloadKind = [BDInfo.Reporting.BDInfoReportSerializer]::SnapshotPayloadKind
+    $snapshot.CreatedBy = 'BDInfo_clicli smoke'
+    $snapshot.CreatedAt = '2026-01-01T00:00:00.0000000Z'
+    $snapshot.Payload = $Report
+
+    $archive = [IO.Compression.ZipFile]::Open($Path, [IO.Compression.ZipArchiveMode]::Create)
+    try {
+        $entry = $archive.CreateEntry('snapshot.json', [IO.Compression.CompressionLevel]::Optimal)
+        $entry.LastWriteTime = [DateTimeOffset]::Parse('2026-01-01T00:00:00Z')
+        $entryStream = $entry.Open()
+        try {
+            $settings = New-Object Runtime.Serialization.Json.DataContractJsonSerializerSettings
+            $settings.UseSimpleDictionaryFormat = $true
+            $serializer = New-Object Runtime.Serialization.Json.DataContractJsonSerializer(
+                [BDInfo.Reporting.BDInfoSnapshotData],
+                $settings)
+            $serializer.WriteObject($entryStream, $snapshot)
+        }
+        finally {
+            $entryStream.Dispose()
+        }
+    }
+    finally {
+        $archive.Dispose()
+    }
+}
+
 function New-SampleReport {
     $streamDataType = [BDInfo.Reporting.StreamData]
 
@@ -264,6 +304,7 @@ function Write-SampleFixtureSet($Report, [string] $Directory) {
     Write-ReportFile $Report (Join-Path $Directory 'sample-json.bdinfo') 'Json'
     Write-CompressedReportFile $Report (Join-Path $Directory 'sample-xml-compressed.bdinfo') 'Xml'
     Write-CompressedReportFile $Report (Join-Path $Directory 'sample-json-compressed.bdinfo') 'Json'
+    Write-SnapshotV2FixtureFile $Report (Join-Path $Directory 'sample-snapshot-v2.bdinfo')
 }
 
 function Test-ReportFixtureDirectory([string] $Directory) {
@@ -275,6 +316,10 @@ function Test-ReportFixtureDirectory([string] $Directory) {
     Assert-True (($files | Measure-Object).Count -gt 0) "No .bdinfo report fixtures were found in $Directory"
 
     foreach ($file in $files) {
+        if ($file.Name -eq 'sample-snapshot-v2.bdinfo') {
+            Test-SnapshotV2Archive $file.FullName
+        }
+
         Test-ReportLoad $file.FullName | Out-Null
     }
 }

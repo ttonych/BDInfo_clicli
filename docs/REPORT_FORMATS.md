@@ -21,10 +21,11 @@ Policy:
 
 The `.bdinfo` file is an application snapshot, not a public stable API.
 
-Current behavior before Snapshot v2:
-- XML `.bdinfo` and JSON `.bdinfo` can both be exported.
-- ZIP-compressed XML/JSON `.bdinfo` can both be exported.
-- The GUI loader auto-detects JSON, XML, and ZIP-compressed `.bdinfo` files.
+Current user-visible behavior during the Snapshot v2 transition:
+- XML `.bdinfo` and JSON `.bdinfo` can both be exported from the current CLI/GUI paths.
+- ZIP-compressed XML/JSON `.bdinfo` can both be exported from the current CLI/GUI paths.
+- Snapshot v2 compressed JSON is supported by the serializer/loader and covered by fixtures.
+- The GUI loader auto-detects Snapshot v2, JSON, XML, and ZIP-compressed `.bdinfo` files.
 
 Target policy:
 - The canonical snapshot format is compressed JSON `.bdinfo`.
@@ -40,7 +41,7 @@ Compression is a storage/container choice, not a separate data model.
 
 Policy:
 - Compressed and uncompressed snapshots must load to equivalent report data.
-- Compression is preferred for normal exchange/storage because raw XML/JSON snapshots are large.
+- Compression is preferred for normal exchange/storage because raw JSON snapshots are large.
 - Compression must not change report semantics.
 
 ### Charts

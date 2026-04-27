@@ -6,7 +6,7 @@
 BDInfo_clicli forks **https://github.com/UniqProject/BDInfo** (tag v0.7.6.2_1b https://github.com/UniqProject/BDInfo/releases/tag/v0.7.6.2_1b). UniqProject/BDInfo itself is not the original BDInfo—the original project is from CinemaSquid: http://www.cinemasquid.com/blu-ray/tools/bdinfo
 
 - **Export & reload .bdinfo reports** (export via **CLI** and **GUI**; open/reload in **GUI**)
-- **Report snapshots: JSON and XML today** (Snapshot v2 will make compressed JSON the canonical `.bdinfo` form; see [`docs/REPORT_FORMATS.md`](docs/REPORT_FORMATS.md))
+- **Report snapshots: legacy XML/JSON today, Snapshot v2 compressed JSON as the canonical direction** (see [`docs/REPORT_FORMATS.md`](docs/REPORT_FORMATS.md))
 - **HDR10+ carryover bug fix** in video stream metadata
 - A simple **command‑line (CLI) mode** for headless use
 
@@ -44,19 +44,19 @@ Options:
 
 ### 2) Export & reload reports (.bdinfo)
 You can now **export a BDInfo report to a single `.bdinfo` file** and later **open it in the GUI** to browse playlists, streams, and **see charts as if you just scanned the disc**.
-You can choose the **report format** when exporting: **JSON** or **XML**. The exported file uses the `.bdinfo` extension in both cases, and ZIP compression is optional. The GUI export dialog also supports a plain text report (`.txt`).
+Current CLI and GUI exports still expose the legacy proof-of-concept **JSON** and **XML** snapshot formats. Snapshot v2 support exists in the serializer/loader and is the canonical compressed JSON direction for follow-up CLI/GUI export changes. The GUI export dialog also supports a plain text report (`.txt`).
 
 - **Export locations**: available in **GUI** (button **“Export Report…”**) and in the **CLI** (use `-r` / `--report`).
 - **GUI export defaults**: the suggested `.bdinfo` filename is based on the disc volume label. Empty or fully unsafe labels fall back to `BDINFO.bdinfo`.
-- **GUI export formats**: **XML `.bdinfo`**, **JSON `.bdinfo`**, **compressed XML `.bdinfo`**, **compressed JSON `.bdinfo`**, and **text `.txt`** are available from the export dialog.
-- **Open/reload**: supported **only in the GUI**. Click **Load Report...** and select a previously saved `.bdinfo` file. BDInfo **automatically detects** JSON vs XML and also loads ZIP-compressed `.bdinfo` reports.
+- **GUI export formats today**: **XML `.bdinfo`**, **JSON `.bdinfo`**, **compressed XML `.bdinfo`**, **compressed JSON `.bdinfo`**, and **text `.txt`** are available from the export dialog.
+- **Open/reload**: supported **only in the GUI**. Click **Load Report...** and select a previously saved `.bdinfo` file. BDInfo detects Snapshot v2 compressed JSON, legacy JSON/XML, and ZIP-compressed legacy `.bdinfo` reports.
 - **Use case**: scan once on a server/headless box, then send the `.bdinfo` to someone who can open it in the GUI and review details/charts without access to the disc.
 
 Format direction:
 - Text `.txt` is the legacy human-readable report and should stay close to original BDInfo output.
 - `.bdinfo` is an application snapshot format, not a public stable API.
-- Compressed JSON is the target canonical `.bdinfo` snapshot format for Snapshot v2.
-- XML is proof-of-concept/deprecated and should not be extended without a specific compatibility need.
+- Snapshot v2 is versioned compressed JSON with a `snapshot.json` entry and explicit `format`, `schemaVersion`, and `payloadKind` markers.
+- Legacy XML/JSON `.bdinfo` export remains available during the transition, but XML is deprecated and should not be extended without a specific compatibility need.
 - Charts are derived visual artifacts, not the source of truth for reports.
 
 See [`docs/REPORT_FORMATS.md`](docs/REPORT_FORMATS.md) for the full policy.
@@ -120,8 +120,8 @@ Codex/agent operating rules live in [`AGENTS.md`](AGENTS.md). Pull requests shou
 1. Launch **BDInfo.exe**.
 2. Select a disc or BDMV folder to scan.
 3. Inspect playlists, streams, and bitrates.
-4. Click **Export Report…** in the report viewer to save as **XML `.bdinfo`**, **JSON `.bdinfo`**, compressed `.bdinfo`, or text `.txt`.
-5. Later, click **Load Report...** to load a saved XML, JSON, or compressed `.bdinfo` and review charts without rescanning.
+4. Click **Export Report…** in the report viewer to save the current legacy **XML `.bdinfo`**, **JSON `.bdinfo`**, compressed `.bdinfo`, or text `.txt`.
+5. Later, click **Load Report...** to load a saved Snapshot v2, legacy XML/JSON, or compressed `.bdinfo` and review charts without rescanning.
 
 ### CLI (headless)
 Common options:
