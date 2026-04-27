@@ -3,8 +3,8 @@ param(
     [string] $SourcePath = 'V:\',
     [string] $OutputPath = (Join-Path $PSScriptRoot '..\tmp_smoke_local'),
     [string] $Playlist = '00107',
-    [string] $PlainReportFormats = 'txt,bdinfo,bdinfo-json',
-    [string] $CompressedReportFormats = 'bdinfo,bdinfo-json',
+    [string] $PlainReportFormats = 'txt,bdinfo,bdinfo-json,bdinfo-xml',
+    [string] $CompressedReportFormats = 'bdinfo,bdinfo-json,bdinfo-xml',
     [string] $ChartFormat = 'jpg',
     [switch] $SkipCharts,
     [switch] $KeepOutput
@@ -33,15 +33,16 @@ function Assert-DirectoryExists([string] $Path, [string] $Description) {
 function Get-ExpectedReportPath([string] $Directory, [string] $Format, [bool] $Compressed) {
     $pattern = switch ($Format) {
         'txt' { '*.txt' }
-        'bdinfo' { if ($Compressed) { '*.bdinfo' } else { '*.bdinfo' } }
+        'bdinfo' { '*.bdinfo' }
         'bdinfo-json' { '*.json.bdinfo' }
+        'bdinfo-xml' { '*.xml.bdinfo' }
         default { throw "Unsupported report format in smoke script: $Format" }
     }
 
     $files = Get-ChildItem -LiteralPath $Directory -Filter $pattern -File -ErrorAction SilentlyContinue
 
     if ($Format -eq 'bdinfo') {
-        $files = $files | Where-Object { $_.Name -notlike '*.json.bdinfo' }
+        $files = $files | Where-Object { $_.Name -notlike '*.json.bdinfo' -and $_.Name -notlike '*.xml.bdinfo' }
     }
 
     $files | Select-Object -First 1
@@ -56,7 +57,7 @@ function Assert-ReportFormats([string] $Directory, [string] $Formats, [bool] $Co
             throw "Expected $format report was not created in $Directory."
         }
 
-        if ($Compressed -and $format -ne 'txt') {
+        if (($Compressed -and $format -ne 'txt') -or $format -eq 'bdinfo') {
             $stream = [IO.File]::OpenRead($file.FullName)
             try {
                 $first = $stream.ReadByte()

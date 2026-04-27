@@ -62,15 +62,15 @@ Files:
 
 Current behavior:
 - Default CLI report format is text.
-- `-r bdinfo` and `-r bdinfo-xml` mean XML `.bdinfo`.
-- `-r bdinfo-json` and `-r json` mean JSON `.bdinfo`.
-- `-z/--compress` controls compression for XML and JSON snapshot formats.
-- When XML and JSON are both requested, JSON gets `.json.bdinfo` to avoid overwriting XML `.bdinfo`.
+- `-r bdinfo` means Snapshot v2 compressed JSON `.bdinfo`.
+- `-r bdinfo-json` and `-r json` mean legacy JSON `.json.bdinfo`.
+- `-r bdinfo-xml` and `-r xml` mean legacy XML `.xml.bdinfo`.
+- `-z/--compress` controls compression for legacy XML and JSON snapshot formats; Snapshot v2 is always compressed.
+- Snapshot v2, legacy XML, and legacy JSON use distinct filenames when requested together.
 
-Policy gap:
-- Target policy says CLI `-r bdinfo` should mean canonical compressed JSON `.bdinfo`.
-- That means `ReportFormat.Bdinfo` should stop meaning XML once Snapshot v2 is implemented.
-- Compression should become the default for canonical `bdinfo`; raw JSON should be explicit debug/development output.
+Policy status:
+- CLI `bdinfo` now matches the canonical compressed JSON policy.
+- Raw JSON and XML remain explicit legacy/development exports.
 
 ### GUI Export And Load
 

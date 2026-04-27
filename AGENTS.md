@@ -93,7 +93,7 @@ Before finalizing a PR, verify:
 - GUI launch with no arguments still opens the GUI.
 - GUI launch with a single path argument still opens the GUI and loads that path/report.
 - CLI mode is entered only for explicit CLI usage, such as options or source plus destination.
-- Text, legacy XML `.bdinfo`, legacy JSON `.bdinfo`, compressed legacy `.bdinfo`, and Snapshot v2 `.bdinfo` paths do not overwrite each other unexpectedly.
+- Text, Snapshot v2 `bdinfo`, legacy `bdinfo-json`, legacy `bdinfo-xml`, and compressed legacy paths do not overwrite each other unexpectedly.
 - Exported `.bdinfo` files and committed Snapshot v2 fixtures load back into the GUI and can regenerate reports/charts without the original disc.
 - README/help text matches the actual CLI behavior.
 
