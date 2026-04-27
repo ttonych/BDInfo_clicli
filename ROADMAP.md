@@ -379,7 +379,7 @@ Done when:
 
 ### 19. Update Report Fixtures And Documentation
 
-Status: next.
+Status: done.
 
 Goal: make tests and user docs match Snapshot v2.
 
@@ -395,7 +395,7 @@ Done when:
 
 ### 20. Align CLI Snapshot Semantics
 
-Status: pending.
+Status: next.
 
 Goal: make CLI report format names match the Snapshot v2 policy.
 
