@@ -426,3 +426,110 @@ Done when:
 - GUI export default is text.
 - Snapshot export is still available.
 - User-visible behavior changes are called out in PR/release notes.
+
+## Post Snapshot v2 Stabilization
+
+This phase starts after Snapshot v2 is available from both CLI and GUI. The goal is to verify the user-visible workflows, prepare a maintenance release, and only then reduce snapshot payload size/noise with small, reversible changes.
+
+### 22. Manual GUI Snapshot v2 Smoke
+
+Status: next.
+
+Goal: verify the interactive GUI workflows that local CLI smoke cannot fully cover.
+
+Scope:
+- Launch the GUI with no arguments and confirm it opens normally.
+- Launch the GUI with a single disc/report path and confirm the GUI path still works.
+- Scan a real disc, export text `.txt`, Snapshot v2 `.bdinfo`, legacy JSON `.json.bdinfo`, and legacy XML `.xml.bdinfo`.
+- Load the exported Snapshot v2 `.bdinfo` back into the GUI and confirm playlists, streams, text report, and charts are usable without the original disc.
+- Record the disc ID, playlist ID, exported file names, and any visual/manual observations in PR notes.
+
+Done when:
+- GUI default export is visibly text `.txt`.
+- GUI Snapshot v2 export loads back and regenerates the report/chart views.
+- Legacy JSON/XML exports are still reachable under explicit legacy labels.
+
+### 23. Snapshot v2 Release Prep
+
+Status: pending.
+
+Goal: prepare the next maintenance release after the Snapshot v2 behavior changes.
+
+Scope:
+- Review README, `docs/REPORT_FORMATS.md`, `AGENTS.md`, and PR notes for release-note accuracy.
+- Confirm local build and required smoke scripts are green on `UHD_Support`.
+- Confirm GitHub Actions is green on the latest `UHD_Support`.
+- Choose the next release tag, expected to be `v0.7.6.2-clicli.3` unless a newer versioning decision is made.
+- Draft release notes that explicitly call out CLI/GUI report format behavior changes.
+
+Done when:
+- Release notes mention `-r bdinfo` now writes Snapshot v2 compressed JSON.
+- Release notes mention GUI export now defaults to text and offers Snapshot v2 `.bdinfo`.
+- The release checklist is ready for a tag push.
+
+### 24. Audit Snapshot DTO Payload
+
+Status: pending.
+
+Goal: decide what data Snapshot v2 should keep before removing or reshaping fields.
+
+Scope:
+- Audit `BDInfoReportData`, `BDROMData`, `PlaylistData`, `StreamFileData`, `StreamData`, and scan diagnostics.
+- Classify fields as required for text report regeneration, required for charts, useful metadata, legacy compatibility, or removable noise.
+- Pay special attention to local paths, stack traces, duplicated stream fields, and fields only meaningful during a live scan.
+- Document the decision before changing the DTO shape.
+
+Done when:
+- A payload audit document lists keep/remove/defer decisions.
+- Each proposed removal has a verification strategy.
+- Risky changes are split into separate follow-up PRs.
+
+### 25. Trim Snapshot Local/Machine Data
+
+Status: pending.
+
+Goal: remove the lowest-risk machine-specific data from normal Snapshot v2 output.
+
+Scope:
+- Avoid persisting temporary output paths and machine-specific cache paths in Snapshot v2.
+- Decide whether scan exception stack traces should be omitted, summarized, or kept only in debug/development exports.
+- Preserve enough source identity for users to understand what disc/report was scanned.
+- Keep legacy XML/JSON loader behavior best-effort and avoid broad compatibility work.
+
+Done when:
+- Snapshot v2 no longer stores clearly local-only data unless explicitly justified.
+- Round-trip smoke and committed fixtures are updated.
+- GUI load/report/chart behavior remains intact.
+
+### 26. Reduce Stream DTO Noise
+
+Status: pending.
+
+Goal: reduce broad flattened stream payloads only after the safer Snapshot v2 cleanup is stable.
+
+Scope:
+- Split common stream fields from video/audio/text/graphics-specific data where it materially reduces noise or mistakes.
+- Remove duplicated or unused fields only when report regeneration and chart generation do not need them.
+- Keep text report output unchanged unless a separate PR deliberately documents the text diff.
+- Measure fixture size before and after so the cleanup has evidence.
+
+Done when:
+- Snapshot v2 fixture size is reduced or the audit explains why it should not be.
+- Round-trip smoke covers the changed DTO shape.
+- Any old proof-of-concept XML/JSON compatibility loss is explicitly accepted or avoided.
+
+### 27. Tag Snapshot v2 Maintenance Release
+
+Status: pending.
+
+Goal: publish the Snapshot v2 behavior changes once verification is complete.
+
+Scope:
+- Tag the release after manual GUI smoke and release prep are complete.
+- Confirm the release workflow attaches `BDInfo_clicli.zip`.
+- Confirm generated release notes are accurate, then edit them if needed.
+
+Done when:
+- The tag exists on GitHub.
+- The GitHub release has `BDInfo_clicli.zip`.
+- Release notes link the Snapshot v2 PRs and list user-visible report/export changes.
