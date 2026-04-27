@@ -6,7 +6,7 @@
 BDInfo_clicli forks **https://github.com/UniqProject/BDInfo** (tag v0.7.6.2_1b https://github.com/UniqProject/BDInfo/releases/tag/v0.7.6.2_1b). UniqProject/BDInfo itself is not the original BDInfo—the original project is from CinemaSquid: http://www.cinemasquid.com/blu-ray/tools/bdinfo
 
 - **Export & reload .bdinfo reports** (export via **CLI** and **GUI**; open/reload in **GUI**)
-- **Report formats: JSON and XML** (the `.bdinfo` file can be either; format is auto‑detected; optional ZIP compression)
+- **Report snapshots: JSON and XML today** (Snapshot v2 will make compressed JSON the canonical `.bdinfo` form; see [`docs/REPORT_FORMATS.md`](docs/REPORT_FORMATS.md))
 - **HDR10+ carryover bug fix** in video stream metadata
 - A simple **command‑line (CLI) mode** for headless use
 
@@ -51,6 +51,15 @@ You can choose the **report format** when exporting: **JSON** or **XML**. The ex
 - **GUI export formats**: **XML `.bdinfo`**, **JSON `.bdinfo`**, **compressed XML `.bdinfo`**, **compressed JSON `.bdinfo`**, and **text `.txt`** are available from the export dialog.
 - **Open/reload**: supported **only in the GUI**. Click **Load Report...** and select a previously saved `.bdinfo` file. BDInfo **automatically detects** JSON vs XML and also loads ZIP-compressed `.bdinfo` reports.
 - **Use case**: scan once on a server/headless box, then send the `.bdinfo` to someone who can open it in the GUI and review details/charts without access to the disc.
+
+Format direction:
+- Text `.txt` is the legacy human-readable report and should stay close to original BDInfo output.
+- `.bdinfo` is an application snapshot format, not a public stable API.
+- Compressed JSON is the target canonical `.bdinfo` snapshot format for Snapshot v2.
+- XML is proof-of-concept/deprecated and should not be extended without a specific compatibility need.
+- Charts are derived visual artifacts, not the source of truth for reports.
+
+See [`docs/REPORT_FORMATS.md`](docs/REPORT_FORMATS.md) for the full policy.
 
 ---
 

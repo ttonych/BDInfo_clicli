@@ -2,6 +2,8 @@
 
 This repository is a long-lived personal fork of BDInfo. Treat it as a production tool even when changes are small: preserve GUI behavior, keep CLI behavior explicit, and verify report round-trips before shipping.
 
+Report format policy lives in `docs/REPORT_FORMATS.md`. In short: keep text reports close to original BDInfo unless fixing wrong output; call out every intentional text report change in PR/release notes; treat `.bdinfo` as an internal application snapshot format; target compressed JSON as the canonical Snapshot v2 format; treat XML as deprecated/best-effort proof-of-concept compatibility.
+
 ## Operating Rules
 
 - Work from a clean, named branch for every task. Use `codex/<short-task-name>` unless the user asks for another branch name.

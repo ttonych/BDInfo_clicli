@@ -320,3 +320,76 @@ Done when:
 Release:
 - [`v0.7.6.2-clicli.2`](https://github.com/ttonych/BDInfo_clicli/releases/tag/v0.7.6.2-clicli.2)
 - Includes `BDInfo_clicli.zip`.
+
+## Report Format Policy And Snapshot v2
+
+This phase defines the report/snapshot format direction before changing serializers. The text report remains the legacy user-facing output; `.bdinfo` becomes an internal application snapshot format with compressed JSON as the target canonical representation.
+
+### 16. Document Report Format Policy
+
+Status: next.
+
+Goal: make the format policy explicit so future code changes do not preserve accidental proof-of-concept behavior.
+
+Scope:
+- Document text report compatibility rules.
+- Document `.bdinfo` as an application snapshot, not a public stable API.
+- Document compressed JSON as the target canonical snapshot format.
+- Document XML as deprecated/best-effort proof-of-concept compatibility.
+- Document charts as derived visual artifacts, not report source of truth.
+
+Done when:
+- `docs/REPORT_FORMATS.md` exists.
+- README and `AGENTS.md` point to the policy.
+- Future PRs have clear rules for text report changes and snapshot changes.
+
+### 17. Audit Current Report Pipeline
+
+Status: pending.
+
+Goal: map current code to the new policy before refactoring.
+
+Scope:
+- Audit `BDInfo/Report/ReportModels.cs`.
+- Audit `BDInfo/Report/ReportSerializer.cs`.
+- Audit `BDInfo/CliReportWriter.cs`.
+- Audit `BDInfo/GuiReportLoader.cs`.
+- Audit GUI export selection and default behavior.
+
+Done when:
+- The current text-report path and snapshot path are documented.
+- Serializer drift and compatibility risks are listed.
+- Snapshot v2 implementation tasks are split into small PRs.
+
+### 18. Implement Snapshot v2 Envelope
+
+Status: pending.
+
+Goal: add an explicit snapshot envelope with schema/version metadata.
+
+Scope:
+- Add `format`, `schemaVersion`, `payloadKind`, `createdBy`, `createdAt`, and `payload`.
+- Make compressed JSON the canonical `.bdinfo` snapshot output.
+- Keep raw JSON as a development/debug export if useful.
+- Decide whether XML export remains visible, deprecated, or removed.
+
+Done when:
+- New `.bdinfo` files are versioned compressed JSON snapshots.
+- Loader identifies Snapshot v2 by envelope fields, not only extension.
+- Round-trip smoke covers Snapshot v2.
+
+### 19. Update Report Fixtures And Documentation
+
+Status: pending.
+
+Goal: make tests and user docs match Snapshot v2.
+
+Scope:
+- Regenerate or replace report round-trip fixtures.
+- Update README examples and format descriptions.
+- Update `AGENTS.md` verification notes if commands or expectations change.
+
+Done when:
+- CI validates Snapshot v2 round-trip.
+- README no longer presents XML and JSON snapshots as equally preferred future formats.
+- Any intentional text report output changes are separately documented.
