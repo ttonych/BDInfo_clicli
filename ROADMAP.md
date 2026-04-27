@@ -433,7 +433,7 @@ This phase starts after Snapshot v2 is available from both CLI and GUI. The goal
 
 ### 22. Manual GUI Snapshot v2 Smoke
 
-Status: next.
+Status: in progress.
 
 Goal: verify the interactive GUI workflows that local CLI smoke cannot fully cover.
 
@@ -448,6 +448,10 @@ Done when:
 - GUI default export is visibly text `.txt`.
 - GUI Snapshot v2 export loads back and regenerates the report/chart views.
 - Legacy JSON/XML exports are still reachable under explicit legacy labels.
+
+Progress:
+- Added `scripts/smoke-gui-launch.ps1` for no-argument and single Snapshot v2 `.bdinfo` GUI launch checks.
+- Added `docs/MANUAL_GUI_SMOKE.md` for the remaining visual export/load/chart checklist.
 
 ### 23. Snapshot v2 Release Prep
 

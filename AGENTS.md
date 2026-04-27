@@ -40,6 +40,14 @@ git diff --check
 & .\scripts\smoke-hdr10plus-carryover.ps1 -BuildOutputPath .\BDInfo\bin\Release
 ```
 
+For GUI launch/export work, also run:
+
+```powershell
+& .\scripts\smoke-gui-launch.ps1 -BuildOutputPath .\BDInfo\bin\Release
+```
+
+Use `docs/MANUAL_GUI_SMOKE.md` for the remaining visual export/load/chart checks.
+
 For CLI/report/export changes, also run a real-disc smoke when a decrypted BD root is available, for example `V:\`:
 
 ```powershell
