@@ -17,10 +17,14 @@ The default GitHub labels remain available for general triage.
 
 ## Current Issues
 
-- [#49 Harden PMT descriptor parsing and diagnostics](https://github.com/ttonych/BDInfo_clicli/issues/49)
-- [#50 Add defensive bounds checks for playlist chapter parsing](https://github.com/ttonych/BDInfo_clicli/issues/50)
+There are currently no open tracked issues.
 
-Both issues came from `docs/BDROM_TODO_AUDIT.md` and should be handled as small PRs into `UHD_Support`.
+Completed tracked issues:
+
+- [#49 Harden PMT descriptor parsing and diagnostics](https://github.com/ttonych/BDInfo_clicli/issues/49), closed by [#54](https://github.com/ttonych/BDInfo_clicli/pull/54).
+- [#50 Add defensive bounds checks for playlist chapter parsing](https://github.com/ttonych/BDInfo_clicli/issues/50), closed by [#53](https://github.com/ttonych/BDInfo_clicli/pull/53).
+
+The remaining parser backlog in `docs/BDROM_TODO_AUDIT.md` is sample-sensitive. Keep it in docs until there is a real disc, report mismatch, crash, or narrow automation task that makes the next action clear.
 
 ## Rules
 
