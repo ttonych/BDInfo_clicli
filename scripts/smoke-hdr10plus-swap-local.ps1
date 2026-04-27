@@ -5,7 +5,7 @@ param(
     [string] $OutputPath = (Join-Path $PSScriptRoot '..\tmp_smoke_hdr10plus_swap'),
     [string] $FirstPlaylist = '00800',
     [string] $SecondPlaylist,
-    [string] $ReportFormats = 'txt,bdinfo,bdinfo-json',
+    [string] $ReportFormats = 'txt,bdinfo,bdinfo-json,bdinfo-xml',
     [string] $SwapReadySignalPath,
     [string] $DiscReadySignalPath,
     [int] $DiscReadyPollSeconds = 2,
@@ -16,6 +16,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 function Resolve-FullPath([string] $Path) {
     $executionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
@@ -83,8 +84,47 @@ function Assert-DirectoryExists([string] $Path, [string] $Description) {
 }
 
 function Test-FileContainsHdr10Plus([string] $Path) {
-    $match = Select-String -LiteralPath $Path -SimpleMatch 'HDR10+' -List -ErrorAction SilentlyContinue
-    $null -ne $match
+    (Get-ReportSearchText $Path) -match 'HDR10\+'
+}
+
+function Get-ReportSearchText([string] $Path) {
+    $stream = [IO.File]::OpenRead($Path)
+    try {
+        $first = $stream.ReadByte()
+        $second = $stream.ReadByte()
+    }
+    finally {
+        $stream.Dispose()
+    }
+
+    if ($first -eq [byte][char]'P' -and $second -eq [byte][char]'K') {
+        $archive = [IO.Compression.ZipFile]::OpenRead($Path)
+        try {
+            $text = New-Object Text.StringBuilder
+            foreach ($entry in $archive.Entries) {
+                $entryStream = $entry.Open()
+                try {
+                    $reader = New-Object IO.StreamReader($entryStream, [Text.Encoding]::UTF8)
+                    try {
+                        [void] $text.AppendLine($reader.ReadToEnd())
+                    }
+                    finally {
+                        $reader.Dispose()
+                    }
+                }
+                finally {
+                    $entryStream.Dispose()
+                }
+            }
+
+            return $text.ToString()
+        }
+        finally {
+            $archive.Dispose()
+        }
+    }
+
+    Get-Content -LiteralPath $Path -Raw
 }
 
 function Get-ReportFile([string] $Directory, [string] $Format) {
@@ -92,13 +132,14 @@ function Get-ReportFile([string] $Directory, [string] $Format) {
         'txt' { '*.txt' }
         'bdinfo' { '*.bdinfo' }
         'bdinfo-json' { '*.json.bdinfo' }
+        'bdinfo-xml' { '*.xml.bdinfo' }
         default { throw "Unsupported report format in smoke script: $Format" }
     }
 
     $files = Get-ChildItem -LiteralPath $Directory -Filter $pattern -File -ErrorAction SilentlyContinue
 
     if ($Format -eq 'bdinfo') {
-        $files = $files | Where-Object { $_.Name -notlike '*.json.bdinfo' }
+        $files = $files | Where-Object { $_.Name -notlike '*.json.bdinfo' -and $_.Name -notlike '*.xml.bdinfo' }
     }
 
     $files | Select-Object -First 1

@@ -395,7 +395,7 @@ Done when:
 
 ### 20. Align CLI Snapshot Semantics
 
-Status: next.
+Status: done.
 
 Goal: make CLI report format names match the Snapshot v2 policy.
 
@@ -412,7 +412,7 @@ Done when:
 
 ### 21. Align GUI Export Semantics
 
-Status: pending.
+Status: next.
 
 Goal: make GUI export defaults match the Snapshot v2 policy.
 

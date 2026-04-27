@@ -36,18 +36,20 @@ Options:
   -w, --whole                Scan whole disc - every playlist.
   -v, --version              Print the version.
   -c, --charts[=FORMAT]      Save all charts as image (png by default; also jpg, bmp, gif, tiff).
-  -r, --report               Choose report formats (txt, bdinfo, bdinfo-json). Use commas for multiple.
-  -z, --compress             Compress generated .bdinfo reports using ZIP.
+  -r, --report               Choose report formats (txt, bdinfo, bdinfo-json, bdinfo-xml). Use commas for multiple.
+                             bdinfo writes Snapshot v2 compressed JSON; bdinfo-json/xml are legacy exports.
+  -z, --compress             Compress legacy bdinfo-json/bdinfo-xml reports using ZIP.
 ```
 
 ---
 
 ### 2) Export & reload reports (.bdinfo)
 You can now **export a BDInfo report to a single `.bdinfo` file** and later **open it in the GUI** to browse playlists, streams, and **see charts as if you just scanned the disc**.
-Current CLI and GUI exports still expose the legacy proof-of-concept **JSON** and **XML** snapshot formats. Snapshot v2 support exists in the serializer/loader and is the canonical compressed JSON direction for follow-up CLI/GUI export changes. The GUI export dialog also supports a plain text report (`.txt`).
+CLI `-r bdinfo` now writes Snapshot v2 compressed JSON. The legacy proof-of-concept **JSON** and **XML** snapshot formats remain available through explicit CLI format names and the current GUI export dialog. The GUI export dialog also supports a plain text report (`.txt`).
 
 - **Export locations**: available in **GUI** (button **“Export Report…”**) and in the **CLI** (use `-r` / `--report`).
 - **GUI export defaults**: the suggested `.bdinfo` filename is based on the disc volume label. Empty or fully unsafe labels fall back to `BDINFO.bdinfo`.
+- **CLI export formats**: `txt`, `bdinfo` (Snapshot v2 compressed JSON), `bdinfo-json` (legacy JSON), and `bdinfo-xml` (legacy XML).
 - **GUI export formats today**: **XML `.bdinfo`**, **JSON `.bdinfo`**, **compressed XML `.bdinfo`**, **compressed JSON `.bdinfo`**, and **text `.txt`** are available from the export dialog.
 - **Open/reload**: supported **only in the GUI**. Click **Load Report...** and select a previously saved `.bdinfo` file. BDInfo detects Snapshot v2 compressed JSON, legacy JSON/XML, and ZIP-compressed legacy `.bdinfo` reports.
 - **Use case**: scan once on a server/headless box, then send the `.bdinfo` to someone who can open it in the GUI and review details/charts without access to the disc.
@@ -128,9 +130,9 @@ Common options:
 - `-l, --list` – list playlists in `<BD_PATH>`
 - `-m, --mpls=VALUE` – comma‑separated playlist IDs to scan (e.g., `-m 800,801`)
 - `-w, --whole` – scan **all** playlists
-- `-r, --report` – choose report formats: `txt`, `bdinfo`, `bdinfo-json` (comma‑separate for multiple)
+- `-r, --report` – choose report formats: `txt`, `bdinfo`, `bdinfo-json`, `bdinfo-xml` (comma‑separate for multiple)
 - `-c, --charts[=FORMAT]` – save bitrate charts as images (default **png**; also `jpg`, `bmp`, `gif`, `tiff`)
-- `-z, --compress` – compress generated `.bdinfo` reports using ZIP
+- `-z, --compress` – compress legacy `bdinfo-json` / `bdinfo-xml` reports using ZIP; `bdinfo` is always compressed Snapshot v2
 
 ---
 

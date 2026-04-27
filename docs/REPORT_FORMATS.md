@@ -22,14 +22,14 @@ Policy:
 The `.bdinfo` file is an application snapshot, not a public stable API.
 
 Current user-visible behavior during the Snapshot v2 transition:
-- XML `.bdinfo` and JSON `.bdinfo` can both be exported from the current CLI/GUI paths.
-- ZIP-compressed XML/JSON `.bdinfo` can both be exported from the current CLI/GUI paths.
-- Snapshot v2 compressed JSON is supported by the serializer/loader and covered by fixtures.
+- CLI `-r bdinfo` writes Snapshot v2 compressed JSON `.bdinfo`.
+- CLI `-r bdinfo-json` and `-r bdinfo-xml` write legacy proof-of-concept JSON/XML snapshots.
+- The GUI export dialog still exposes legacy XML/JSON snapshot options until the GUI follow-up is completed.
 - The GUI loader auto-detects Snapshot v2, JSON, XML, and ZIP-compressed `.bdinfo` files.
 
 Target policy:
 - The canonical snapshot format is compressed JSON `.bdinfo`.
-- CLI `-r bdinfo` should mean canonical compressed JSON `.bdinfo`.
+- CLI `-r bdinfo` means canonical compressed JSON `.bdinfo`.
 - GUI text export remains the default human-readable export.
 - Raw JSON can remain available as a development/debug export.
 - XML is deprecated. Do not extend XML unless a specific compatibility need is identified.

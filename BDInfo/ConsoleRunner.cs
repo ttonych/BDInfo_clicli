@@ -1334,8 +1334,9 @@ namespace BDInfo
             Console.WriteLine("  -w, --whole                Scan whole disc - every playlist.");
             Console.WriteLine("  -v, --version              Print the version.");
             Console.WriteLine("  -c, --charts[=FORMAT]      Save all charts as image (png by default; also jpg, bmp, gif, tiff).");
-            Console.WriteLine("  -r, --report               Choose report formats (txt, bdinfo, bdinfo-json). Use commas for multiple.");
-            Console.WriteLine("  -z, --compress             Compress generated .bdinfo reports using ZIP.");
+            Console.WriteLine("  -r, --report               Choose report formats (txt, bdinfo, bdinfo-json, bdinfo-xml). Use commas for multiple.");
+            Console.WriteLine("                             bdinfo writes Snapshot v2 compressed JSON; bdinfo-json/xml are legacy exports.");
+            Console.WriteLine("  -z, --compress             Compress legacy bdinfo-json/bdinfo-xml reports using ZIP.");
         }
     }
 }

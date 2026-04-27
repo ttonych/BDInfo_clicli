@@ -9,7 +9,8 @@ namespace BDInfo
     {
         Text,
         Bdinfo,
-        BdinfoJson
+        BdinfoJson,
+        BdinfoXml
     }
 
     internal sealed class CliOptions
@@ -302,8 +303,10 @@ namespace BDInfo
                 case "text":
                     return ReportFormat.Text;
                 case "bdinfo":
-                case "bdinfo-xml":
                     return ReportFormat.Bdinfo;
+                case "bdinfo-xml":
+                case "xml":
+                    return ReportFormat.BdinfoXml;
                 case "bdinfo-json":
                 case "json":
                     return ReportFormat.BdinfoJson;

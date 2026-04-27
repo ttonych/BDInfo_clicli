@@ -46,6 +46,13 @@ namespace BDInfo
 
             if (formats.Contains(ReportFormat.Bdinfo))
             {
+                string reportPath = Path.Combine(destination, fileNames.SnapshotReportFileName);
+                BDInfoReportSerializer.SaveSnapshotV2(reportPath, bdrom, playlists, scanResult, compress: true);
+                writtenPaths.Add(reportPath);
+            }
+
+            if (formats.Contains(ReportFormat.BdinfoXml))
+            {
                 string reportPath = Path.Combine(destination, fileNames.XmlReportFileName);
                 BDInfoReportSerializer.Save(reportPath, bdrom, playlists, scanResult, BDInfoReportFormat.Xml, compress);
                 writtenPaths.Add(reportPath);
@@ -64,25 +71,26 @@ namespace BDInfo
             string sanitizedVolumeLabel = ReportFileNameHelper.CreateSafeBaseName(volumeLabel, "UNKNOWN", "BDINFO");
 
             string textFileName = ToolBox.GetSafeFileName(string.Format(CultureInfo.InvariantCulture, "BDINFO.{0}.txt", sanitizedVolumeLabel));
-            string xmlFileName = sanitizedVolumeLabel + ".bdinfo";
-            string jsonFileName = formats.Contains(ReportFormat.Bdinfo)
-                ? sanitizedVolumeLabel + ".json.bdinfo"
-                : sanitizedVolumeLabel + ".bdinfo";
+            string snapshotFileName = sanitizedVolumeLabel + ".bdinfo";
+            string xmlFileName = sanitizedVolumeLabel + ".xml.bdinfo";
+            string jsonFileName = sanitizedVolumeLabel + ".json.bdinfo";
 
-            return new CliReportFileNames(textFileName, xmlFileName, jsonFileName);
+            return new CliReportFileNames(textFileName, snapshotFileName, xmlFileName, jsonFileName);
         }
     }
 
     internal sealed class CliReportFileNames
     {
-        public CliReportFileNames(string textFileName, string xmlReportFileName, string jsonReportFileName)
+        public CliReportFileNames(string textFileName, string snapshotReportFileName, string xmlReportFileName, string jsonReportFileName)
         {
             TextFileName = textFileName;
+            SnapshotReportFileName = snapshotReportFileName;
             XmlReportFileName = xmlReportFileName;
             JsonReportFileName = jsonReportFileName;
         }
 
         public string TextFileName { get; private set; }
+        public string SnapshotReportFileName { get; private set; }
         public string XmlReportFileName { get; private set; }
         public string JsonReportFileName { get; private set; }
     }
