@@ -327,7 +327,7 @@ This phase defines the report/snapshot format direction before changing serializ
 
 ### 16. Document Report Format Policy
 
-Status: next.
+Status: done in [#59](https://github.com/ttonych/BDInfo_clicli/pull/59).
 
 Goal: make the format policy explicit so future code changes do not preserve accidental proof-of-concept behavior.
 
@@ -345,7 +345,7 @@ Done when:
 
 ### 17. Audit Current Report Pipeline
 
-Status: pending.
+Status: done in `docs/REPORT_PIPELINE_AUDIT.md`.
 
 Goal: map current code to the new policy before refactoring.
 
@@ -363,7 +363,7 @@ Done when:
 
 ### 18. Implement Snapshot v2 Envelope
 
-Status: pending.
+Status: next.
 
 Goal: add an explicit snapshot envelope with schema/version metadata.
 
@@ -393,3 +393,37 @@ Done when:
 - CI validates Snapshot v2 round-trip.
 - README no longer presents XML and JSON snapshots as equally preferred future formats.
 - Any intentional text report output changes are separately documented.
+
+### 20. Align CLI Snapshot Semantics
+
+Status: pending.
+
+Goal: make CLI report format names match the Snapshot v2 policy.
+
+Scope:
+- Change `-r bdinfo` to write canonical compressed JSON `.bdinfo`.
+- Keep raw JSON under an explicit development/debug format name.
+- Keep XML only under an explicit deprecated name if XML export remains available.
+- Update CLI help, README, smoke scripts, and PR/release notes.
+
+Done when:
+- CLI behavior matches `docs/REPORT_FORMATS.md`.
+- Existing text report behavior is unchanged unless separately documented.
+- Snapshot round-trip smoke covers canonical compressed JSON.
+
+### 21. Align GUI Export Semantics
+
+Status: pending.
+
+Goal: make GUI export defaults match the Snapshot v2 policy.
+
+Scope:
+- Make text `.txt` the default GUI export.
+- Make compressed JSON `.bdinfo` the preferred snapshot export.
+- Decide whether XML export is hidden, removed, or left as explicit deprecated export.
+- Update README and manual verification notes.
+
+Done when:
+- GUI export default is text.
+- Snapshot export is still available.
+- User-visible behavior changes are called out in PR/release notes.
