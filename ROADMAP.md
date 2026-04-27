@@ -363,24 +363,23 @@ Done when:
 
 ### 18. Implement Snapshot v2 Envelope
 
-Status: next.
+Status: done.
 
 Goal: add an explicit snapshot envelope with schema/version metadata.
 
 Scope:
 - Add `format`, `schemaVersion`, `payloadKind`, `createdBy`, `createdAt`, and `payload`.
-- Make compressed JSON the canonical `.bdinfo` snapshot output.
-- Keep raw JSON as a development/debug export if useful.
-- Decide whether XML export remains visible, deprecated, or removed.
+- Add a serializer entry point that writes compressed JSON Snapshot v2 archives.
+- Keep existing CLI and GUI defaults unchanged until their dedicated follow-up items.
 
 Done when:
-- New `.bdinfo` files are versioned compressed JSON snapshots.
+- Snapshot v2 archives are versioned compressed JSON with a deterministic `snapshot.json` entry.
 - Loader identifies Snapshot v2 by envelope fields, not only extension.
 - Round-trip smoke covers Snapshot v2.
 
 ### 19. Update Report Fixtures And Documentation
 
-Status: pending.
+Status: next.
 
 Goal: make tests and user docs match Snapshot v2.
 
