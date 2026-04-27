@@ -101,7 +101,7 @@ Before finalizing a PR, verify:
 - Fill in `.github/pull_request_template.md`.
 - Wait for GitHub Actions to pass before merging.
 - Dependabot is enabled for NuGet packages and GitHub Actions. Treat its PRs like normal code changes: review the diff, wait for CI, and merge only when the update is relevant.
-- Use tag pushes for releases. The build workflow attaches `BDInfo_clicli.zip` to tags matching `v*.*.*`.
+- Use tag pushes for releases. The build workflow attaches `BDInfo_clicli.zip` and asks GitHub to generate release notes for tags matching `v*.*.*`.
 - Suggested tag format for this fork: `v0.7.6.2-clicli.N`.
 
 Recommended GitHub repository settings:
